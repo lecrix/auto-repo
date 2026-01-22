@@ -1,10 +1,32 @@
-node_modules
-miniprogram_npm
+# General
 .DS_Store
-dist
+Thumbs.db
+*.log
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.env
+
+# WeChat Mini Program
+node_modules/
+miniprogram_npm/
+dist/
 project.private.config.json
 sitemap.json
 
+# Local History
 .history/
-__pycache__/
-*.pyc
