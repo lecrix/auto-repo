@@ -1,0 +1,127 @@
+.container {
+  padding: var(--spacing-lg);
+  padding-top: var(--nav-height); /* Standardized Top Padding */
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding: 0 var(--spacing-xs);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary-color);
+  letter-spacing: -1px;
+  text-shadow: 0 2px 10px rgba(44, 62, 80, 0.1);
+}
+
+.add-btn {
+  background: var(--primary-color);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 300;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.add-btn:active {
+  transform: scale(0.92);
+  box-shadow: var(--shadow-sm);
+}
+
+.repo-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.repo-card {
+  background: white;
+  padding: var(--spacing-lg);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); /* Softer, richer shadow */
+  border: 1px solid rgba(255,255,255,0.8);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+}
+
+.repo-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(149, 157, 165, 0.1);
+}
+
+/* Subtle decorative gradient on top of card */
+.repo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  opacity: 0.8;
+}
+
+.repo-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+.repo-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.branch {
+  background: #f0f7ff;
+  color: #0066cc; /* More premium blue */
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: 0.5px;
+}
+
+.mileage {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.repo-vin {
+  font-size: 11px;
+  color: #a0a0a0;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  letter-spacing: 1px;
+  display: block;
+  border-top: 1px solid #f5f5f5;
+  padding-top: var(--spacing-md);
+  word-break: break-all; /* Ensure full VIN wraps if needed */
+  text-transform: uppercase;
+}
+
+.loading {
+  text-align: center;
+  color: var(--text-light);
+  margin-top: var(--spacing-xl);
+}

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # 1. FastAPI Backend Service
+  backend:
+    build: .
+    ports:
+      - "8000:8000"          # Map local 8000 to container 8000
+    environment:
+      - MONGO_URL=mongodb://mongo:27017  # 'mongo' is the service name below
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app               # Hot-reload: sync local folder to container code
+
+  # 2. MongoDB Database Service
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"        # Expose DB to localhost (optional, but good for inspection)
+    volumes:
+      - mongo_data:/data/db  # Persist data even if container stops
+
+volumes:
+  mongo_data:

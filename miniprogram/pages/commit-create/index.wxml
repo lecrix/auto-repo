@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="page-header">
+    <view class="back-btn" bindtap="onCancel">❮</view>
+    <text class="page-title">提交整备记录</text>
+  </view>
+  
+  <view class="form-group">
+    <view class="label">标题</view>
+    <input class="input" placeholder="简短描述 (如: 更换机油)" data-field="title" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">类型</view>
+    <picker bindchange="onTypeChange" value="{{typeIndex}}" range="{{typeLabels}}">
+      <view class="picker">
+        {{typeLabels[typeIndex]}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <view class="label">当前里程 (km)</view>
+    <input class="input" type="number" placeholder="请输入当前里程" data-field="mileage" bindinput="onInput" />
+  </view>
+  
+  <view class="section-title">详情内容</view>
+
+  <view class="form-group">
+    <view class="label">详细描述</view>
+    <textarea class="textarea" placeholder="详细的施工内容、使用的零件品牌等..." data-field="message" bindinput="onInput" />
+  </view>
+
+  <view class="row">
+    <view class="form-group half">
+      <view class="label">配件费 (元)</view>
+      <input class="input" type="number" placeholder="0" data-field="cost_parts" bindinput="onInput" />
+    </view>
+    <view class="form-group half">
+      <view class="label">工时费 (元)</view>
+      <input class="input" type="number" placeholder="0" data-field="cost_labor" bindinput="onInput" />
+    </view>
+  </view>
+
+  <view class="btn-group">
+    <button class="submit-btn" bindtap="onSubmit">提交记录</button>
+  </view>
+</view>

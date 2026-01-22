@@ -4,3 +4,7 @@ miniprogram_npm
 dist
 project.private.config.json
 sitemap.json
+
+.history/
+__pycache__/
+*.pyc

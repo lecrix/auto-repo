@@ -1,0 +1,64 @@
+<view class="container">
+  <block wx:if="{{loading}}">
+    <view class="loading">加载中...</view>
+  </block>
+  
+  <block wx:else>
+    <!-- Header: Repo Info -->
+    <view class="repo-header">
+      <view class="repo-title">
+        <view class="title-row">
+            <view class="back-btn" bindtap="goBack">❮</view>
+            <text class="name">{{repo.name}}</text>
+        </view>
+        <text class="branch">⎇ {{repo.branch}}</text>
+      </view>
+      <view class="repo-stats">
+        <view class="stat-item">
+          <text class="label">当前里程</text>
+          <text class="value">{{repo.current_mileage}} km</text>
+        </view>
+        <view class="stat-item">
+          <text class="label">Head</text>
+          <text class="value hash">{{repo.current_head || 'Init'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Content: Commit Log -->
+    <view class="commit-log">
+      <view class="log-title">整备记录</view>
+      
+      <view class="commit-list">
+        <view class="commit-item" wx:for="{{commits}}" wx:key="_id">
+          <view class="commit-left">
+            <view class="commit-dot"></view>
+            <view class="commit-line"></view>
+          </view>
+          <view class="commit-content" bindtap="goToCommitDetail" data-id="{{item._id}}">
+            <view class="commit-header">
+              <text class="commit-title">{{item.title}}</text>
+              <text class="commit-miles">{{item.mileage}} km</text>
+            </view>
+            <view class="commit-meta">
+              <text class="commit-id">{{item._id}}</text>
+              <text class="commit-date">{{item.date}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="commit-item start-node">
+            <view class="commit-left">
+                <view class="commit-dot outline"></view>
+            </view>
+            <view class="commit-content">
+                <text class="commit-start">车辆档案建立 (Initialized)</text>
+            </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- FAB: Add Commit -->
+    <view class="fab-btn" bindtap="goToCommitCreate">+</view>
+  </block>
+</view>

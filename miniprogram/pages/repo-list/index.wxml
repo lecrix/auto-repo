@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">我的车库 🚗</text>
+    <view class="add-btn" bindtap="goToCreate">+</view>
+  </view>
+
+  <view class="repo-list">
+    <block wx:if="{{loading}}">
+      <view class="loading">加载中...</view>
+    </block>
+    
+    <block wx:else>
+      <view class="repo-card" wx:for="{{repos}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
+        <view class="repo-name">{{item.name}}</view>
+        <view class="repo-info">
+          <text class="branch">⎇ {{item.branch}}</text>
+          <text class="mileage">{{item.current_mileage}} km</text>
+        </view>
+        <view class="repo-vin">VIN: {{item.vin}}</view>
+      </view>
+    </block>
+  </view>
+</view>

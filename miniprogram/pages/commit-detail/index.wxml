@@ -1,0 +1,50 @@
+<view class="container">
+  <view class="page-header">
+    <view class="back-btn" bindtap="goBack">❮</view>
+    <text class="page-title">记录详情</text>
+  </view>
+
+  <view class="detail-card" wx:if="{{commit}}">
+    <view class="header-row">
+        <view class="title">{{commit.title}}</view>
+        <view class="type-tag">{{commit.type}}</view>
+    </view>
+    
+    <view class="info-row">
+        <text class="label">提交ID</text>
+        <text class="value code">{{commit._id}}</text>
+    </view>
+    
+     <view class="info-row">
+        <text class="label">里程节点</text>
+        <text class="value highlight">{{commit.mileage}} km</text>
+    </view>
+    
+    <view class="info-row">
+        <text class="label">日期</text>
+        <text class="value">{{commit.date}}</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="section-label">详细描述</view>
+    <view class="message-box">
+        {{commit.message || '无详细描述'}}
+    </view>
+
+    <view class="cost-section" wx:if="{{commit.cost}}">
+        <view class="cost-row">
+            <text>配件费</text>
+            <text>¥ {{commit.cost.parts}}</text>
+        </view>
+        <view class="cost-row">
+            <text>工时费</text>
+            <text>¥ {{commit.cost.labor}}</text>
+        </view>
+        <view class="total-row">
+            <text>总计</text>
+            <text class="total-price">¥ {{commit.cost.parts + commit.cost.labor}}</text>
+        </view>
+    </view>
+  </view>
+</view>

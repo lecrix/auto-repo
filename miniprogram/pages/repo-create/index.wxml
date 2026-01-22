@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="page-header">
+    <view class="back-btn" bindtap="goBack">❮</view>
+    <text class="page-title">新建车辆档案</text>
+  </view>
+
+  <view class="form-group">
+    <view class="label">车辆名称</view>
+    <input class="input" placeholder="请输入名称" data-field="name" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">VIN 码 (车架号)</view>
+    <input class="input" placeholder="请输入 VIN" data-field="vin" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">当前里程 (km)</view>
+    <input class="input" type="number" placeholder="0" data-field="current_mileage" bindinput="onInput" />
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit">初始化仓库</button>
+</view>
