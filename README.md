@@ -1,8 +1,18 @@
-# 🚗 AutoRepo
+<h1 align="center">🚗 AutoRepo</h1>
 
-> **Manage your vehicle maintenance like a Git repository.**
+<p align="center">
+  <strong>Manage your vehicle maintenance like a Git repository.</strong>
+</p>
 
-[![中文文档](https://img.shields.io/badge/Language-中文-red.svg)](README_ZH.md) ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Python](https://img.shields.io/badge/Backend-FastAPI-009688.svg) ![WeChat](https://img.shields.io/badge/Frontend-MiniProgram-07c160.svg)
+<p align="center">
+  <a href="./README_ZH.md">简体中文</a> | <strong>English</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688.svg" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Frontend-MiniProgram-07c160.svg" alt="WeChat">
+</p>
 
 **AutoRepo** is a geek-style vehicle lifecycle management tool. It borrows the concepts of **Git Version Control** to provide a structured, visualized way to track every "change" to your car.
 

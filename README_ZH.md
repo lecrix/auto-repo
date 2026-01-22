@@ -1,8 +1,18 @@
-# 🚗 AutoRepo
+<h1 align="center">🚗 AutoRepo</h1>
 
-> **像管理代码一样，管理您的爱车档案。**
+<p align="center">
+  <strong>像管理代码一样，管理您的爱车档案。</strong>
+</p>
 
-[![English](https://img.shields.io/badge/Language-English-blue.svg)](README.md) ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Python](https://img.shields.io/badge/Backend-FastAPI-009688.svg) ![WeChat](https://img.shields.io/badge/Frontend-MiniProgram-07c160.svg)
+<p align="center">
+  <strong>简体中文</strong> | <a href="./README.md">English</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688.svg" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Frontend-MiniProgram-07c160.svg" alt="WeChat">
+</p>
 
 **AutoRepo** 是一款极客风格的车辆全生命周期管理工具。它巧妙地借用了 **Git 版本控制** 的概念，为汽车爱好者提供了一种结构化、可视化的方式来记录和回溯车辆的每一次“改变”。
 
