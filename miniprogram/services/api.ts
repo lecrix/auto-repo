@@ -51,3 +51,19 @@ export const createCommit = (commit: any) => {
 export const getCommitDetail = (id: string) => {
     return request(`/commits/${id}`, 'GET');
 };
+
+export const getRepoStats = (repoId: string) => {
+    return request(`/repos/${repoId}/stats`, 'GET');
+};
+
+export const getIssues = (repoId: string, status?: string) => {
+    let url = `/repos/${repoId}/issues`;
+    if (status) {
+        url += `?status=${status}`;
+    }
+    return request(url, 'GET');
+};
+
+export const createIssue = (repoId: string, issue: any) => {
+    return request(`/repos/${repoId}/issues`, 'POST', issue);
+};

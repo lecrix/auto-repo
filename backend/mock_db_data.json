@@ -1,0 +1,70 @@
+{
+  "repos": [
+    {
+      "name": "晶锐",
+      "vin": "14654351",
+      "current_mileage": 36000,
+      "current_head": "更换轮胎",
+      "branch": "main",
+      "created_at": 1769089124375.3718,
+      "_id": "697228640d69d8b88ab1cbf6"
+    },
+    {
+      "name": "API Test Car",
+      "vin": null,
+      "current_mileage": 0,
+      "current_head": null,
+      "branch": "master",
+      "created_at": 1769089855446.089,
+      "_id": "69722b3f17e089b662113f67"
+    }
+  ],
+  "commits": [
+    {
+      "repo_id": "697228640d69d8b88ab1cbf6",
+      "title": "更换机油",
+      "message": "更换机油机滤",
+      "mileage": 35000,
+      "type": "repair",
+      "cost": {
+        "parts": 500.0,
+        "labor": 50.0,
+        "currency": "CNY"
+      },
+      "closes_issues": [],
+      "timestamp": 1769089165468.199,
+      "_id": "6972288d0d69d8b88ab1cbf7"
+    },
+    {
+      "repo_id": "697228640d69d8b88ab1cbf6",
+      "title": "更换轮胎",
+      "message": "",
+      "mileage": 36000,
+      "type": "modification",
+      "cost": {
+        "parts": 800.0,
+        "labor": 100.0,
+        "currency": "CNY"
+      },
+      "closes_issues": [],
+      "timestamp": 1769089312240.4622,
+      "_id": "697229200d69d8b88ab1cbf8"
+    }
+  ],
+  "issues": [
+    {
+      "repo_id": "697228640d69d8b88ab1cbf6",
+      "title": "更换刹车片",
+      "description": null,
+      "status": "open",
+      "priority": "high",
+      "labels": [],
+      "due_date": null,
+      "due_mileage": 60000,
+      "created_at": 1769091056870.695,
+      "closed_at": null,
+      "closed_by_commit_id": null,
+      "_id": "69722ff017e089b662113f68"
+    }
+  ]
+}

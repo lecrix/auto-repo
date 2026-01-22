@@ -6,11 +6,12 @@ Page({
     repo: null as any,
     commits: [] as any[],
     loading: true,
-    repoId: ''
+    repoId: '',
+    currentTab: 0
   },
 
   async onLoad(options: any) {
-    this.data.repoId = options.id
+    this.setData({ repoId: options.id })
   },
 
   async onShow() {
@@ -19,11 +20,11 @@ Page({
       getRepoDetail(this.data.repoId),
       getCommits(this.data.repoId)
     ])
-    
+
     // Format timestamps
     const formattedCommits = (commits as any[]).map(c => ({
-        ...c,
-        date: formatTime(new Date(c.timestamp))
+      ...c,
+      date: formatTime(new Date(c.timestamp))
     }))
 
     this.setData({
@@ -48,5 +49,10 @@ Page({
     wx.navigateTo({
       url: `/pages/commit-detail/index?commitId=${commitId}`
     })
+  },
+
+  switchTab(e: any) {
+    const index = e.currentTarget.dataset.index
+    this.setData({ currentTab: index })
   }
 })

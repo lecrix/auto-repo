@@ -7,6 +7,24 @@ class Cost(BaseModel):
     labor: float = 0
     currency: str = "CNY"
 
+class Issue(BaseModel):
+    id: Optional[str] = Field(alias="_id", default=None)
+    repo_id: str
+    title: str
+    description: Optional[str] = None
+    status: str = "open"          # "open", "closed"
+    priority: str = "medium"      # "high", "medium", "low"
+    labels: list[str] = []        # ["maintenance", "legal", "mod"]
+    
+    # Triggers (OR logic)
+    due_date: Optional[float] = None     # Timestamp
+    due_mileage: Optional[int] = None    # Target Km
+    
+    # Closing info
+    created_at: float = Field(default_factory=lambda: datetime.now().timestamp() * 1000)
+    closed_at: Optional[float] = None
+    closed_by_commit_id: Optional[str] = None
+
 class Commit(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     repo_id: str
@@ -15,6 +33,7 @@ class Commit(BaseModel):
     mileage: int
     type: str
     cost: Optional[Cost] = None
+    closes_issues: list[str] = []  # List of Issue IDs
     timestamp: float = Field(default_factory=lambda: datetime.now().timestamp() * 1000)
 
 class Repo(BaseModel):

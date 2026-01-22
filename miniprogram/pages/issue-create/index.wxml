@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="page-header">
+    <view class="back-btn" bindtap="onCancel">❮</view>
+    <text class="page-title">新建提醒 (Issue)</text>
+  </view>
+  
+  <view class="form-group">
+    <view class="label">标题</view>
+    <input class="input" placeholder="例如: 更换刹车片" data-field="title" bindinput="onInput" />
+  </view>
+
+  <view class="form-group">
+    <view class="label">优先级</view>
+    <picker bindchange="onPriorityChange" value="{{pIndex}}" range="{{pLabels}}">
+      <view class="picker">
+        {{pLabels[pIndex]}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="section-title">触发条件 (选填)</view>
+  
+  <view class="form-group">
+    <view class="label">目标里程 (km)</view>
+    <input class="input" type="number" placeholder="到达该里程时提醒" data-field="due_mileage" bindinput="onInput" />
+  </view>
+
+  <view class="btn-group">
+    <button class="submit-btn" bindtap="onSubmit">创建提醒</button>
+  </view>
+</view>

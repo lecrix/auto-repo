@@ -49,17 +49,20 @@
 *   Docker & Docker Compose
 *   WeChat Developer Tools
 
-### 1. Start the Backend
-```bash
-# Clone the repository
-git clone https://github.com/lecrix/auto-repo.git
-cd auto-repo
+### 1. Start the Backend (Local Mode)
+Since Docker might be unstable on some Windows environments, we recommend running locally with the built-in Mock Database (File-based).
 
-# Start services with Docker
-docker-compose up -d --build
+```bash
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run server
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
-The API server will run at `http://localhost:8000`.  
-Docs available at: `http://localhost:8000/docs`.
+*   The system will automatically use `MockDB` (saved to local JSON) if MongoDB is not detected.
+*   API docs: `http://localhost:8000/docs`.
 
 ### 2. Run the Frontend
 1. Open **WeChat Developer Tools**.
@@ -73,23 +76,28 @@ Docs available at: `http://localhost:8000/docs`.
 auto-repo/
 ├── backend/                # FastAPI Backend
 │   ├── main.py             # Entry point
-│   ├── models.py           # MongoDB Models (Pydantic)
+│   ├── mock_db.py          # Local File Database (New!)
+│   ├── models.py           # Data Models
 │   ├── routes.py           # API Routes
-│   ├── Dockerfile          # Backend Docker config
 │   └── ...
 ├── miniprogram/            # WeChat Mini Program Source
-│   ├── pages/              # UI Pages (repo-detail, commit-create, etc.)
+│   ├── pages/              # UI Pages
+│   │   ├── repo-detail/    # Detail View (Timeline + Insights)
+│   │   ├── issue-create/   # Issue Creation (New!)
+│   │   └── ...
 │   ├── components/         # Reusable Components
-│   ├── app.ts              # App Entry
+│   │   ├── insights-view/  # Data Viz & Tasks
+│   │   ├── dashboard-widget/ # High Priority Alerts
+│   │   └── ...
 │   └── ...
-└── docker-compose.yml      # Container Orchestration
+└── docker-compose.yml      # (Optional) Container Orchestration
 ```
 
 ## 🛣 Roadmap
 
 - [x] **Phase 1**: Core UI/UX implementation & Backend Integration
 - [ ] **Phase 2**: Cloud Deployment (WeChat Cloud Hosting)
-- [ ] **Phase 3**: Data Visualization & Charts
+- [x] **Phase 3**: Data Visualization, Costs & Task Management
 - [ ] **Phase 4**: Social Sharing Features
 
 ## 🤝 Contributing

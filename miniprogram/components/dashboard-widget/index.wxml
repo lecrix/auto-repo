@@ -1,0 +1,15 @@
+<view class="widget-container" wx:if="{{topIssue}}">
+  <view class="alert-card {{topIssue.priority}}">
+    <view class="icon-area">
+      <view class="icon-warning">!</view>
+    </view>
+    <view class="content-area">
+      <view class="title">Attention Needed</view>
+      <view class="message">{{topIssue.title}}</view>
+      <view class="meta" wx:if="{{topIssue.due_mileage}}">Due at {{topIssue.due_mileage}} km</view>
+    </view>
+    <view class="action-area">
+      <view class="btn-resolve">Handle</view>
+    </view>
+  </view>
+</view>

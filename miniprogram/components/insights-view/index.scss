@@ -1,0 +1,199 @@
+.insights-container {
+    padding: 24px;
+    background: #f8f9fa;
+}
+
+/* 1. Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.metric-card {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.metric-card.main {
+    background: #2c3e50;
+    /* Primary color */
+}
+
+.metric-card.main .label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.metric-card.main .value {
+    color: white;
+}
+
+.label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.unit {
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: 2px;
+}
+
+/* 2. Chart Section */
+.chart-section {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #333;
+    padding-left: 8px;
+    border-left: 4px solid #2c3e50;
+}
+
+/* Simple Chart Visualization */
+.simple-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.row-label {
+    width: 100px;
+    font-size: 13px;
+    color: #666;
+    text-align: right;
+}
+
+.row-bar-area {
+    flex: 1;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.row-bar {
+    height: 100%;
+    background: #3498db;
+    border-radius: 4px;
+}
+
+.row-val {
+    width: 60px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+.add-hint {
+    margin-top: 8px;
+    color: #3498db;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px;
+}
+
+/* Issues List */
+.issue-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.issue-left {
+    margin-right: 12px;
+}
+
+.issue-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+
+    &.high {
+        background: #e74c3c;
+        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+    }
+
+    &.medium {
+        background: #f39c12;
+    }
+
+    &.low {
+        background: #2ecc71;
+    }
+}
+
+.issue-content {
+    flex: 1;
+}
+
+.issue-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.issue-meta {
+    font-size: 11px;
+    color: #999;
+}
+
+.issue-action {
+    padding: 0 8px;
+}
+
+.btn-check {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 4px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 4px;
+}

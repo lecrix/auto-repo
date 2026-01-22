@@ -4,7 +4,7 @@
   </block>
   
   <block wx:else>
-    <!-- Header: Repo Info -->
+    <!-- Header: Repo Info (Keep consistent) -->
     <view class="repo-header">
       <view class="repo-title">
         <view class="title-row">
@@ -25,40 +25,60 @@
       </view>
     </view>
 
-    <!-- Content: Commit Log -->
-    <view class="commit-log">
-      <view class="log-title">整备记录</view>
-      
-      <view class="commit-list">
-        <view class="commit-item" wx:for="{{commits}}" wx:key="_id">
-          <view class="commit-left">
-            <view class="commit-dot"></view>
-            <view class="commit-line"></view>
-          </view>
-          <view class="commit-content" bindtap="goToCommitDetail" data-id="{{item._id}}">
-            <view class="commit-header">
-              <text class="commit-title">{{item.title}}</text>
-              <text class="commit-miles">{{item.mileage}} km</text>
-            </view>
-            <view class="commit-meta">
-              <text class="commit-id">{{item._id}}</text>
-              <text class="commit-date">{{item.date}}</text>
-            </view>
-          </view>
+    <!-- Tab Bar -->
+    <view class="tab-bar">
+        <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="{{0}}">
+            <text>Timeline</text>
         </view>
-        
-        <view class="commit-item start-node">
-            <view class="commit-left">
-                <view class="commit-dot outline"></view>
-            </view>
-            <view class="commit-content">
-                <text class="commit-start">车辆档案建立 (Initialized)</text>
-            </view>
+        <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="{{1}}">
+            <text>Insights</text>
         </view>
-      </view>
     </view>
 
-    <!-- FAB: Add Commit -->
-    <view class="fab-btn" bindtap="goToCommitCreate">+</view>
+    <!-- Tab 1: Timeline -->
+    <view class="tab-content" wx:if="{{currentTab === 0}}">
+        <!-- Dashboard Widget (High Priority Alerts) -->
+        <dashboard-widget repoId="{{repoId}}"></dashboard-widget>
+
+        <view class="commit-log">
+            <view class="log-title">整备记录</view>
+            
+            <view class="commit-list">
+                <view class="commit-item" wx:for="{{commits}}" wx:key="_id">
+                <view class="commit-left">
+                    <view class="commit-dot"></view>
+                    <view class="commit-line"></view>
+                </view>
+                <view class="commit-content" bindtap="goToCommitDetail" data-id="{{item._id}}">
+                    <view class="commit-header">
+                    <text class="commit-title">{{item.title}}</text>
+                    <text class="commit-miles">{{item.mileage}} km</text>
+                    </view>
+                    <view class="commit-meta">
+                    <text class="commit-id">{{item._id}}</text>
+                    <text class="commit-date">{{item.date}}</text>
+                    </view>
+                </view>
+                </view>
+                
+                <view class="commit-item start-node">
+                    <view class="commit-left">
+                        <view class="commit-dot outline"></view>
+                    </view>
+                    <view class="commit-content">
+                        <text class="commit-start">车辆档案建立 (Initialized)</text>
+                    </view>
+                </view>
+            </view>
+        </view>
+
+        <!-- FAB: Add Commit (Only in Timeline) -->
+        <view class="fab-btn" bindtap="goToCommitCreate">+</view>
+    </view>
+
+    <!-- Tab 2: Insights -->
+    <view class="tab-content" wx:if="{{currentTab === 1}}">
+        <insights-view repoId="{{repoId}}"></insights-view>
+    </view> 
   </block>
 </view>

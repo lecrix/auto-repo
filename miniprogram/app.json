@@ -5,8 +5,7 @@
     "pages/repo-detail/index",
     "pages/commit-create/index",
     "pages/commit-detail/index",
-    "pages/index/index",
-    "pages/logs/logs"
+    "pages/issue-create/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

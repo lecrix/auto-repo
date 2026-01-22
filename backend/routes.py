@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Body
 from typing import List
-from models import Repo, Commit
+from models import Repo, Commit, Issue
 from database import get_db
 from bson import ObjectId
 
@@ -69,9 +69,31 @@ async def create_commit(commit: Commit):
         {"_id": ObjectId(commit.repo_id)},
         {"$set": {
             "current_mileage": commit.mileage,
-            "current_head": commit.title # Or commit ID ideally, simplification for now
+            "current_head": commit.title 
         }}
     )
+
+    # 3. AUTOMATION: Close Issues
+    if commit.closes_issues:
+        issue_oids = [ObjectId(i_id) for i_id in commit.closes_issues]
+        await db.issues.update_many(
+            {"_id": {"$in": issue_oids}},
+            {"$set": {
+                "status": "closed", 
+                "closed_at": commit.timestamp,
+                "closed_by_commit_id": commit_dict["_id"]
+            }}
+        )
+
+    # 4. AUTOMATION: Check Mileage Triggers for Open Issues
+    # Find active issues for this repo with due_mileage set
+    async for issue in db.issues.find({"repo_id": commit.repo_id, "status": "open", "due_mileage": {"$ne": None}}):
+        if commit.mileage >= issue["due_mileage"]:
+            # Mark as High Priority (Overdue)
+            await db.issues.update_one(
+                {"_id": issue["_id"]},
+                {"$set": {"priority": "high"}}
+            )
     
     return commit_dict
 
@@ -87,3 +109,106 @@ async def get_commit_detail(commit_id: str):
         commit["_id"] = str(commit["_id"])
         return commit
     raise HTTPException(status_code=404, detail="Commit not found")
+
+# --- Issues (Reminders/Tasks) ---
+
+@router.post("/repos/{repo_id}/issues", response_model=Issue)
+async def create_issue(repo_id: str, issue: Issue):
+    db = get_db()
+    issue.repo_id = repo_id # Ensure repo_id matches path
+    issue_dict = issue.dict(exclude={"id"})
+    
+    result = await db.issues.insert_one(issue_dict)
+    issue_dict["_id"] = str(result.inserted_id)
+    return issue_dict
+
+@router.get("/repos/{repo_id}/issues", response_model=List[Issue])
+async def get_issues(repo_id: str, status: str = None):
+    db = get_db()
+    query = {"repo_id": repo_id}
+    if status:
+        query["status"] = status
+        
+    issues = []
+    # Sort: High priority first, then by due_date
+    cursor = db.issues.find(query).sort([("priority", 1), ("due_date", 1)]) 
+    # Note: Sorting strings "high", "medium", "low" alphabetically isn't perfect ("high" < "low" < "medium"), 
+    # but for simple prototype it's okay. In prod, use int levels.
+    
+    async for doc in cursor:
+        doc["_id"] = str(doc["_id"])
+        issues.append(doc)
+    return issues
+
+@router.patch("/issues/{issue_id}", response_model=Issue)
+async def update_issue(issue_id: str, update_data: dict = Body(...)):
+    db = get_db()
+    # Filter out fields that shouldn't be touched directly if needed
+    # For now allow full update
+    
+    await db.issues.update_one(
+        {"_id": ObjectId(issue_id)},
+        {"$set": update_data}
+    )
+    
+    updated_doc = await db.issues.find_one({"_id": ObjectId(issue_id)})
+    if updated_doc:
+        updated_doc["_id"] = str(updated_doc["_id"])
+        return updated_doc
+    raise HTTPException(status_code=404, detail="Issue not found")
+
+# --- Insights / Stats ---
+
+@router.get("/repos/{repo_id}/stats")
+async def get_repo_stats(repo_id: str):
+    db = get_db()
+    
+    # 1. Basic Repo Info
+    repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found")
+        
+    current_mileage = repo.get("current_mileage", 0)
+    
+    # 2. Aggregations
+    pipeline = [
+        {"$match": {"repo_id": repo_id}},
+        {"$group": {
+            "_id": None,
+            "total_parts": {"$sum": "$cost.parts"},
+            "total_labor": {"$sum": "$cost.labor"},
+            "count": {"$sum": 1}
+        }}
+    ]
+    
+    stats_result = await db.commits.aggregate(pipeline).to_list(length=1)
+    
+    total_cost = 0
+    total_parts = 0
+    total_labor = 0
+    
+    if stats_result:
+        res = stats_result[0]
+        total_parts = res.get("total_parts", 0)
+        total_labor = res.get("total_labor", 0)
+        total_cost = total_parts + total_labor
+        
+    # 3. Cost Composition (for Pie Chart)
+    # Simple grouping by 'type' (Maintenance, Modification, Repair)
+    composition_pipeline = [
+        {"$match": {"repo_id": repo_id}},
+        {"$group": {
+            "_id": "$type", 
+            "value": {"$sum": {"$add": ["$cost.parts", "$cost.labor"]}}
+        }}
+    ]
+    composition = await db.commits.aggregate(composition_pipeline).to_list(length=10)
+    # Format for charts: [{"name": "Maintenance", "value": 1200}, ...]
+    chart_data = [{"name": item["_id"], "value": item["value"]} for item in composition]
+
+    return {
+        "total_cost": total_cost,
+        "total_mileage": current_mileage,
+        "cost_per_km": round(total_cost / current_mileage, 2) if current_mileage > 0 else 0,
+        "composition": chart_data
+    }

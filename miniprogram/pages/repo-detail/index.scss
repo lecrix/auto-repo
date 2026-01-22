@@ -237,3 +237,40 @@
 .fab-btn:active {
   transform: scale(0.9);
 }
+
+// Tab Bar Styles
+.tab-bar {
+  display: flex;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0; // Or adjust based on header
+  z-index: 10;
+  margin-top: 1px;
+
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    
+    &.active {
+      color: #fff;
+      font-weight: bold;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 30%;
+        width: 40%;
+        height: 2px;
+        background: #007bff;
+        border-radius: 2px;
+      }
+    }
+  }
+}
