@@ -4,23 +4,55 @@
   </block>
   
   <block wx:else>
-    <!-- Header: Repo Info (Keep consistent) -->
+    <custom-nav showBack="{{true}}" />
+    
+    <!-- Header: Repo Info (Redesigned - Two Column Layout) -->
     <view class="repo-header">
-      <view class="repo-title">
-        <view class="title-row">
-            <view class="back-btn" bindtap="goBack">❮</view>
+      <!-- Top Row: Name + Edit -->
+      <view class="header-top">
+         <view class="title-row">
             <text class="name">{{repo.name}}</text>
+            <text class="edit-btn" bindtap="goToEdit">✎</text>
         </view>
-        <text class="branch">⎇ {{repo.branch}}</text>
       </view>
-      <view class="repo-stats">
-        <view class="stat-item">
-          <text class="label">当前里程</text>
-          <text class="value">{{repo.current_mileage}} km</text>
+
+      <!-- Two Column Layout -->
+      <view class="header-columns">
+        <!-- Left Column: Mileage & Register Date -->
+        <view class="header-left">
+          <view class="mileage-block">
+            <text class="mileage-value">{{repo.current_mileage}}</text>
+            <text class="mileage-unit">km</text>
+          </view>
+          <view class="register-info">
+            <view class="info-row">
+              <text class="info-label">注册日期：</text>
+              <text class="info-val">{{repo.formatted_register_date || '--'}}</text>
+            </view>
+            <view class="info-row">
+              <text class="info-label">车龄：</text>
+              <text class="info-val">{{repo.vehicle_age}}</text>
+            </view>
+          </view>
         </view>
-        <view class="stat-item">
-          <text class="label">Head</text>
-          <text class="value hash">{{repo.current_head || 'Init'}}</text>
+
+        <!-- Divider -->
+        <view class="header-divider"></view>
+
+        <!-- Right Column: Insurance & Inspection (Days Left) -->
+        <view class="header-right">
+          <view class="expiry-item">
+            <text class="expiry-label">车检</text>
+            <text class="expiry-val {{repo.inspection_warning ? 'warn' : ''}}">{{repo.inspection_days_left}}</text>
+          </view>
+          <view class="expiry-item">
+            <text class="expiry-label">交强险</text>
+            <text class="expiry-val {{repo.compulsory_warning ? 'warn' : ''}}">{{repo.compulsory_days_left}}</text>
+          </view>
+          <view class="expiry-item">
+            <text class="expiry-label">商业险</text>
+            <text class="expiry-val {{repo.commercial_warning ? 'warn' : ''}}">{{repo.commercial_days_left}}</text>
+          </view>
         </view>
       </view>
     </view>
@@ -28,10 +60,10 @@
     <!-- Tab Bar -->
     <view class="tab-bar">
         <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="{{0}}">
-            <text>Timeline</text>
+            <text>时间线</text>
         </view>
         <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="{{1}}">
-            <text>Insights</text>
+            <text>数据统计</text>
         </view>
     </view>
 

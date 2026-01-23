@@ -41,6 +41,49 @@ async def get_repo(repo_id: str):
         return repo
     raise HTTPException(status_code=404, detail="Repo not found")
 
+@router.put("/repos/{repo_id}")
+async def update_repo(repo_id: str, repo: Repo):
+    db = get_db()
+    # Retrieve existing to keep created_at content if needed
+    try:
+        existing = await db.repos.find_one({"_id": ObjectId(repo_id)})
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+        
+    if not existing:
+        raise HTTPException(status_code=404, detail="Repo not found")
+        
+    # We exclude 'id' and 'created_at' from update to preserve them
+    update_data = repo.dict(exclude_unset=True, exclude={"id", "created_at"})
+    
+    await db.repos.update_one(
+        {"_id": ObjectId(repo_id)},
+        {"$set": update_data}
+    )
+    return {"status": "updated", "id": repo_id}
+
+@router.delete("/repos/{repo_id}")
+async def delete_repo(repo_id: str):
+    db = get_db()
+    # 1. Check existence
+    try:
+        repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found")
+
+    # 2. Delete Repo
+    await db.repos.delete_one({"_id": ObjectId(repo_id)})
+
+    # 3. Delete associated Commits and Issues (Cascade Delete)
+    await db.commits.delete_many({"repo_id": repo_id})
+    await db.issues.delete_many({"repo_id": repo_id})
+
+    return {"status": "deleted", "id": repo_id}
+
+
 # --- Commits (Records) ---
 
 @router.get("/commits", response_model=List[Commit])
@@ -65,13 +108,16 @@ async def create_commit(commit: Commit):
     
     # 2. Update Repo HEAD automatically
     # Update current_mileage and current_head pointer on the Repo
-    await db.repos.update_one(
-        {"_id": ObjectId(commit.repo_id)},
-        {"$set": {
-            "current_mileage": commit.mileage,
-            "current_head": commit.title 
-        }}
-    )
+    # FIX: Only update if the new commit's mileage is greater than current (prevent rollback when backfilling)
+    current_repo = await db.repos.find_one({"_id": ObjectId(commit.repo_id)})
+    if current_repo and commit.mileage > current_repo.get("current_mileage", 0):
+        await db.repos.update_one(
+            {"_id": ObjectId(commit.repo_id)},
+            {"$set": {
+                "current_mileage": commit.mileage,
+                "current_head": commit.title
+            }}
+        )
 
     # 3. AUTOMATION: Close Issues
     if commit.closes_issues:
@@ -130,14 +176,18 @@ async def get_issues(repo_id: str, status: str = None):
         query["status"] = status
         
     issues = []
-    # Sort: High priority first, then by due_date
-    cursor = db.issues.find(query).sort([("priority", 1), ("due_date", 1)]) 
-    # Note: Sorting strings "high", "medium", "low" alphabetically isn't perfect ("high" < "low" < "medium"), 
-    # but for simple prototype it's okay. In prod, use int levels.
-    
+    # FIX: Sort in memory because alphabetical sort (high < low < medium) is incorrect
+    # We want: High -> Medium -> Low
+    cursor = db.issues.find(query)
+
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
         issues.append(doc)
+
+    # Custom sort priority
+    priority_map = {"high": 0, "medium": 1, "low": 2}
+    issues.sort(key=lambda x: (priority_map.get(x.get("priority"), 99), x.get("due_date") or float('inf')))
+
     return issues
 
 @router.patch("/issues/{issue_id}", response_model=Issue)

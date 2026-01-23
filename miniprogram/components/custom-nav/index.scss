@@ -1,0 +1,49 @@
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(245, 247, 250, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.title-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 20px;
+    /* Compact font size */
+    font-weight: 800;
+    /* Extra bold */
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    /* Tight tracking */
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Guangdong', 'Helvetica Neue', sans-serif;
+    pointer-events: auto;
+    /* Allow clicks */
+}
+
+.title-bar:active {
+    opacity: 0.6;
+}
+
+.left-actions {
+    position: absolute;
+    left: 10px;
+    padding-right: 20px;
+    /* Hit area */
+    display: flex;
+    align-items: center;
+    z-index: 10000;
+}
+
+.back-btn {
+    font-size: 20px;
+    padding: 0 12px;
+    color: var(--text-main);
+    font-weight: 600;
+    line-height: 1;
+}

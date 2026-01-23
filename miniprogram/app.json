@@ -1,4 +1,9 @@
 {
+  "usingComponents": {
+    "custom-nav": "/components/custom-nav/index",
+    "dashboard-widget": "/components/dashboard-widget/index",
+    "insights-view": "/components/insights-view/index"
+  },
   "pages": [
     "pages/repo-list/index",
     "pages/repo-create/index",

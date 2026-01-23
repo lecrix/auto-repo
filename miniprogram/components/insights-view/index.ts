@@ -54,6 +54,16 @@ Component({
             wx.navigateTo({
                 url: `/pages/issue-create/index?repoId=${this.properties.repoId}`
             })
+        },
+
+        onCompleteIssue(e: any) {
+            const issue = e.currentTarget.dataset.issue
+            const repoId = this.properties.repoId
+            if (issue && repoId) {
+                wx.navigateTo({
+                    url: `/pages/commit-create/index?repoId=${repoId}&closeIssueId=${issue._id}&closeIssueTitle=${encodeURIComponent(issue.title)}`
+                })
+            }
         }
     }
 })

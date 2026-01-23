@@ -40,7 +40,12 @@ class Repo(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     name: str
     vin: Optional[str] = None
+    color: str = "#2c3e50" # Default color
     current_mileage: int = 0
     current_head: Optional[str] = None
     branch: str = "main"
+    register_date: Optional[float] = None     # Registration timestamp
+    compulsory_insurance_expiry: Optional[float] = None  # Compulsory Insurance expiry
+    commercial_insurance_expiry: Optional[float] = None  # Commercial Insurance expiry
+    inspection_expiry: Optional[float] = None # Inspection expiry timestamp
     created_at: float = Field(default_factory=lambda: datetime.now().timestamp() * 1000)

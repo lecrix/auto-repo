@@ -5,21 +5,22 @@ services:
   backend:
     build: .
     ports:
-      - "8000:8000"          # Map local 8000 to container 8000
+      - "8001:8000" # Map local 8001 to container 8000
     environment:
-      - MONGO_URL=mongodb://mongo:27017  # 'mongo' is the service name below
+      - MONGO_URL=mongodb://mongo:27017 # 'mongo' is the service name below
     depends_on:
       - mongo
     volumes:
-      - .:/app               # Hot-reload: sync local folder to container code
+      - .:/app # Hot-reload: sync local folder to container code
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   # 2. MongoDB Database Service
   mongo:
     image: mongo:6.0
     ports:
-      - "27017:27017"        # Expose DB to localhost (optional, but good for inspection)
+      - "27017:27017" # Expose DB to localhost (optional, but good for inspection)
     volumes:
-      - mongo_data:/data/db  # Persist data even if container stops
+      - mongo_data:/data/db # Persist data even if container stops
 
 volumes:
   mongo_data:

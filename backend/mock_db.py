@@ -108,6 +108,34 @@ class MockCollection:
             count += 1
         if count > 0:
             self.db.save()
+
+    async def delete_one(self, query):
+        item = await self.find_one(query)
+        if item:
+            self.data = [d for d in self.data if d is not item]
+            self.db.save()
+            class Result:
+                deleted_count = 1
+            return Result()
+        class Result:
+            deleted_count = 0
+        return Result()
+
+    async def delete_many(self, query):
+        cursor = self.find(query)
+        items = await cursor.to_list()
+        ids_to_delete = set()
+        for item in items:
+            ids_to_delete.add(str(item.get("_id")))
+        original_count = len(self.data)
+        self.data = [d for d in self.data if str(d.get("_id")) not in ids_to_delete]
+        deleted_count = original_count - len(self.data)
+        if deleted_count > 0:
+            self.db.save()
+        class Result:
+            pass
+        Result.deleted_count = deleted_count
+        return Result()
     
     # Very basic aggregation for stats
     def aggregate(self, pipeline):

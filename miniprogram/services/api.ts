@@ -1,6 +1,6 @@
 // services/api.ts
 
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8001/api';
 
 const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any) => {
     return new Promise((resolve, reject) => {
@@ -36,9 +36,20 @@ export const createRepo = (repo: any) => {
     return request('/repos', 'POST', repo);
 };
 
+export const updateRepo = (id: string, data: any) => {
+    return request(`/repos/${id}`, 'PUT', data);
+};
+
+export const deleteRepo = (id: string) => {
+    return request(`/repos/${id}`, 'DELETE');
+};
+
 export const getRepoDetail = (id: string) => {
     return request(`/repos/${id}`, 'GET');
 };
+
+// Alias for compatibility
+export const getRepo = getRepoDetail;
 
 export const getCommits = (repoId: string) => {
     return request(`/commits?repo_id=${repoId}`, 'GET');

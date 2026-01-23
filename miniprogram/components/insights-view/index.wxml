@@ -1,24 +1,24 @@
 <view class="insights-container">
-  
+
   <!-- 1. Key Metrics Cards -->
   <view class="metrics-grid">
     <view class="metric-card main">
-      <view class="label">Total Cost</view>
+      <view class="label">总花费</view>
       <view class="value currency">¥{{stats.total_cost || 0}}</view>
     </view>
     <view class="metric-card">
-      <view class="label">Mileage</view>
+      <view class="label">总里程</view>
       <view class="value">{{stats.total_mileage || 0}}<text class="unit">km</text></view>
     </view>
     <view class="metric-card">
-      <view class="label">Cost/Km</view>
+      <view class="label">每公里成本</view>
       <view class="value">¥{{stats.cost_per_km || 0}}</view>
     </view>
   </view>
 
   <!-- 2. Charts Section -->
   <view class="chart-section">
-    <view class="section-title">Cost Composition</view>
+    <view class="section-title">费用构成</view>
     <view class="chart-container">
       <!-- TODO: Integrate uCharts here later -->
       <!-- For now, use simple bar list visualization -->
@@ -32,15 +32,15 @@
          </view>
       </view>
       <view class="empty-state" wx:else>
-        No data available
+        暂无数据
       </view>
     </view>
   </view>
-  
+
   <!-- 3. Upcoming Tasks (Issues) -->
   <view class="chart-section">
-    <view class="section-title">Upcoming Tasks</view>
-    
+    <view class="section-title">待办事项</view>
+
     <view class="issue-list" wx:if="{{issues && issues.length > 0}}">
         <view class="issue-item" wx:for="{{issues}}" wx:key="_id">
             <view class="issue-left">
@@ -49,19 +49,19 @@
             <view class="issue-content">
                 <view class="issue-title">{{item.title}}</view>
                 <view class="issue-meta">
-                    <text wx:if="{{item.due_mileage}}">Target: {{item.due_mileage}} km</text>
-                    <text wx:if="{{item.due_date}}">Due: {{item.due_date}}</text>
+                    <text wx:if="{{item.due_mileage}}">目标里程: {{item.due_mileage}} km</text>
+                    <text wx:if="{{item.due_date}}">截止日期: {{item.due_date}}</text>
                 </view>
             </view>
             <view class="issue-action">
-                <text class="btn-check">✓</text>
+                <text class="btn-check" bindtap="onCompleteIssue" data-issue="{{item}}">✓</text>
             </view>
         </view>
     </view>
 
     <view class="empty-state" wx:else>
-        No pending tasks.
-        <view class="add-hint" bindtap="goToAddIssue">+ Add a reminder</view> 
+        暂无待办事项
+        <view class="add-hint" bindtap="goToAddIssue">+ 添加提醒</view>
     </view>
   </view>
 

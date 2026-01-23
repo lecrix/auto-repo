@@ -1,0 +1,13 @@
+<view class="fixed-header" style="height: {{navHeight}}px;">
+  <!-- Back Button -->
+  <view class="left-actions" style="top: {{menuTop}}px; height: {{menuHeight}}px;" wx:if="{{showBack}}">
+     <view class="back-btn" bindtap="goBack">❮</view>
+  </view>
+
+  <!-- Title -->
+  <view class="title-bar" style="top: {{menuTop}}px; height: {{menuHeight}}px; line-height: {{menuHeight}}px;" bindtap="goHome">
+    AutoRepo
+  </view>
+</view>
+<!-- Spacer to occupy flow -->
+<view style="height: {{navHeight}}px; width: 100%;"></view>

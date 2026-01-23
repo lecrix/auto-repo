@@ -1,8 +1,5 @@
 <view class="container">
-  <view class="page-header">
-    <view class="back-btn" bindtap="onCancel">❮</view>
-    <text class="page-title">提交整备记录</text>
-  </view>
+  <custom-nav showBack="{{true}}" />
   
   <view class="form-group">
     <view class="label">标题</view>

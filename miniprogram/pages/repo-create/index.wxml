@@ -1,22 +1,94 @@
 <view class="container">
-  <view class="page-header">
-    <view class="back-btn" bindtap="goBack">❮</view>
-    <text class="page-title">新建车辆档案</text>
-  </view>
+  <custom-nav showBack="{{true}}" />
 
   <view class="form-group">
     <view class="label">车辆名称</view>
-    <input class="input" placeholder="请输入名称" data-field="name" bindinput="onInput" />
+    <input class="input" placeholder="请输入名称 (必填)" data-field="name" value="{{name}}" bindinput="onInput" />
   </view>
 
   <view class="form-group">
     <view class="label">VIN 码 (车架号)</view>
-    <input class="input" placeholder="请输入 VIN" data-field="vin" bindinput="onInput" />
+    <input class="input" placeholder="请输入 VIN (选填)" data-field="vin" value="{{vin}}" bindinput="onInput" />
   </view>
 
   <view class="form-group">
     <view class="label">当前里程 (km)</view>
-    <input class="input" type="number" placeholder="0" data-field="current_mileage" bindinput="onInput" />
+    <input class="input" type="number" placeholder="0" data-field="current_mileage" value="{{current_mileage}}" bindinput="onInput" />
+  </view>
+
+  <view class="section-title">车辆卡片外观</view>
+  <view class="form-group">
+    <view class="label">背景颜色</view>
+    <view class="color-picker">
+        <view
+            class="color-item {{color === item ? 'selected' : ''}}"
+            wx:for="{{presetColors}}"
+            wx:key="*this"
+            style="background: {{item}}"
+            bindtap="onColorSelect"
+            data-color="{{item}}"
+        >
+            <view class="check-mark" wx:if="{{color === item}}">✓</view>
+        </view>
+    </view>
+  </view>
+
+  <view class="section-title">重要日期 (选填)</view>
+
+  <view class="form-group">
+    <view class="label">注册登记日期</view>
+    <picker mode="date" bindchange="onDateChange" data-field="register_date">
+      <view class="picker {{register_date ? '' : 'placeholder'}}">
+        {{register_date || '请选择日期'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <view class="label">交强险生效日</view>
+    <picker mode="date" bindchange="onCompulsoryStart" data-field="compulsory_start">
+       <view class="picker {{compulsory_start ? '' : 'placeholder'}}">
+        {{compulsory_start || '请选择日期'}}
+      </view>
+    </picker>
+    <view class="auto-calc-info" wx:if="{{compulsory_insurance_expiry}}">
+        到期: {{compulsory_insurance_expiry}}
+        <text class="edit-link" bindtap="editDate" data-field="compulsory_insurance_expiry">修改</text>
+    </view>
+  </view>
+
+  <view class="form-group">
+    <view class="label">商业险生效日</view>
+    <picker mode="date" bindchange="onCommercialStart" data-field="commercial_start">
+       <view class="picker {{commercial_start ? '' : 'placeholder'}}">
+        {{commercial_start || '请选择日期'}}
+      </view>
+    </picker>
+    <view class="auto-calc-info" wx:if="{{commercial_insurance_expiry}}">
+        到期: {{commercial_insurance_expiry}}
+        <text class="edit-link" bindtap="editDate" data-field="commercial_insurance_expiry">修改</text>
+    </view>
+  </view>
+
+  <view class="form-group">
+    <view class="label">上次检车日</view>
+    <picker mode="date" bindchange="onInspectionStart" data-field="inspection_start">
+       <view class="picker {{inspection_start ? '' : 'placeholder'}}">
+        {{inspection_start || '请选择日期'}}
+      </view>
+    </picker>
+    <view class="auto-calc-info" wx:if="{{inspection_expiry}}">
+        有效期至: {{inspection_expiry}}
+        <text class="edit-link" bindtap="editDate" data-field="inspection_expiry">修改</text>
+    </view>
+  </view>
+
+  <!-- Only show this picker if explicitly editing expiry manually -->
+  <view class="form-group" wx:if="{{showManualExpiry}}">
+    <view class="label">手动修改到期日</view>
+    <picker mode="date" bindchange="onDateChange" data-field="{{editingField}}">
+        <view class="picker">选择日期</view>
+    </picker>
   </view>
 
   <button class="submit-btn" bindtap="onSubmit">初始化仓库</button>

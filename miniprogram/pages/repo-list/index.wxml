@@ -1,22 +1,35 @@
+<custom-nav />
+
 <view class="container">
-  <view class="header">
-    <text class="title">我的车库 🚗</text>
-    <view class="add-btn" bindtap="goToCreate">+</view>
-  </view>
 
   <view class="repo-list">
     <block wx:if="{{loading}}">
       <view class="loading">加载中...</view>
     </block>
-    
+
     <block wx:else>
-      <view class="repo-card" wx:for="{{repos}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
-        <view class="repo-name">{{item.name}}</view>
-        <view class="repo-info">
-          <text class="branch">⎇ {{item.branch}}</text>
-          <text class="mileage">{{item.current_mileage}} km</text>
+      <view class="card-wrapper" wx:for="{{repos}}" wx:key="_id">
+        <!-- Swipe Actions (Right side, revealed by swiping left) -->
+        <view class="swipe-actions">
+           <view class="action-btn edit" catchtap="editRepo" data-id="{{item._id}}">编辑</view>
+           <view class="action-btn delete" catchtap="deleteRepo" data-id="{{item._id}}" data-index="{{index}}">删除</view>
         </view>
-        <view class="repo-vin">VIN: {{item.vin}}</view>
+
+        <view class="repo-card" style="background: {{item.color || '#2c3e50'}}; transform: translateX({{item.offsetX || 0}}px)" bindtap="goToDetail" data-id="{{item._id}}" data-index="{{index}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+          <view class="card-content">
+            <view class="repo-name">{{item.name}}</view>
+            <view class="repo-info">
+              <text class="mileage">{{item.current_mileage}} km</text>
+              <text class="vehicle-age" wx:if="{{item.vehicle_age}}">{{item.vehicle_age}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Add Button Below Cards -->
+      <view class="add-card" bindtap="goToCreate">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加车辆</text>
       </view>
     </block>
   </view>

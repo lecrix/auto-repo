@@ -1,19 +1,139 @@
 .container {
   padding-bottom: 100px;
-  padding-top: var(--nav-height); /* Restore standard spacing */
+  /* padding-top removed (handled by custom-nav spacer) */
   background: var(--bg-color);
   min-height: 100vh;
 }
 
 .repo-header {
-  background: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1a252f 100%);
   color: white;
-  margin: 0 var(--spacing-md) 0; /* Floating card with side margins */
-  padding: var(--spacing-lg);
-  border-radius: 24px;
+  margin: 12px var(--spacing-md) 0;
+  /* Add 12px top spacing */
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: 20px;
   box-shadow: 0 8px 20px rgba(44, 62, 80, 0.25);
   position: relative;
   overflow: hidden;
+}
+
+.header-top {
+  margin-bottom: var(--spacing-sm);
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Two Column Layout */
+.header-columns {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.header-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mileage-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.mileage-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mileage-unit {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.register-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.register-info .info-row {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.register-info .info-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.register-info .info-val {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-divider {
+  width: 1px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 var(--spacing-sm);
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.expiry-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.expiry-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.expiry-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+.expiry-val.warn {
+  color: #ff6b6b;
+  animation: pulse-warn 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-warn {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .repo-title {
@@ -23,33 +143,44 @@
   margin-bottom: var(--spacing-lg);
 }
 
-.title-row {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
 .back-btn {
-    font-size: 24px;
-    padding: 4px 8px;
-    margin-left: -8px; /* Negative margin to align with edge */
-    cursor: pointer;
-    opacity: 0.8;
+  font-size: 24px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  /* Negative margin to align with edge */
+  cursor: pointer;
+  opacity: 0.8;
 }
 
 .back-btn:active {
-    opacity: 0.5;
+  opacity: 0.5;
+}
+
+.edit-btn {
+  font-size: 18px;
+  padding: 4px 8px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+.edit-btn:active {
+  opacity: 0.6;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .name {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  font-family: var(--font-family); /* Ensure global font */
+  font-family: var(--font-family);
+  /* Ensure global font */
 }
 
 .branch {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   padding: 4px 10px;
   border-radius: 8px;
@@ -57,7 +188,8 @@
   font-weight: 600;
   display: flex;
   align-items: center;
-  font-family: 'SF Mono', 'Roboto Mono', monospace; /* Monospace for branch */
+  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  /* Monospace for branch */
 }
 
 .repo-stats {
@@ -72,7 +204,7 @@
 
 .label {
   font-size: 11px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -80,14 +212,16 @@
 }
 
 .value {
-  font-size: 22px; /* Larger number */
+  font-size: 22px;
+  /* Larger number */
   font-weight: 700;
-  font-variant-numeric: tabular-nums; /* Better number alignment */
+  font-variant-numeric: tabular-nums;
+  /* Better number alignment */
 }
 
 .hash {
   font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   padding: 2px 8px;
   border-radius: 6px;
   font-size: 14px;
@@ -96,7 +230,8 @@
 
 .commit-log {
   padding: 0 var(--spacing-lg);
-  margin-top: var(--spacing-lg); /* Ensure positive gap */
+  margin-top: var(--spacing-lg);
+  /* Ensure positive gap */
 }
 
 .log-title {
@@ -104,8 +239,10 @@
   font-weight: 700;
   margin-bottom: var(--spacing-lg);
   color: var(--text-main);
-  background: var(--bg-color); /* Match page bg for cutout look if needed, or just let it float */
-  display: none; /* Hide title for cleaner look, or style it distinctly */
+  background: var(--bg-color);
+  /* Match page bg for cutout look if needed, or just let it float */
+  display: none;
+  /* Hide title for cleaner look, or style it distinctly */
 }
 
 .commit-list {
@@ -125,7 +262,8 @@
   flex-direction: column;
   align-items: center;
   margin-right: var(--spacing-md);
-  padding-top: 6px; /* Align dot with title */
+  padding-top: 6px;
+  /* Align dot with title */
 }
 
 .commit-dot {
@@ -134,7 +272,8 @@
   background: var(--success-color);
   border-radius: 50%;
   z-index: 2;
-  box-shadow: 0 0 0 4px var(--bg-color); /* Cutout effect */
+  box-shadow: 0 0 0 4px var(--bg-color);
+  /* Cutout effect */
 }
 
 .commit-dot.outline {
@@ -149,7 +288,8 @@
   background: #e0e0e0;
   flex: 1;
   min-height: 40px;
-  margin-top: -2px; /* Connect to dot */
+  margin-top: -2px;
+  /* Connect to dot */
   margin-bottom: -2px;
 }
 
@@ -164,7 +304,7 @@
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   margin-bottom: var(--spacing-lg);
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
 }
 
@@ -203,17 +343,17 @@
 }
 
 .start-node .commit-content {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    padding: var(--spacing-xs) 0;
-    opacity: 0.6;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: var(--spacing-xs) 0;
+  opacity: 0.6;
 }
 
 .commit-start {
-    color: var(--text-light);
-    font-size: 14px;
-    font-style: italic;
+  color: var(--text-light);
+  font-size: 14px;
+  font-style: italic;
 }
 
 .fab-btn {
@@ -241,8 +381,9 @@
 // Tab Bar Styles
 .tab-bar {
   display: flex;
-  background: #1e1e1e;
-  border-bottom: 1px solid #333;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0; // Or adjust based on header
   z-index: 10;
@@ -252,15 +393,15 @@
     flex: 1;
     text-align: center;
     padding: 12px 0;
-    color: #888;
+    color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
     position: relative;
-    
+
     &.active {
-      color: #fff;
+      color: var(--primary-color);
       font-weight: bold;
-      
+
       &::after {
         content: '';
         position: absolute;
@@ -268,7 +409,7 @@
         left: 30%;
         width: 40%;
         height: 2px;
-        background: #007bff;
+        background: var(--primary-color);
         border-radius: 2px;
       }
     }
