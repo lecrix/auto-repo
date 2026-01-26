@@ -1,0 +1,9 @@
+[tool.basedpyright]
+typeCheckingMode = "standard"
+reportImplicitRelativeImport = false
+reportExplicitAny = false
+
+[tool.pyright]
+typeCheckingMode = "standard"
+reportImplicitRelativeImport = false
+reportExplicitAny = false

@@ -1,6 +1,7 @@
 <view class="container">
+  <!-- Skeleton Loading -->
   <block wx:if="{{loading}}">
-    <view class="loading">加载中...</view>
+    <skeleton-loader type="detail" />
   </block>
   
   <block wx:else>

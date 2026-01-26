@@ -1,0 +1,46 @@
+<view class="skeleton-container" wx:if="{{loading}}">
+  <block wx:if="{{type === 'card'}}">
+    <view class="skeleton-card" wx:for="{{count}}" wx:key="index">
+      <view class="skeleton-header">
+        <view class="skeleton-avatar shimmer"></view>
+        <view class="skeleton-title-group">
+          <view class="skeleton-title shimmer"></view>
+          <view class="skeleton-subtitle shimmer"></view>
+        </view>
+      </view>
+      <view class="skeleton-body">
+        <view class="skeleton-line shimmer"></view>
+        <view class="skeleton-line short shimmer"></view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:elif="{{type === 'list'}}">
+    <view class="skeleton-list-item" wx:for="{{count}}" wx:key="index">
+      <view class="skeleton-icon shimmer"></view>
+      <view class="skeleton-content">
+        <view class="skeleton-title shimmer"></view>
+        <view class="skeleton-subtitle shimmer"></view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:elif="{{type === 'detail'}}">
+    <view class="skeleton-detail">
+      <view class="skeleton-hero shimmer"></view>
+      <view class="skeleton-stats">
+        <view class="skeleton-stat-box shimmer"></view>
+        <view class="skeleton-stat-box shimmer"></view>
+        <view class="skeleton-stat-box shimmer"></view>
+      </view>
+      <view class="skeleton-section">
+        <view class="skeleton-title shimmer"></view>
+        <view class="skeleton-list-item shimmer"></view>
+        <view class="skeleton-list-item shimmer"></view>
+        <view class="skeleton-list-item shimmer"></view>
+      </view>
+    </view>
+  </block>
+</view>
+
+<slot wx:else></slot>

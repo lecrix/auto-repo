@@ -31,3 +31,8 @@ sitemap.json
 
 # Local History
 .history/
+
+# AI/Agent tools
+.agent/
+.opencode/
+

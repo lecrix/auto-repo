@@ -13,14 +13,14 @@ page {
   --text-light: #bdc3c7;
 
   /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 32rpx;
+  --spacing-lg: 48rpx;
+  --spacing-xl: 64rpx;
   
   /* Navigation Bar Height (Status Bar + Nav Bar) */
-  --nav-height: 88px;
+  --nav-height: 176rpx;
 
   /* Shadows (Glassmorphism / Elevation) */
   --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
@@ -45,7 +45,7 @@ page {
 /* Common Utility Classes */
 .card {
   background: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 24rpx;
   box-shadow: var(--shadow-small);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
@@ -54,8 +54,8 @@ page {
 .btn-primary {
   background: var(--primary-color);
   color: white;
-  border-radius: 20px;
-  padding: 10px 20px;
+  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
   font-weight: 600;
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;

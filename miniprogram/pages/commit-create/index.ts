@@ -42,25 +42,35 @@ Page({
 
     wx.showLoading({ title: '提交 Commit...' })
     
-    await createCommit({
-        repo_id: repoId,
-        title,
-        message,
-        mileage: Number(mileage),
-        type,
-        cost: {
-            parts: Number(cost_parts) || 0,
-            labor: Number(cost_labor) || 0,
-            currency: 'CNY'
-        }
-    })
+    try {
+      await createCommit({
+          repo_id: repoId,
+          title,
+          message,
+          mileage: Number(mileage),
+          type,
+          cost: {
+              parts: Number(cost_parts) || 0,
+              labor: Number(cost_labor) || 0,
+              currency: 'CNY'
+          }
+      })
 
-    wx.hideLoading()
-    wx.showToast({ title: '提交成功', icon: 'success' })
+      wx.showToast({ title: '提交成功', icon: 'success' })
 
-    setTimeout(() => {
-        wx.navigateBack()
-    }, 1500)
+      setTimeout(() => {
+          wx.navigateBack()
+      }, 1500)
+    } catch (err: any) {
+      console.error('Failed to create commit:', err)
+      wx.showToast({
+        title: err.message || '创建失败',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   onCancel() {

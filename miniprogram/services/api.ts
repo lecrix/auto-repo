@@ -15,14 +15,19 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
                 if (res.statusCode >= 200 && res.statusCode < 300) {
                     resolve(res.data);
                 } else {
-                    wx.showToast({ title: '请求失败', icon: 'none' });
-                    reject(res);
+                    const detail = res.data && res.data.detail;
+                    let errorMsg = '请求失败';
+                    if (typeof detail === 'string') {
+                        errorMsg = detail;
+                    } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+                        errorMsg = detail[0].msg;
+                    }
+                    reject(new Error(errorMsg));
                 }
             },
             fail: (err) => {
-                wx.showToast({ title: '网络错误', icon: 'none' });
                 console.error('API Error:', err);
-                reject(err);
+                reject(new Error('网络错误'));
             }
         });
     });

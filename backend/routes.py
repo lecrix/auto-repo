@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Body
-from typing import List
+from typing import List, Optional, Dict, Any
 from models import Repo, Commit, Issue
 from database import get_db
 from bson import ObjectId
@@ -33,7 +33,7 @@ async def get_repo(repo_id: str):
     db = get_db()
     try:
         repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
-    except:
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ID format")
         
     if repo:
@@ -47,7 +47,7 @@ async def update_repo(repo_id: str, repo: Repo):
     # Retrieve existing to keep created_at content if needed
     try:
         existing = await db.repos.find_one({"_id": ObjectId(repo_id)})
-    except:
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ID")
         
     if not existing:
@@ -68,7 +68,7 @@ async def delete_repo(repo_id: str):
     # 1. Check existence
     try:
         repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
-    except:
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ID")
 
     if not repo:
@@ -132,14 +132,15 @@ async def create_commit(commit: Commit):
         )
 
     # 4. AUTOMATION: Check Mileage Triggers for Open Issues
-    # Find active issues for this repo with due_mileage set
-    async for issue in db.issues.find({"repo_id": commit.repo_id, "status": "open", "due_mileage": {"$ne": None}}):
-        if commit.mileage >= issue["due_mileage"]:
-            # Mark as High Priority (Overdue)
-            await db.issues.update_one(
-                {"_id": issue["_id"]},
-                {"$set": {"priority": "high"}}
-            )
+    # Find and mark all issues that should be high priority in ONE bulk update
+    await db.issues.update_many(
+        {
+            "repo_id": commit.repo_id,
+            "status": "open",
+            "due_mileage": {"$ne": None, "$lte": commit.mileage}
+        },
+        {"$set": {"priority": "high"}}
+    )
     
     return commit_dict
 
@@ -148,7 +149,7 @@ async def get_commit_detail(commit_id: str):
     db = get_db()
     try:
         commit = await db.commits.find_one({"_id": ObjectId(commit_id)})
-    except:
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ID")
 
     if commit:
@@ -169,7 +170,7 @@ async def create_issue(repo_id: str, issue: Issue):
     return issue_dict
 
 @router.get("/repos/{repo_id}/issues", response_model=List[Issue])
-async def get_issues(repo_id: str, status: str = None):
+async def get_issues(repo_id: str, status: Optional[str] = None):
     db = get_db()
     query = {"repo_id": repo_id}
     if status:
@@ -191,7 +192,7 @@ async def get_issues(repo_id: str, status: str = None):
     return issues
 
 @router.patch("/issues/{issue_id}", response_model=Issue)
-async def update_issue(issue_id: str, update_data: dict = Body(...)):
+async def update_issue(issue_id: str, update_data: Dict[str, Any] = Body(...)):
     db = get_db()
     # Filter out fields that shouldn't be touched directly if needed
     # For now allow full update

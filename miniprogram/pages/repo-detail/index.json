@@ -4,6 +4,7 @@
   "navigationBarTextStyle": "white",
   "usingComponents": {
     "dashboard-widget": "../../components/dashboard-widget/index",
-    "insights-view": "../../components/insights-view/index"
+    "insights-view": "../../components/insights-view/index",
+    "skeleton-loader": "../../components/skeleton-loader/index"
   }
 }

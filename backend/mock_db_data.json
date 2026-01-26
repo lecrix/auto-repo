@@ -1,44 +1,9 @@
 {
   "repos": [
     {
-      "name": "晶锐",
-      "vin": "14654351",
-      "current_mileage": 36008,
-      "current_head": "更换轮胎",
-      "branch": "main",
-      "created_at": 1769089124375.3718,
-      "_id": "697228640d69d8b88ab1cbf6",
-      "register_date": 1705968000000.0,
-      "insurance_expiry": 1792627200000.0,
-      "inspection_expiry": 1800662400000.0,
-      "compulsory_insurance_expiry": 1790121600000.0,
-      "commercial_insurance_expiry": 1771804800000.0
-    },
-    {
-      "name": "API Test Car",
-      "vin": null,
-      "current_mileage": 0,
-      "current_head": null,
-      "branch": "master",
-      "created_at": 1769089855446.089,
-      "_id": "69722b3f17e089b662113f67"
-    },
-    {
       "name": "12",
       "vin": "",
-      "current_mileage": 0,
-      "current_head": null,
-      "branch": "main",
-      "register_date": 1295654400000.0,
-      "compulsory_insurance_expiry": null,
-      "commercial_insurance_expiry": null,
-      "inspection_expiry": 1942444800000.0,
-      "created_at": 1769094625394.281,
-      "_id": "69723de174ee254c7d93c30d"
-    },
-    {
-      "name": "13",
-      "vin": "",
+      "color": "#2c3e50",
       "current_mileage": 0,
       "current_head": null,
       "branch": "main",
@@ -46,95 +11,10 @@
       "compulsory_insurance_expiry": null,
       "commercial_insurance_expiry": null,
       "inspection_expiry": null,
-      "created_at": 1769158258028.483,
-      "_id": "6973367212ab39046857bfd5"
-    },
-    {
-      "name": "111",
-      "vin": "",
-      "current_mileage": 0,
-      "current_head": null,
-      "branch": "main",
-      "register_date": null,
-      "compulsory_insurance_expiry": null,
-      "commercial_insurance_expiry": null,
-      "inspection_expiry": null,
-      "created_at": 1769159258091.311,
-      "_id": "69733a5a12ab39046857bfd6"
-    },
-    {
-      "name": "133",
-      "vin": "",
-      "current_mileage": 0,
-      "current_head": null,
-      "branch": "main",
-      "register_date": null,
-      "compulsory_insurance_expiry": null,
-      "commercial_insurance_expiry": null,
-      "inspection_expiry": null,
-      "created_at": 1769159264971.714,
-      "_id": "69733a6012ab39046857bfd7"
-    },
-    {
-      "name": "14",
-      "vin": "",
-      "current_mileage": 0,
-      "current_head": null,
-      "branch": "main",
-      "register_date": null,
-      "compulsory_insurance_expiry": null,
-      "commercial_insurance_expiry": null,
-      "inspection_expiry": null,
-      "created_at": 1769159636548.916,
-      "_id": "69733bd412ab39046857bfd8"
+      "created_at": 1769419746819.4521,
+      "_id": "697733e2303c4cd656630b9b"
     }
   ],
-  "commits": [
-    {
-      "repo_id": "697228640d69d8b88ab1cbf6",
-      "title": "更换机油",
-      "message": "更换机油机滤",
-      "mileage": 35000,
-      "type": "repair",
-      "cost": {
-        "parts": 500.0,
-        "labor": 50.0,
-        "currency": "CNY"
-      },
-      "closes_issues": [],
-      "timestamp": 1769089165468.199,
-      "_id": "6972288d0d69d8b88ab1cbf7"
-    },
-    {
-      "repo_id": "697228640d69d8b88ab1cbf6",
-      "title": "更换轮胎",
-      "message": "",
-      "mileage": 36000,
-      "type": "modification",
-      "cost": {
-        "parts": 800.0,
-        "labor": 100.0,
-        "currency": "CNY"
-      },
-      "closes_issues": [],
-      "timestamp": 1769089312240.4622,
-      "_id": "697229200d69d8b88ab1cbf8"
-    }
-  ],
-  "issues": [
-    {
-      "repo_id": "697228640d69d8b88ab1cbf6",
-      "title": "更换刹车片",
-      "description": null,
-      "status": "open",
-      "priority": "high",
-      "labels": [],
-      "due_date": null,
-      "due_mileage": 60000,
-      "created_at": 1769091056870.695,
-      "closed_at": null,
-      "closed_by_commit_id": null,
-      "_id": "69722ff017e089b662113f68"
-    }
-  ]
+  "commits": [],
+  "issues": []
 }

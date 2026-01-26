@@ -3,10 +3,23 @@
 <view class="container">
 
   <view class="repo-list">
+    <!-- Skeleton Loading -->
     <block wx:if="{{loading}}">
-      <view class="loading">加载中...</view>
+      <skeleton-loader type="card" count="3" />
     </block>
 
+    <!-- Empty State -->
+    <block wx:elif="{{repos.length === 0}}">
+      <empty-state 
+        icon="🚗"
+        title="还没有添加车辆"
+        description="点击下方按钮，添加你的第一辆爱车"
+        actionText="添加车辆"
+        bind:action="goToCreate"
+      />
+    </block>
+
+    <!-- Repo List -->
     <block wx:else>
       <view class="card-wrapper" wx:for="{{repos}}" wx:key="_id">
         <!-- Swipe Actions (Right side, revealed by swiping left) -->

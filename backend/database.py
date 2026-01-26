@@ -1,31 +1,57 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Any
 import os
 
-class DatabaseManager:
-    client: AsyncIOMotorClient = None
-    db = None
 
-    async def connect(self):
-        # Default to local mongo if not specified
+class DatabaseManager:
+    def __init__(self) -> None:
+        self.client: Any = None
+        self.db: Any = None
+
+    async def connect(self) -> None:
         mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
         try:
+            from motor.motor_asyncio import AsyncIOMotorClient
             self.client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=2000)
-            # Trigger checking connection
-            await self.client.server_info()
-            self.db = self.client.auto_repo
+            await self.client.server_info()  # type: ignore
+            self.db = self.client.auto_repo  # type: ignore
             print(f"Connected to MongoDB at {mongo_url}")
         except Exception as e:
             print(f"Warning: Could not connect to MongoDB ({e}). Using Mock Database.")
-            from mock_db import MockDatabase
-            self.db = MockDatabase()
+            import mock_db  # type: ignore[import-not-found]
+            self.db = mock_db.MockDatabase()
             self.client = None
 
-    async def close(self):
+    async def create_indexes(self) -> None:
+        """Create database indexes for common queries"""
+        # MockDatabase doesn't support indexes
+        if not self.client:
+            return
+        
+        # Index for commits queries (repo_id + timestamp descending)
+        await self.db.commits.create_index([
+            ("repo_id", 1),
+            ("timestamp", -1)
+        ])
+        
+        # Index for issues queries (repo_id + status)
+        await self.db.issues.create_index([
+            ("repo_id", 1),
+            ("status", 1)
+        ])
+        
+        # Index for issues mileage trigger queries
+        await self.db.issues.create_index([
+            ("repo_id", 1),
+            ("due_mileage", 1),
+            ("status", 1)
+        ])
+
+    async def close(self) -> None:
         if self.client:
             self.client.close()
             print("Closed MongoDB connection")
 
 db_manager = DatabaseManager()
 
-def get_db():
+def get_db() -> Any:
     return db_manager.db
