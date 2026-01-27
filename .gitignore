@@ -36,3 +36,7 @@ sitemap.json
 .agent/
 .opencode/
 
+.sisyphus/
+*.pyc
+__pycache__/
+.DS_Store
