@@ -18,7 +18,14 @@ Page({
     await this.loadRepos()
   },
 
+  async onPullDownRefresh() {
+    await this.loadRepos()
+    wx.stopPullDownRefresh()
+    wx.vibrateShort({ type: 'light' })
+  },
+
   initNavBar() {
+
     const menu = wx.getMenuButtonBoundingClientRect()
     const system = wx.getSystemInfoSync()
     const navHeight = menu.bottom + 8 // Slightly more padding

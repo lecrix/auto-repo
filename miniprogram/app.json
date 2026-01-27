@@ -2,7 +2,10 @@
   "usingComponents": {
     "custom-nav": "/components/custom-nav/index",
     "dashboard-widget": "/components/dashboard-widget/index",
-    "insights-view": "/components/insights-view/index"
+    "insights-view": "/components/insights-view/index",
+    "skeleton-loader": "/components/skeleton-loader/index",
+    "empty-state": "/components/empty-state/index",
+    "filter-bar": "/components/filter-bar/index"
   },
   "pages": [
     "pages/repo-list/index",

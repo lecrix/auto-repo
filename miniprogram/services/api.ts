@@ -56,8 +56,24 @@ export const getRepoDetail = (id: string) => {
 // Alias for compatibility
 export const getRepo = getRepoDetail;
 
-export const getCommits = (repoId: string) => {
-    return request(`/commits?repo_id=${repoId}`, 'GET');
+export const getCommits = (repoId: string, filters?: {
+  type?: string,
+  mileageMin?: number,
+  mileageMax?: number,
+  dateStart?: number,
+  dateEnd?: number,
+  search?: string
+}) => {
+  let url = `/commits?repo_id=${repoId}`;
+  if (filters) {
+    if (filters.type) url += `&type=${filters.type}`;
+    if (filters.mileageMin !== undefined) url += `&mileage_min=${filters.mileageMin}`;
+    if (filters.mileageMax !== undefined) url += `&mileage_max=${filters.mileageMax}`;
+    if (filters.dateStart) url += `&date_start=${filters.dateStart}`;
+    if (filters.dateEnd) url += `&date_end=${filters.dateEnd}`;
+    if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
+  }
+  return request(url, 'GET');
 };
 
 export const createCommit = (commit: any) => {
@@ -83,3 +99,8 @@ export const getIssues = (repoId: string, status?: string) => {
 export const createIssue = (repoId: string, issue: any) => {
     return request(`/repos/${repoId}/issues`, 'POST', issue);
 };
+
+export const getRepoTrends = (repoId: string, months: number = 12) => {
+    return request(`/repos/${repoId}/trends?months=${months}`, 'GET');
+};
+

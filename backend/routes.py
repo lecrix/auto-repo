@@ -87,11 +87,44 @@ async def delete_repo(repo_id: str):
 # --- Commits (Records) ---
 
 @router.get("/commits", response_model=List[Commit])
-async def get_commits(repo_id: str):
+async def get_commits(
+    repo_id: str,
+    type: Optional[str] = None,
+    mileage_min: Optional[int] = None,
+    mileage_max: Optional[int] = None,
+    date_start: Optional[float] = None,
+    date_end: Optional[float] = None,
+    search: Optional[str] = None
+):
     db = get_db()
+    query: dict = {"repo_id": repo_id}
+    
+    if type:
+        query["type"] = type
+    if mileage_min is not None:
+        if "mileage" not in query:
+            query["mileage"] = {}
+        query["mileage"]["$gte"] = mileage_min
+    if mileage_max is not None:
+        if "mileage" not in query:
+            query["mileage"] = {}
+        query["mileage"]["$lte"] = mileage_max
+    if date_start:
+        if "timestamp" not in query:
+            query["timestamp"] = {}
+        query["timestamp"]["$gte"] = date_start
+    if date_end:
+        if "timestamp" not in query:
+            query["timestamp"] = {}
+        query["timestamp"]["$lte"] = date_end
+    if search:
+        query["$or"] = [
+            {"title": {"$regex": search, "$options": "i"}},
+            {"message": {"$regex": search, "$options": "i"}}
+        ]
+    
     commits = []
-    # Sort by timestamp descending (newest first)
-    cursor = db.commits.find({"repo_id": repo_id}).sort("timestamp", -1)
+    cursor = db.commits.find(query).sort("timestamp", -1)
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
         commits.append(doc)
@@ -263,3 +296,60 @@ async def get_repo_stats(repo_id: str):
         "cost_per_km": round(total_cost / current_mileage, 2) if current_mileage > 0 else 0,
         "composition": chart_data
     }
+
+@router.get("/repos/{repo_id}/trends")
+async def get_repo_trends(repo_id: str, months: int = 12):
+    """
+    Monthly trend aggregation for line charts
+    Returns: mileage progression and cost trends by month
+    """
+    db = get_db()
+    
+    repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found")
+    
+    from datetime import datetime, timedelta
+    
+    now = datetime.now()
+    start_date = now - timedelta(days=months * 30)
+    start_timestamp = start_date.timestamp() * 1000
+    
+    pipeline = [
+        {"$match": {
+            "repo_id": repo_id,
+            "timestamp": {"$gte": start_timestamp}
+        }},
+        {"$addFields": {
+            "month": {
+                "$dateToString": {
+                    "format": "%Y-%m",
+                    "date": {"$toDate": "$timestamp"}
+                }
+            }
+        }},
+        {"$group": {
+            "_id": "$month",
+            "total_cost": {"$sum": {"$add": ["$cost.parts", "$cost.labor"]}},
+            "max_mileage": {"$max": "$mileage"},
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    
+    trends = await db.commits.aggregate(pipeline).to_list(length=100)
+    
+    monthly_data = []
+    for item in trends:
+        monthly_data.append({
+            "month": item["_id"],
+            "cost": item["total_cost"],
+            "mileage": item["max_mileage"],
+            "count": item["count"]
+        })
+    
+    return {
+        "months": monthly_data,
+        "total_months": len(monthly_data)
+    }
+

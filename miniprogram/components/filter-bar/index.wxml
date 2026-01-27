@@ -1,0 +1,60 @@
+<view class="filter-bar">
+  <!-- Basic Filters -->
+  <view class="filter-row">
+    <view class="filter-item">
+      <picker bindchange="onTypeChange" value="{{typeIndex}}" range="{{typeLabels}}">
+        <view class="picker">
+          <text class="filter-label">类型:</text>
+          <text class="filter-value">{{typeLabels[typeIndex]}}</text>
+        </view>
+      </picker>
+    </view>
+    
+    <view class="filter-item search">
+      <input 
+        class="search-input" 
+        placeholder="搜索关键词" 
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+  </view>
+  
+  <!-- Advanced Toggle -->
+  <view class="advanced-toggle" bindtap="toggleAdvanced">
+    <text>{{showAdvanced ? '▲' : '▼'}} 高级筛选</text>
+  </view>
+  
+  <!-- Advanced Filters -->
+  <view class="advanced-filters" wx:if="{{showAdvanced}}">
+    <view class="filter-row">
+      <view class="filter-item half">
+        <text class="filter-label">最小里程</text>
+        <input 
+          class="input" 
+          type="number" 
+          placeholder="0" 
+          value="{{mileageMin}}"
+          data-field="mileageMin"
+          bindinput="onMileageInput"
+        />
+      </view>
+      <view class="filter-item half">
+        <text class="filter-label">最大里程</text>
+        <input 
+          class="input" 
+          type="number" 
+          placeholder="999999" 
+          value="{{mileageMax}}"
+          data-field="mileageMax"
+          bindinput="onMileageInput"
+        />
+      </view>
+    </view>
+    
+    <view class="button-row">
+      <button class="btn-reset" bindtap="resetFilters">重置</button>
+      <button class="btn-apply" bindtap="applyFilters">应用</button>
+    </view>
+  </view>
+</view>

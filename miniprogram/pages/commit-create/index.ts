@@ -1,4 +1,5 @@
 import { createCommit } from '../../services/api'
+import { MAINTENANCE_TEMPLATES } from '../../data/templates'
 
 Page({
   data: {
@@ -11,7 +12,9 @@ Page({
     type: 'maintenance',
     typeKeys: ['maintenance', 'repair', 'modification'],
     typeLabels: ['常规保养', '故障维修', '改装升级'],
-    typeIndex: 0
+    typeIndex: 0,
+    templates: MAINTENANCE_TEMPLATES,
+    selectedTemplateId: ''
   },
 
   onLoad(options: any) {
@@ -23,6 +26,22 @@ Page({
     this.setData({
       [field]: e.detail.value
     })
+  },
+
+  selectTemplate(e: any) {
+    const template = e.currentTarget.dataset.template
+    const typeIndex = this.data.typeKeys.indexOf(template.type)
+    
+    this.setData({
+      title: template.title,
+      type: template.type,
+      typeIndex: typeIndex >= 0 ? typeIndex : 0,
+      cost_parts: String(template.suggestedCost.parts),
+      cost_labor: String(template.suggestedCost.labor),
+      selectedTemplateId: template.id
+    })
+
+    wx.showToast({ title: '已应用模板', icon: 'success' })
   },
 
   onTypeChange(e: any) {

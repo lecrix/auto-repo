@@ -6,13 +6,13 @@
 }
 
 .repo-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #1a252f 100%);
+  background: var(--gradient-primary);
   color: white;
   margin: 12px var(--spacing-md) 0;
   /* Add 12px top spacing */
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(44, 62, 80, 0.25);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
 }
@@ -231,18 +231,46 @@
 .commit-log {
   padding: 0 var(--spacing-lg);
   margin-top: var(--spacing-lg);
-  /* Ensure positive gap */
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
 }
 
 .log-title {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: var(--spacing-lg);
   color: var(--text-main);
-  background: var(--bg-color);
-  /* Match page bg for cutout look if needed, or just let it float */
-  display: none;
-  /* Hide title for cleaner look, or style it distinctly */
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 12rpx 24rpx;
+  background: var(--gradient-accent);
+  color: white;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s var(--ease-out-expo);
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.export-icon {
+  font-size: 32rpx;
+}
+
+.export-text {
+  font-size: 28rpx;
 }
 
 .commit-list {
@@ -305,11 +333,14 @@
   box-shadow: var(--shadow-sm);
   margin-bottom: var(--spacing-lg);
   border: 1px solid rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--ease-out-expo);
+  position: relative;
+  overflow: hidden;
 }
 
 .commit-content:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
+  box-shadow: var(--shadow-md);
 }
 
 .commit-header {
@@ -362,7 +393,7 @@
   right: 30px;
   width: 60px;
   height: 60px;
-  background: var(--primary-color);
+  background: var(--gradient-accent);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -371,12 +402,27 @@
   font-size: 32px;
   font-weight: 300;
   box-shadow: var(--shadow-lg);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s var(--ease-elastic);
+  animation: popIn 0.5s var(--ease-elastic) forwards;
+  animation-delay: 0.2s;
+  transform: scale(0); /* Start hidden for animation */
+  overflow: hidden;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 .fab-btn:active {
   transform: scale(0.9);
+  box-shadow: var(--shadow-glow);
 }
+
 
 // Tab Bar Styles
 .tab-bar {
@@ -411,7 +457,22 @@
         height: 2px;
         background: var(--primary-color);
         border-radius: 2px;
-      }
     }
   }
+}
+
+.tab-content {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 }

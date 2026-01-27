@@ -16,7 +16,41 @@
     </view>
   </view>
 
-  <!-- 2. Charts Section -->
+  <!-- 2. Trend Charts Section -->
+  <view class="chart-section" wx:if="{{trends && trends.months && trends.months.length > 0}}">
+    <view class="section-title">趋势分析 (最近6个月)</view>
+    <view class="trend-container">
+      <!-- Cost Trend -->
+      <view class="trend-chart">
+        <view class="trend-label">月度花费</view>
+        <view class="trend-bars">
+          <view class="trend-bar-item" wx:for="{{trends.months}}" wx:key="month">
+            <view class="bar-wrapper">
+              <view class="bar" style="height: {{item.cost / (trends.months[0].cost || 1) * 100}}%"></view>
+            </view>
+            <view class="bar-label">{{item.month.split('-')[1]}}月</view>
+            <view class="bar-value">¥{{item.cost}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Mileage Trend -->
+      <view class="trend-chart">
+        <view class="trend-label">里程变化</view>
+        <view class="trend-bars">
+          <view class="trend-bar-item" wx:for="{{trends.months}}" wx:key="month">
+            <view class="bar-wrapper">
+              <view class="bar mileage" style="height: {{item.mileage / (trends.months[trends.months.length - 1].mileage || 1) * 100}}%"></view>
+            </view>
+            <view class="bar-label">{{item.month.split('-')[1]}}月</view>
+            <view class="bar-value">{{item.mileage}}km</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 3. Cost Composition Charts Section -->
   <view class="chart-section">
     <view class="section-title">费用构成</view>
     <view class="chart-container">

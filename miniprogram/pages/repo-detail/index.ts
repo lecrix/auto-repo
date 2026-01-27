@@ -1,5 +1,6 @@
 import { getRepoDetail, getCommits } from '../../services/api'
 import { formatTime } from '../../utils/util'
+import { exportToCSV, shareCSV } from '../../utils/exporter'
 
 Page({
   data: {
@@ -7,7 +8,8 @@ Page({
     commits: [] as any[],
     loading: true,
     repoId: '',
-    currentTab: 0
+    currentTab: 0,
+    filters: {} as any
   },
 
   async onLoad(options: any) {
@@ -16,11 +18,20 @@ Page({
 
   async onShow() {
     this.setData({ loading: true })
-    
+    await this.loadData()
+  },
+
+  async onPullDownRefresh() {
+    await this.loadData()
+    wx.stopPullDownRefresh()
+    wx.vibrateShort({ type: 'light' })
+  },
+
+  async loadData() {
     try {
       const [repo, commits] = await Promise.all([
         getRepoDetail(this.data.repoId),
-        getCommits(this.data.repoId)
+        getCommits(this.data.repoId, this.data.filters)
       ])
 
       // Format timestamps
@@ -125,5 +136,57 @@ Page({
   switchTab(e: any) {
     const index = e.currentTarget.dataset.index
     this.setData({ currentTab: index })
+  },
+
+  onFilterChange(e: any) {
+    this.setData({ filters: e.detail })
+    this.loadData()
+  },
+
+  async handleExport() {
+    if (this.data.commits.length === 0) {
+      wx.showToast({
+        title: '暂无记录可导出',
+        icon: 'none'
+      })
+      return
+    }
+
+    wx.showLoading({ title: '生成中...' })
+
+    try {
+      const filePath = await exportToCSV(this.data.commits, this.data.repo.name)
+      wx.hideLoading()
+
+      wx.showModal({
+        title: '导出成功',
+        content: '是否分享CSV文件?',
+        confirmText: '分享',
+        cancelText: '稍后',
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              await shareCSV(filePath)
+            } catch (err: any) {
+              wx.showToast({
+                title: err.message || '分享失败',
+                icon: 'none'
+              })
+            }
+          } else {
+            wx.showToast({
+              title: '已保存到本地',
+              icon: 'success'
+            })
+          }
+        }
+      })
+    } catch (err: any) {
+      wx.hideLoading()
+      wx.showToast({
+        title: err.message || '导出失败',
+        icon: 'none'
+      })
+    }
   }
 })

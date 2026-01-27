@@ -70,11 +70,20 @@
 
     <!-- Tab 1: Timeline -->
     <view class="tab-content" wx:if="{{currentTab === 0}}">
+        <!-- FilterBar Component -->
+        <filter-bar bind:change="onFilterChange" />
+        
         <!-- Dashboard Widget (High Priority Alerts) -->
         <dashboard-widget repoId="{{repoId}}"></dashboard-widget>
 
         <view class="commit-log">
-            <view class="log-title">整备记录</view>
+            <view class="log-header">
+                <view class="log-title">整备记录</view>
+                <view class="export-btn" bindtap="handleExport">
+                    <text class="export-icon">📊</text>
+                    <text class="export-text">导出</text>
+                </view>
+            </view>
             
             <view class="commit-list">
                 <view class="commit-item" wx:for="{{commits}}" wx:key="_id">
@@ -106,8 +115,9 @@
         </view>
 
         <!-- FAB: Add Commit (Only in Timeline) -->
-        <view class="fab-btn" bindtap="goToCommitCreate">+</view>
+        <view class="fab-btn ripple" bindtap="goToCommitCreate">+</view>
     </view>
+
 
     <!-- Tab 2: Insights -->
     <view class="tab-content" wx:if="{{currentTab === 1}}">

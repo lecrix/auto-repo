@@ -1,4 +1,4 @@
-import { getRepoStats, getIssues } from '../../services/api'
+import { getRepoStats, getIssues, getRepoTrends } from '../../services/api'
 
 Component({
     properties: {
@@ -16,6 +16,7 @@ Component({
     data: {
         stats: null as any,
         issues: [] as any[],
+        trends: null as any,
         loading: false
     },
 
@@ -33,14 +34,14 @@ Component({
 
             this.setData({ loading: true })
             try {
-                const [stats, issues] = await Promise.all([
+                const [stats, issues, trends] = await Promise.all([
                     getRepoStats(id),
-                    getIssues(id, 'open')
+                    getIssues(id, 'open'),
+                    getRepoTrends(id, 6)
                 ])
-                this.setData({ stats, issues })
+                this.setData({ stats, issues, trends })
             } catch (e) {
                 console.error('Failed to load insights data', e)
-                // Fallback: try to just get stats if issues failed
                 try {
                     const stats = await getRepoStats(id)
                     this.setData({ stats })

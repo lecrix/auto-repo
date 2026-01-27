@@ -40,10 +40,11 @@
       </view>
 
       <!-- Add Button Below Cards -->
-      <view class="add-card" bindtap="goToCreate">
+      <view class="add-card ripple" bindtap="goToCreate">
         <text class="add-icon">+</text>
         <text class="add-text">添加车辆</text>
       </view>
+
     </block>
   </view>
 </view>

@@ -1,0 +1,96 @@
+.filter-bar {
+  background: var(--card-bg);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md);
+  border-radius: 16rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.filter-item {
+  flex: 1;
+  
+  &.search {
+    flex: 2;
+  }
+  
+  &.half {
+    flex: 0.5;
+  }
+}
+
+.picker {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: var(--bg-color);
+  border-radius: 8rpx;
+}
+
+.filter-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-right: 8rpx;
+}
+
+.filter-value {
+  font-size: 28rpx;
+  color: var(--text-main);
+}
+
+.search-input {
+  padding: 16rpx;
+  background: var(--bg-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.advanced-toggle {
+  text-align: center;
+  padding: 16rpx;
+  color: var(--accent-color);
+  font-size: 26rpx;
+  cursor: pointer;
+}
+
+.advanced-filters {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--bg-color);
+}
+
+.input {
+  padding: 16rpx;
+  background: var(--bg-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  width: 100%;
+}
+
+.button-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.btn-reset, .btn-apply {
+  flex: 1;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.btn-reset {
+  background: var(--bg-color);
+  color: var(--text-secondary);
+}
+
+.btn-apply {
+  background: var(--primary-color);
+  color: white;
+}
