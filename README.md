@@ -29,6 +29,11 @@
 *   **🔄 Auto-State Management**: Committing a maintenance record automatically updates the vehicle's "HEAD" (current mileage & condition).
 *   **🎨 Premium UI/UX**: Dark mode, glassmorphism design, and fluid animations for a high-end experience.
 *   **🚙 Multi-Vehicle Support**: Manage multiple "Repositories" (cars) in one app.
+*   **📝 Edit & Delete Records**: Edit existing maintenance records or delete them with confirmation.
+*   **📅 Custom Timestamps**: Set custom date/time for each record (not just auto-generated).
+*   **⛽ Extended Templates**: 12 templates including fuel costs and parking fees.
+*   **💰 Purchase Cost Tracking**: Track vehicle purchase cost in total statistics.
+*   **❓ Built-in Help**: Quick help guide accessible from main menu.
 
 ## 🛠 Tech Stack
 
@@ -98,7 +103,32 @@ auto-repo/
 - [x] **Phase 1**: Core UI/UX implementation & Backend Integration
 - [ ] **Phase 2**: Cloud Deployment (WeChat Cloud Hosting)
 - [x] **Phase 3**: Data Visualization, Costs & Task Management
+- [x] **Phase 3.5**: Bug Fixes & UX Improvements (2026-01)
 - [ ] **Phase 4**: Social Sharing Features
+
+## 🔧 Recent Updates (2026-01-27)
+
+### Round 2 Bug Fixes
+- ✅ Implemented full data pre-fill for edit mode (including insurance field parsing)
+- ✅ Removed redundant time picker, simplified date entry
+- ✅ Fixed CSV export showing zero costs
+- ✅ Fixed chart max value calculation and month display issues
+- ✅ Timeline cards now show cost and date (no longer display database ID)
+- ✅ Template system reorganization: added insurance template, simplified cost input
+- ✅ Unified mileage label terminology to eliminate user confusion
+- ✅ Purchase cost now correctly included in total cost statistics
+- ✅ Fixed help icon being obscured by navigation bar
+
+### Round 1 Bug Fixes & Improvements
+- ✅ Added date/time pickers for custom record timestamps
+- ✅ Implemented edit/delete functionality for maintenance records
+- ✅ Made mileage field optional (useful for parking/fuel records)
+- ✅ Extended templates to 12 (added fuel & parking cost templates)
+- ✅ Fixed CSV export sharing on WeChat (.xls format)
+- ✅ Dynamic vehicle color theming in detail pages
+- ✅ Added purchase cost tracking
+- ✅ Improved mileage display (shows driven distance)
+- ✅ Added in-app help documentation
 
 ## 🤝 Contributing
 

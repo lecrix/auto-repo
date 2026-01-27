@@ -7,7 +7,7 @@
       <view class="value currency">¥{{stats.total_cost || 0}}</view>
     </view>
     <view class="metric-card">
-      <view class="label">总里程</view>
+      <view class="label">总里程 (累计)</view>
       <view class="value">{{stats.total_mileage || 0}}<text class="unit">km</text></view>
     </view>
     <view class="metric-card">
@@ -19,6 +19,11 @@
   <!-- 2. Trend Charts Section -->
   <view class="chart-section" wx:if="{{trends && trends.months && trends.months.length > 0}}">
     <view class="section-title">趋势分析 (最近6个月)</view>
+    <wxs module="utils">
+    module.exports.parseInt = function(s) {
+      return parseInt(s);
+    }
+    </wxs>
     <view class="trend-container">
       <!-- Cost Trend -->
       <view class="trend-chart">
@@ -26,23 +31,23 @@
         <view class="trend-bars">
           <view class="trend-bar-item" wx:for="{{trends.months}}" wx:key="month">
             <view class="bar-wrapper">
-              <view class="bar" style="height: {{item.cost / (trends.months[0].cost || 1) * 100}}%"></view>
+              <view class="bar" style="height: {{item.cost / (trends.maxCost || 1) * 100}}%"></view>
             </view>
-            <view class="bar-label">{{item.month.split('-')[1]}}月</view>
+            <view class="bar-label">{{utils.parseInt(item.month.split('-')[1])}}月</view>
             <view class="bar-value">¥{{item.cost}}</view>
           </view>
         </view>
       </view>
 
-      <!-- Mileage Trend -->
-      <view class="trend-chart">
-        <view class="trend-label">里程变化</view>
+       <!-- Mileage Trend -->
+       <view class="trend-chart">
+         <view class="trend-label">月度里程</view>
         <view class="trend-bars">
           <view class="trend-bar-item" wx:for="{{trends.months}}" wx:key="month">
             <view class="bar-wrapper">
-              <view class="bar mileage" style="height: {{item.mileage / (trends.months[trends.months.length - 1].mileage || 1) * 100}}%"></view>
+              <view class="bar mileage" style="height: {{item.mileage / (trends.maxMileage || 1) * 100}}%"></view>
             </view>
-            <view class="bar-label">{{item.month.split('-')[1]}}月</view>
+            <view class="bar-label">{{utils.parseInt(item.month.split('-')[1])}}月</view>
             <view class="bar-value">{{item.mileage}}km</view>
           </view>
         </view>
@@ -83,7 +88,7 @@
             <view class="issue-content">
                 <view class="issue-title">{{item.title}}</view>
                 <view class="issue-meta">
-                    <text wx:if="{{item.due_mileage}}">目标里程: {{item.due_mileage}} km</text>
+                    <text wx:if="{{item.due_mileage}}">提醒里程: {{item.due_mileage}} km</text>
                     <text wx:if="{{item.due_date}}">截止日期: {{item.due_date}}</text>
                 </view>
             </view>

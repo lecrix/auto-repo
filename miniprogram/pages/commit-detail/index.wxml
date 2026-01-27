@@ -44,4 +44,13 @@
         </view>
     </view>
   </view>
+
+  <view class="action-bar" wx:if="{{commit}}">
+    <view class="btn edit-btn" bindtap="onEdit">
+      <text class="icon">✏️</text> 编辑
+    </view>
+    <view class="btn delete-btn" bindtap="onDelete">
+      <text class="icon">🗑️</text> 删除
+    </view>
+  </view>
 </view>

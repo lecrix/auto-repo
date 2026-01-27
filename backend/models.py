@@ -30,7 +30,7 @@ class Commit(BaseModel):
     repo_id: str
     title: str
     message: Optional[str] = None
-    mileage: int
+    mileage: Optional[int] = None
     type: str
     cost: Optional[Cost] = None
     closes_issues: list[str] = []  # List of Issue IDs
@@ -42,6 +42,8 @@ class Repo(BaseModel):
     vin: Optional[str] = None
     color: str = "#2c3e50" # Default color
     current_mileage: int = 0
+    initial_mileage: int = 0  # Initial mileage at vehicle registration
+    purchase_cost: Optional[float] = None  # Purchase cost of the vehicle
     current_head: Optional[str] = None
     branch: str = "main"
     register_date: Optional[float] = None     # Registration timestamp

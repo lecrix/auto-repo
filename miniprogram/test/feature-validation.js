@@ -18,15 +18,15 @@ const validateTemplateSystem = () => {
     console.log('✓ Templates module loaded successfully');
     
     // Validate template count
-    if (MAINTENANCE_TEMPLATES.length !== 10) {
-      console.error(`✗ Expected 10 templates, found ${MAINTENANCE_TEMPLATES.length}`);
+    if (MAINTENANCE_TEMPLATES.length !== 14) {
+      console.error(`✗ Expected 14 templates, found ${MAINTENANCE_TEMPLATES.length}`);
       return false;
     }
-    console.log('✓ Template count: 10');
+    console.log('✓ Template count: 14');
     
     // Validate each template structure
     const requiredFields = ['id', 'title', 'type', 'suggestedCost', 'icon'];
-    const validTypes = ['maintenance', 'repair', 'modification'];
+    const validTypes = ['maintenance', 'repair', 'modification', 'preparation', 'insurance'];
     
     MAINTENANCE_TEMPLATES.forEach((template, index) => {
       // Check required fields
@@ -42,11 +42,11 @@ const validateTemplateSystem = () => {
       }
       
       // Validate cost structure
-      if (!template.suggestedCost.parts || !template.suggestedCost.labor) {
-        console.error(`✗ Template ${index + 1} has invalid cost structure`);
+      if (typeof template.suggestedCost !== 'number') {
+        console.error(`✗ Template ${index + 1} has invalid cost structure (expected number)`);
       }
       
-      console.log(`  ${index + 1}. ${template.icon} ${template.title} - ${template.type} (¥${template.suggestedCost.parts + template.suggestedCost.labor})`);
+      console.log(`  ${index + 1}. ${template.icon} ${template.title} - ${template.type} (¥${template.suggestedCost})`);
     });
     
     console.log('\n✓ All templates validated\n');

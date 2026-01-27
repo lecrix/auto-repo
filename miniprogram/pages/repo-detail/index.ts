@@ -73,6 +73,10 @@ Page({
       if (repo) {
         repo.formatted_register_date = formatDate(repo.register_date);
         repo.vehicle_age = calcVehicleAge(repo.register_date);
+        
+        // Calculate driven distance
+        const drivenDistance = repo.current_mileage - (repo.initial_mileage || 0);
+        repo.driven_distance = drivenDistance;
 
         // Calculate days left for each expiry
         const inspectionDays = calcDaysLeft(repo.inspection_expiry);

@@ -1,56 +1,46 @@
 export interface MaintenanceTemplate {
   id: string;
   title: string;
-  type: 'maintenance' | 'repair' | 'modification';
-  suggestedCost: {
-    parts: number;
-    labor: number;
-  };
+  type: 'maintenance' | 'repair' | 'modification' | 'preparation' | 'insurance';
+  suggestedCost: number;
   suggestedMileageInterval?: number;
   icon: string;
   description?: string;
 }
 
 export const MAINTENANCE_TEMPLATES: MaintenanceTemplate[] = [
+  // 保养 (Maintenance)
   {
     id: 'oil_change',
     title: '更换机油',
     type: 'maintenance',
-    suggestedCost: { parts: 300, labor: 100 },
+    suggestedCost: 400,
     suggestedMileageInterval: 5000,
     icon: '🛢️',
     description: '定期更换机油和机滤'
   },
   {
     id: 'tire_rotation',
-    title: '轮胎换位',
+    title: '倒胎存胎',
     type: 'maintenance',
-    suggestedCost: { parts: 0, labor: 80 },
+    suggestedCost: 80,
     suggestedMileageInterval: 10000,
     icon: '🔄',
-    description: '前后轮胎对调以延长寿命'
+    description: '冬夏季轮胎更换或倒胎存放'
   },
   {
     id: 'air_filter',
-    title: '更换空气滤清器',
+    title: '更换空滤',
     type: 'maintenance',
-    suggestedCost: { parts: 80, labor: 20 },
+    suggestedCost: 100,
     icon: '💨',
     description: '更换发动机进气滤芯'
-  },
-  {
-    id: 'brake_pads',
-    title: '更换刹车片',
-    type: 'repair',
-    suggestedCost: { parts: 400, labor: 150 },
-    icon: '🛑',
-    description: '更换磨损的刹车片'
   },
   {
     id: 'wheel_alignment',
     title: '四轮定位',
     type: 'maintenance',
-    suggestedCost: { parts: 0, labor: 200 },
+    suggestedCost: 200,
     icon: '⚖️',
     description: '调整车轮角度'
   },
@@ -58,40 +48,88 @@ export const MAINTENANCE_TEMPLATES: MaintenanceTemplate[] = [
     id: 'spark_plugs',
     title: '更换火花塞',
     type: 'maintenance',
-    suggestedCost: { parts: 200, labor: 100 },
+    suggestedCost: 300,
     icon: '⚡',
     description: '更换点火系统火花塞'
-  },
-  {
-    id: 'battery_replacement',
-    title: '更换电池',
-    type: 'repair',
-    suggestedCost: { parts: 500, labor: 50 },
-    icon: '🔋',
-    description: '更换蓄电池'
   },
   {
     id: 'coolant_flush',
     title: '冷却液更换',
     type: 'maintenance',
-    suggestedCost: { parts: 150, labor: 100 },
+    suggestedCost: 250,
     icon: '❄️',
     description: '更换防冻冷却液'
-  },
-  {
-    id: 'audio_upgrade',
-    title: '改装音响',
-    type: 'modification',
-    suggestedCost: { parts: 2000, labor: 500 },
-    icon: '🔊',
-    description: '升级车载音响系统'
   },
   {
     id: 'annual_inspection',
     title: '年检',
     type: 'maintenance',
-    suggestedCost: { parts: 0, labor: 300 },
+    suggestedCost: 300,
     icon: '📋',
     description: '车辆年度检验'
+  },
+  {
+    id: 'fuel_cost',
+    title: '加油',
+    type: 'maintenance',
+    suggestedCost: 400,
+    icon: '⛽',
+    description: '燃油加油记录'
+  },
+  {
+    id: 'parking_cost',
+    title: '停车费',
+    type: 'maintenance',
+    suggestedCost: 20,
+    icon: '🅿️',
+    description: '停车费用记录'
+  },
+
+  // 维修 (Repair)
+  {
+    id: 'brake_pads',
+    title: '更换刹车片',
+    type: 'repair',
+    suggestedCost: 550,
+    icon: '🛑',
+    description: '更换磨损的刹车片'
+  },
+  {
+    id: 'battery_replacement',
+    title: '更换电池',
+    type: 'repair',
+    suggestedCost: 550,
+    icon: '🔋',
+    description: '更换蓄电池'
+  },
+
+  // 改装 (Modification)
+  {
+    id: 'audio_upgrade',
+    title: '改装音响',
+    type: 'modification',
+    suggestedCost: 2500,
+    icon: '🔊',
+    description: '升级车载音响系统'
+  },
+
+  // 整备 (Preparation)
+  {
+    id: 'detailing',
+    title: '全车整备',
+    type: 'preparation',
+    suggestedCost: 2000,
+    icon: '✨',
+    description: '全车精洗、内饰清洁、漆面修复'
+  },
+
+  // 保险 (Insurance)
+  {
+    id: 'insurance_renewal',
+    title: '购买保险',
+    type: 'insurance',
+    suggestedCost: 4000,
+    icon: '🛡️',
+    description: '车辆商业险/交强险续保'
   }
 ];

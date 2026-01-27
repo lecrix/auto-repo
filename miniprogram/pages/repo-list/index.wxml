@@ -1,5 +1,10 @@
 <custom-nav />
 
+<!-- Help Button (Fixed top-right) -->
+<view class="help-button" bindtap="onShowHelp" title="使用帮助">
+  <text class="help-icon">❓</text>
+</view>
+
 <view class="container">
 
   <view class="repo-list">

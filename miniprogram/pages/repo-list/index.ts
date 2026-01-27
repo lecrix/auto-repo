@@ -155,22 +155,51 @@ Page({
     }
   },
 
-  touchEnd(e: any) {
-    if (e.changedTouches.length === 1) {
-      const index = e.currentTarget.dataset.index
-      const endX = e.changedTouches[0].clientX
-      const disX = this.data.startX - endX
+   touchEnd(e: any) {
+     if (e.changedTouches.length === 1) {
+       const index = e.currentTarget.dataset.index
+       const endX = e.changedTouches[0].clientX
+       const disX = this.data.startX - endX
+ 
+       let offsetX = 0
+       // Threshold to snap open
+       if (disX > 35) {
+         offsetX = -140
+       } else {
+         offsetX = 0
+       }
+ 
+       const key = `repos[${index}].offsetX`
+       this.setData({ [key]: offsetX })
+     }
+   },
 
-      let offsetX = 0
-      // Threshold to snap open
-      if (disX > 35) {
-        offsetX = -140
-      } else {
-        offsetX = 0
-      }
+   onShowHelp() {
+     const helpContent = `1. 创建车辆
+点击"+"按钮，输入车型、年份等信息，建立你的第一个爱车档案。
 
-      const key = `repos[${index}].offsetX`
-      this.setData({ [key]: offsetX })
-    }
-  }
+2. 记录维保
+进入车辆详情页面，点击"新建Commit"按钮记录每次保养、维修、改装或零件更换。每条记录都会自动更新车辆的当前里程。
+
+3. 使用模板
+常见维保项目（如换机油、轮胎保养等）已有模板，选择模板可快速填写，大幅节省时间。
+
+4. 查看历史
+车辆详情页展示所有维保记录的时间线，一目了然查看爱车的成长历程。
+
+5. 导出与分享
+在车辆详情页点击"导出"按钮，生成数据报告便于备份或分享给朋友。
+
+6. 数据管理
+向左滑动车辆卡片，可快速编辑或删除车辆记录。所有数据都自动保存到云端。`
+
+     wx.showModal({
+       title: '📖 使用帮助',
+       content: helpContent,
+       showCancel: false,
+       confirmText: '知道了',
+       confirmColor: '#2c3e50',
+       success: () => {}
+     })
+   }
 })

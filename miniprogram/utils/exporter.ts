@@ -39,8 +39,8 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
     const type = typeMap[commit.type] || commit.type;
     const title = escapeCSV(commit.title);
     const mileage = commit.mileage || 0;
-    const costParts = commit.cost_parts || 0;
-    const costLabor = commit.cost_labor || 0;
+    const costParts = commit.cost?.parts || 0;
+    const costLabor = commit.cost?.labor || 0;
     const totalCost = costParts + costLabor;
     const message = escapeCSV(commit.message || '');
 
@@ -50,7 +50,7 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
   // Generate filename with timestamp
   const timestamp = new Date().toISOString().split('T')[0];
   const sanitizedRepoName = repoName.replace(/[^\w\u4e00-\u9fa5]/g, '_');
-  const fileName = `${sanitizedRepoName}_维保记录_${timestamp}.csv`;
+  const fileName = `${sanitizedRepoName}_维保记录_${timestamp}.xls`;
 
   // Save file using WeChat FileSystemManager
   const fs = wx.getFileSystemManager();
@@ -93,6 +93,7 @@ export const shareCSV = (filePath: string) => {
         // Fallback: Open file with default app
         wx.openDocument({
           filePath,
+          fileType: 'xls',
           showMenu: true,
           success: () => {
             wx.showToast({

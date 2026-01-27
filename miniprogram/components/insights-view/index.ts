@@ -39,7 +39,18 @@ Component({
                     getIssues(id, 'open'),
                     getRepoTrends(id, 6)
                 ])
-                this.setData({ stats, issues, trends })
+
+                if (trends && trends.months && trends.months.length > 0) {
+                    const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
+                    const maxMileage = Math.max(...trends.months.map((m: any) => m.mileage || 0))
+                    this.setData({
+                        stats,
+                        issues,
+                        trends: { ...trends, maxCost, maxMileage }
+                    })
+                } else {
+                    this.setData({ stats, issues, trends })
+                }
             } catch (e) {
                 console.error('Failed to load insights data', e)
                 try {

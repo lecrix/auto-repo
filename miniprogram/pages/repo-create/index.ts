@@ -39,6 +39,7 @@ Page({
     name: '',
     vin: '',
     current_mileage: '',
+    purchase_cost: '',
 
     // Color
     color: '#2c3e50', // Default
@@ -171,48 +172,50 @@ Page({
     wx.showToast({ title: '请在下方选择新日期', icon: 'none' })
   },
 
-  async onSubmit() {
-    const { repoId, name, vin, current_mileage, color, register_date, compulsory_insurance_expiry, commercial_insurance_expiry, inspection_expiry } = this.data
+   async onSubmit() {
+     const { repoId, name, vin, current_mileage, purchase_cost, color, register_date, compulsory_insurance_expiry, commercial_insurance_expiry, inspection_expiry } = this.data
 
-    if (!name) {
-      wx.showToast({ title: '请输入车辆名称', icon: 'none' })
-      return
-    }
+     if (!name) {
+       wx.showToast({ title: '请输入车辆名称', icon: 'none' })
+       return
+     }
 
-    const payload = {
-      name,
-      vin,
-      color,
-      current_mileage: Number(current_mileage) || 0,
-      // Convert dates to Timestamps (ms)
-      register_date: register_date ? new Date(register_date).getTime() : null,
-      compulsory_insurance_expiry: compulsory_insurance_expiry ? new Date(compulsory_insurance_expiry).getTime() : null,
-      commercial_insurance_expiry: commercial_insurance_expiry ? new Date(commercial_insurance_expiry).getTime() : null,
-      inspection_expiry: inspection_expiry ? new Date(inspection_expiry).getTime() : null
-    }
+     const payload = {
+       name,
+       vin,
+       color,
+       current_mileage: Number(current_mileage) || 0,
+       initial_mileage: Number(current_mileage) || 0,
+       purchase_cost: purchase_cost ? Number(purchase_cost) : undefined,
+       // Convert dates to Timestamps (ms)
+       register_date: register_date ? new Date(register_date).getTime() : null,
+       compulsory_insurance_expiry: compulsory_insurance_expiry ? new Date(compulsory_insurance_expiry).getTime() : null,
+       commercial_insurance_expiry: commercial_insurance_expiry ? new Date(commercial_insurance_expiry).getTime() : null,
+       inspection_expiry: inspection_expiry ? new Date(inspection_expiry).getTime() : null
+     }
 
-    wx.showLoading({ title: 'Saving...' })
+     wx.showLoading({ title: 'Saving...' })
 
-    try {
-      if (repoId) {
-        await updateRepo(repoId, payload)
-      } else {
-        await createRepo({ ...payload, branch: 'main' })
-      }
+     try {
+       if (repoId) {
+         await updateRepo(repoId, payload)
+       } else {
+         await createRepo({ ...payload, branch: 'main' })
+       }
 
-      wx.hideLoading()
-      wx.showToast({ title: '保存成功', icon: 'success' })
+       wx.hideLoading()
+       wx.showToast({ title: '保存成功', icon: 'success' })
 
-      setTimeout(() => {
-        wx.navigateBack()
-        // Optional: Notify prev page to refresh
-      }, 1500)
-    } catch (e) {
-      wx.hideLoading()
-      console.error(e)
-      wx.showToast({ title: '保存失败', icon: 'none' })
-    }
-  },
+       setTimeout(() => {
+         wx.navigateBack()
+         // Optional: Notify prev page to refresh
+       }, 1500)
+     } catch (e) {
+       wx.hideLoading()
+       console.error(e)
+       wx.showToast({ title: '保存失败', icon: 'none' })
+     }
+   },
 
   goBack() {
     wx.navigateBack()

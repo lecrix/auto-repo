@@ -84,6 +84,14 @@ export const getCommitDetail = (id: string) => {
     return request(`/commits/${id}`, 'GET');
 };
 
+export const updateCommit = (id: string, commit: any) => {
+    return request(`/commits/${id}`, 'PUT', commit);
+};
+
+export const deleteCommit = (id: string) => {
+    return request(`/commits/${id}`, 'DELETE');
+};
+
 export const getRepoStats = (repoId: string) => {
     return request(`/repos/${repoId}/stats`, 'GET');
 };

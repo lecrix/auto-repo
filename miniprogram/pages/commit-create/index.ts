@@ -1,5 +1,16 @@
-import { createCommit } from '../../services/api'
+import { createCommit, getCommitDetail, updateCommit } from '../../services/api'
 import { MAINTENANCE_TEMPLATES } from '../../data/templates'
+
+const formatDate = (date: Date) => {
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+
+
+const now = new Date()
 
 Page({
   data: {
@@ -7,22 +18,98 @@ Page({
     title: '',
     message: '',
     mileage: '',
-    cost_parts: '',
-    cost_labor: '',
+    cost_total: '',
+    
+    // Insurance specific fields
+    insurance_type: '商业险+交强险',
+    insurance_company: '',
+    policy_number: '',
+    coverage_start: formatDate(now),
+    coverage_end: formatDate(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())),
+
     type: 'maintenance',
-    typeKeys: ['maintenance', 'repair', 'modification'],
-    typeLabels: ['常规保养', '故障维修', '改装升级'],
+    typeKeys: ['maintenance', 'repair', 'modification', 'preparation', 'insurance'],
+    typeLabels: ['常规保养', '故障维修', '改装升级', '整备翻新', '车辆保险'],
     typeIndex: 0,
     templates: MAINTENANCE_TEMPLATES,
-    selectedTemplateId: ''
+    selectedTemplateId: '',
+    selectedDate: formatDate(now),
+    isEditMode: false,
+    editCommitId: ''
   },
 
-  onLoad(options: any) {
+  async onLoad(options: any) {
     this.data.repoId = options.repoId
+    
+    if (options.mode === 'edit' && options.id) {
+      this.setData({
+        isEditMode: true,
+        editCommitId: options.id
+      })
+      wx.setNavigationBarTitle({ title: '编辑记录' })
+      await this.loadCommitDetail(options.id)
+    } else {
+      wx.setNavigationBarTitle({ title: '新建记录' })
+    }
+  },
+
+  async loadCommitDetail(id: string) {
+    wx.showLoading({ title: '加载中...' })
+    try {
+      const commit = await getCommitDetail(id)
+      const typeIndex = this.data.typeKeys.indexOf(commit.type)
+      
+      let message = commit.message
+      let insuranceData: any = {}
+
+      if (commit.type === 'insurance') {
+        // Parse insurance info
+        const typeMatch = message.match(/类型: (.+)/)
+        const companyMatch = message.match(/公司: (.+)/)
+        const policyMatch = message.match(/保单号: (.+)/)
+        const startMatch = message.match(/起保: (.+)/)
+        const endMatch = message.match(/到期: (.+)/)
+
+        if (typeMatch) insuranceData['insurance_type'] = typeMatch[1]
+        if (companyMatch) insuranceData['insurance_company'] = companyMatch[1]
+        if (policyMatch) insuranceData['policy_number'] = policyMatch[1]
+        if (startMatch) insuranceData['coverage_start'] = startMatch[1]
+        if (endMatch) insuranceData['coverage_end'] = endMatch[1]
+
+        // Strip insurance info from message for display
+        const splitMsg = message.split('\n\n【保险信息】')
+        if (splitMsg.length > 0) {
+            message = splitMsg[0]
+        }
+      }
+
+      this.setData({
+        title: commit.title,
+        message: message,
+        mileage: commit.mileage ? String(commit.mileage) : '',
+        cost_total: commit.cost && commit.cost.parts ? String(commit.cost.parts) : '',
+        type: commit.type,
+        typeIndex: typeIndex >= 0 ? typeIndex : 0,
+        selectedDate: formatDate(new Date(commit.timestamp)),
+        ...insuranceData
+      })
+    } catch (err) {
+      console.error(err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   onInput(e: any) {
     const field = e.currentTarget.dataset.field
+    this.setData({
+      [field]: e.detail.value
+    })
+  },
+
+  bindDateChange(e: any) {
+    const field = e.currentTarget.dataset.field || 'selectedDate'
     this.setData({
       [field]: e.detail.value
     })
@@ -34,10 +121,10 @@ Page({
     
     this.setData({
       title: template.title,
+      message: template.description || '',
       type: template.type,
       typeIndex: typeIndex >= 0 ? typeIndex : 0,
-      cost_parts: String(template.suggestedCost.parts),
-      cost_labor: String(template.suggestedCost.labor),
+      cost_total: String(template.suggestedCost),
       selectedTemplateId: template.id
     })
 
@@ -52,38 +139,54 @@ Page({
   },
 
   async onSubmit() {
-    const { repoId, title, message, mileage, cost_parts, cost_labor, type } = this.data
+    const { repoId, title, message, mileage, cost_total, type, selectedDate,
+            insurance_type, insurance_company, policy_number, coverage_start, coverage_end,
+            isEditMode, editCommitId } = this.data
     
-    if (!title || !mileage) {
-        wx.showToast({ title: '请填写标题和里程', icon: 'none' })
+    if (!title) {
+        wx.showToast({ title: '请填写标题', icon: 'none' })
         return
     }
 
-    wx.showLoading({ title: '提交 Commit...' })
+    wx.showLoading({ title: isEditMode ? '更新中...' : '提交 Commit...' })
     
     try {
-      await createCommit({
+      const timestamp = new Date((selectedDate + ' 00:00:00').replace(/-/g, '/')).getTime()
+
+      let finalMessage = message
+      if (type === 'insurance') {
+          finalMessage += `\n\n【保险信息】\n类型: ${insurance_type}\n公司: ${insurance_company}\n保单号: ${policy_number}\n起保: ${coverage_start}\n到期: ${coverage_end}`
+      }
+
+      const commitData = {
           repo_id: repoId,
           title,
-          message,
-          mileage: Number(mileage),
+          message: finalMessage,
+          mileage: mileage ? Number(mileage) : undefined,
           type,
+          timestamp,
           cost: {
-              parts: Number(cost_parts) || 0,
-              labor: Number(cost_labor) || 0,
+              parts: Number(cost_total) || 0,
+              labor: 0,
               currency: 'CNY'
           }
-      })
+      }
 
-      wx.showToast({ title: '提交成功', icon: 'success' })
+      if (isEditMode) {
+        await updateCommit(editCommitId, commitData)
+        wx.showToast({ title: '更新成功', icon: 'success' })
+      } else {
+        await createCommit(commitData)
+        wx.showToast({ title: '提交成功', icon: 'success' })
+      }
 
       setTimeout(() => {
           wx.navigateBack()
       }, 1500)
     } catch (err: any) {
-      console.error('Failed to create commit:', err)
+      console.error('Failed to save commit:', err)
       wx.showToast({
-        title: err.message || '创建失败',
+        title: err.message || (isEditMode ? '更新失败' : '创建失败'),
         icon: 'none',
         duration: 2000
       })

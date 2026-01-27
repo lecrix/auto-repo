@@ -11,12 +11,17 @@
     <input class="input" placeholder="请输入 VIN (选填)" data-field="vin" value="{{vin}}" bindinput="onInput" />
   </view>
 
-  <view class="form-group">
-    <view class="label">当前里程 (km)</view>
-    <input class="input" type="number" placeholder="0" data-field="current_mileage" value="{{current_mileage}}" bindinput="onInput" />
-  </view>
+    <view class="form-group">
+      <view class="label">总里程 (km)</view>
+      <input class="input" type="number" placeholder="0" data-field="current_mileage" value="{{current_mileage}}" bindinput="onInput" />
+    </view>
 
-  <view class="section-title">车辆卡片外观</view>
+   <view class="form-group">
+     <view class="label">购车费用 (可选)</view>
+     <input class="input" type="number" placeholder="购车成本（元）" data-field="purchase_cost" value="{{purchase_cost}}" bindinput="onInput" />
+   </view>
+
+   <view class="section-title">车辆卡片外观</view>
   <view class="form-group">
     <view class="label">背景颜色</view>
     <view class="color-picker">

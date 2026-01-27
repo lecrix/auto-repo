@@ -26,27 +26,60 @@
   </view>
 
   <view class="form-group">
-    <view class="label">当前里程 (km)</view>
-    <input class="input" type="number" value="{{mileage}}" placeholder="请输入当前里程" data-field="mileage" bindinput="onInput" />
+    <view class="label">日期</view>
+    <picker mode="date" value="{{selectedDate}}" bindchange="bindDateChange">
+      <view class="picker">
+        {{selectedDate}}
+      </view>
+    </picker>
   </view>
+
+   <view class="form-group">
+     <view class="label">记录里程 (km)</view>
+     <input class="input" type="number" value="{{mileage}}" placeholder="请输入当前里程" data-field="mileage" bindinput="onInput" />
+   </view>
   
-  <view class="section-title">详情内容</view>
-
-  <view class="form-group">
-    <view class="label">详细描述</view>
-    <textarea class="textarea" value="{{message}}" placeholder="详细的施工内容、使用的零件品牌等..." data-field="message" bindinput="onInput" />
-  </view>
-
-  <view class="row">
-    <view class="form-group half">
-      <view class="label">配件费 (元)</view>
-      <input class="input" type="number" value="{{cost_parts}}" placeholder="0" data-field="cost_parts" bindinput="onInput" />
+   <block wx:if="{{type === 'insurance'}}">
+    <view class="section-title">保险信息</view>
+    <view class="form-group">
+      <view class="label">保险类型</view>
+      <input class="input" value="{{insurance_type}}" placeholder="如: 商业险+交强险" data-field="insurance_type" bindinput="onInput" />
     </view>
-    <view class="form-group half">
-      <view class="label">工时费 (元)</view>
-      <input class="input" type="number" value="{{cost_labor}}" placeholder="0" data-field="cost_labor" bindinput="onInput" />
+    <view class="form-group">
+      <view class="label">保险公司</view>
+      <input class="input" value="{{insurance_company}}" placeholder="如: 平安保险" data-field="insurance_company" bindinput="onInput" />
     </view>
-  </view>
+    <view class="form-group">
+      <view class="label">保单号</view>
+      <input class="input" value="{{policy_number}}" placeholder="请输入保单号" data-field="policy_number" bindinput="onInput" />
+    </view>
+    <view class="row">
+      <view class="form-group half">
+        <view class="label">起保日期</view>
+        <picker mode="date" value="{{coverage_start}}" data-field="coverage_start" bindchange="bindDateChange">
+          <view class="picker">{{coverage_start}}</view>
+        </picker>
+      </view>
+      <view class="form-group half">
+        <view class="label">到期日期</view>
+        <picker mode="date" value="{{coverage_end}}" data-field="coverage_end" bindchange="bindDateChange">
+          <view class="picker">{{coverage_end}}</view>
+        </picker>
+      </view>
+    </view>
+   </block>
+
+   <view class="section-title">详情内容</view>
+
+   <view class="form-group">
+     <view class="label">详细描述</view>
+     <textarea class="textarea" value="{{message}}" placeholder="详细的施工内容、使用的零件品牌等..." data-field="message" bindinput="onInput" />
+   </view>
+
+   <view class="form-group">
+     <view class="label">总费用 (元)</view>
+     <input class="input" type="number" value="{{cost_total}}" placeholder="0" data-field="cost_total" bindinput="onInput" />
+   </view>
 
   <view class="btn-group">
     <button class="submit-btn" bindtap="onSubmit">提交记录</button>

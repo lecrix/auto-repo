@@ -200,3 +200,30 @@
   color: var(--text-light);
   margin-top: var(--spacing-xl);
 }
+
+/* Help Button */
+.help-button {
+  position: fixed;
+  top: 60px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
+  z-index: 999;
+  transition: all 0.2s var(--ease-out-expo);
+}
+
+.help-button:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+}
+
+.help-icon {
+  font-size: 24px;
+  line-height: 1;
+}

@@ -28,19 +28,19 @@
   <!-- Advanced Filters -->
   <view class="advanced-filters" wx:if="{{showAdvanced}}">
     <view class="filter-row">
-      <view class="filter-item half">
-        <text class="filter-label">最小里程</text>
-        <input 
-          class="input" 
-          type="number" 
-          placeholder="0" 
-          value="{{mileageMin}}"
-          data-field="mileageMin"
-          bindinput="onMileageInput"
-        />
-      </view>
-      <view class="filter-item half">
-        <text class="filter-label">最大里程</text>
+       <view class="filter-item half">
+         <text class="filter-label">最小记录里程</text>
+         <input 
+           class="input" 
+           type="number" 
+           placeholder="0" 
+           value="{{mileageMin}}"
+           data-field="mileageMin"
+           bindinput="onMileageInput"
+         />
+       </view>
+       <view class="filter-item half">
+         <text class="filter-label">最大记录里程</text>
         <input 
           class="input" 
           type="number" 
