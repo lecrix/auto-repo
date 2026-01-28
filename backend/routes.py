@@ -190,30 +190,35 @@ async def get_commit(commit_id: str):
     return commit
 
 @router.put("/commits/{commit_id}")
-async def update_commit(commit_id: str, commit: Commit):
+async def update_commit(commit_id: str, update_data: dict):
     db = get_db()
     
     existing = await db.commits.find_one({"_id": ObjectId(commit_id)})
     if not existing:
         raise HTTPException(status_code=404, detail="Commit not found")
     
-    update_data = commit.dict(exclude_unset=True, exclude={"id"})
+    clean_data = {k: v for k, v in update_data.items() if k not in ["id", "_id"]}
+    
+    if not clean_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
     
     await db.commits.update_one(
         {"_id": ObjectId(commit_id)},
-        {"$set": update_data}
+        {"$set": clean_data}
     )
     
-    if "mileage" in update_data and update_data["mileage"]:
-        repo = await db.repos.find_one({"_id": ObjectId(commit.repo_id)})
-        if repo and update_data["mileage"] > repo.get("current_mileage", 0):
-            await db.repos.update_one(
-                {"_id": ObjectId(commit.repo_id)},
-                {"$set": {
-                    "current_mileage": update_data["mileage"],
-                    "current_head": update_data.get("title", existing.get("title"))
-                }}
-            )
+    if "mileage" in clean_data and clean_data["mileage"]:
+        repo_id = clean_data.get("repo_id") or existing.get("repo_id")
+        if repo_id:
+            repo = await db.repos.find_one({"_id": ObjectId(repo_id)})
+            if repo and clean_data["mileage"] > repo.get("current_mileage", 0):
+                await db.repos.update_one(
+                    {"_id": ObjectId(repo_id)},
+                    {"$set": {
+                        "current_mileage": clean_data["mileage"],
+                        "current_head": clean_data.get("title", existing.get("title"))
+                    }}
+                )
     
     updated = await db.commits.find_one({"_id": ObjectId(commit_id)})
     updated["_id"] = str(updated["_id"])
