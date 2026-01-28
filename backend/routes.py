@@ -347,7 +347,8 @@ async def get_repo_stats(repo_id: str):
     return {
         "total_cost": total_cost,
         "total_mileage": current_mileage,
-        "cost_per_km": round(total_cost / current_mileage, 2) if current_mileage > 0 else 0,
+        "driven_mileage": current_mileage - repo.get("initial_mileage", 0),
+        "cost_per_km": round(total_cost / (current_mileage - repo.get("initial_mileage", 0)), 2) if (current_mileage - repo.get("initial_mileage", 0)) > 0 else 0,
         "composition": chart_data
     }
 

@@ -22,8 +22,8 @@
         <!-- Left Column: Mileage & Register Date -->
         <view class="header-left">
           <view class="mileage-block">
-            <text class="mileage-label">行驶里程</text>
-            <text class="mileage-value">{{repo.driven_distance}}</text>
+            <text class="mileage-label">总里程</text>
+            <text class="mileage-value">{{repo.current_mileage}}</text>
             <text class="mileage-unit">km</text>
           </view>
           <view class="register-info">

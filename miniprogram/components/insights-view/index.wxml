@@ -7,8 +7,8 @@
       <view class="value currency">¥{{stats.total_cost || 0}}</view>
     </view>
     <view class="metric-card">
-      <view class="label">总里程 (累计)</view>
-      <view class="value">{{stats.total_mileage || 0}}<text class="unit">km</text></view>
+      <view class="label">行驶里程</view>
+      <view class="value">{{stats.driven_mileage || 0}}<text class="unit">km</text></view>
     </view>
     <view class="metric-card">
       <view class="label">每公里成本</view>
