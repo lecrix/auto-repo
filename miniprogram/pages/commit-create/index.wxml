@@ -42,16 +42,20 @@
    <block wx:if="{{type === 'insurance'}}">
     <view class="section-title">保险信息</view>
     <view class="form-group">
-      <view class="label">保险类型</view>
-      <input class="input" value="{{insurance_type}}" placeholder="如: 商业险+交强险" data-field="insurance_type" bindinput="onInput" />
-    </view>
-    <view class="form-group">
       <view class="label">保险公司</view>
       <input class="input" value="{{insurance_company}}" placeholder="如: 平安保险" data-field="insurance_company" bindinput="onInput" />
     </view>
     <view class="form-group">
-      <view class="label">保单号</view>
-      <input class="input" value="{{policy_number}}" placeholder="请输入保单号" data-field="policy_number" bindinput="onInput" />
+      <view class="label">商业险费用 (元)</view>
+      <input class="input" type="digit" value="{{commercial_insurance}}" placeholder="0" data-field="commercial_insurance" bindinput="onInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">交强险费用 (元)</view>
+      <input class="input" type="digit" value="{{compulsory_insurance}}" placeholder="0" data-field="compulsory_insurance" bindinput="onInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">总费用 (元)</view>
+      <input class="input" type="digit" value="{{insurance_total}}" placeholder="0" data-field="insurance_total" bindinput="onInput" />
     </view>
     <view class="row">
       <view class="form-group half">

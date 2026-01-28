@@ -21,9 +21,10 @@ Page({
     cost_total: '',
     
     // Insurance specific fields
-    insurance_type: '商业险+交强险',
     insurance_company: '',
-    policy_number: '',
+    commercial_insurance: '',
+    compulsory_insurance: '',
+    insurance_total: '',
     coverage_start: formatDate(now),
     coverage_end: formatDate(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())),
 
@@ -64,15 +65,17 @@ Page({
 
       if (commit.type === 'insurance') {
         // Parse insurance info
-        const typeMatch = message.match(/类型: (.+)/)
         const companyMatch = message.match(/公司: (.+)/)
-        const policyMatch = message.match(/保单号: (.+)/)
+        const commercialMatch = message.match(/商业险: ¥(.+)/)
+        const compulsoryMatch = message.match(/交强险: ¥(.+)/)
+        const totalMatch = message.match(/总费用: ¥(.+)/)
         const startMatch = message.match(/起保: (.+)/)
         const endMatch = message.match(/到期: (.+)/)
 
-        if (typeMatch) insuranceData['insurance_type'] = typeMatch[1]
         if (companyMatch) insuranceData['insurance_company'] = companyMatch[1]
-        if (policyMatch) insuranceData['policy_number'] = policyMatch[1]
+        if (commercialMatch) insuranceData['commercial_insurance'] = commercialMatch[1]
+        if (compulsoryMatch) insuranceData['compulsory_insurance'] = compulsoryMatch[1]
+        if (totalMatch) insuranceData['insurance_total'] = totalMatch[1]
         if (startMatch) insuranceData['coverage_start'] = startMatch[1]
         if (endMatch) insuranceData['coverage_end'] = endMatch[1]
 
@@ -140,7 +143,7 @@ Page({
 
   async onSubmit() {
     const { repoId, title, message, mileage, cost_total, type, selectedDate,
-            insurance_type, insurance_company, policy_number, coverage_start, coverage_end,
+            insurance_company, commercial_insurance, compulsory_insurance, insurance_total, coverage_start, coverage_end,
             isEditMode, editCommitId } = this.data
     
     if (!title) {
@@ -155,7 +158,7 @@ Page({
 
       let finalMessage = message
       if (type === 'insurance') {
-          finalMessage += `\n\n【保险信息】\n类型: ${insurance_type}\n公司: ${insurance_company}\n保单号: ${policy_number}\n起保: ${coverage_start}\n到期: ${coverage_end}`
+          finalMessage += `\n\n【保险信息】\n公司: ${insurance_company}\n商业险: ¥${commercial_insurance}\n交强险: ¥${compulsory_insurance}\n总费用: ¥${insurance_total}\n起保: ${coverage_start}\n到期: ${coverage_end}`
       }
 
       const commitData = {
