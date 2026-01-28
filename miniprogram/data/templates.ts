@@ -1,7 +1,7 @@
 export interface MaintenanceTemplate {
   id: string;
   title: string;
-  type: 'maintenance' | 'repair' | 'modification' | 'preparation' | 'insurance';
+  type: 'maintenance' | 'repair' | 'modification' | 'fuel' | 'parking' | 'insurance';
   suggestedCost: number;
   suggestedMileageInterval?: number;
   icon: string;
@@ -113,14 +113,21 @@ export const MAINTENANCE_TEMPLATES: MaintenanceTemplate[] = [
     description: '升级车载音响系统'
   },
 
-  // 整备 (Preparation)
   {
-    id: 'detailing',
-    title: '全车整备',
-    type: 'preparation',
-    suggestedCost: 2000,
-    icon: '✨',
-    description: '全车精洗、内饰清洁、漆面修复'
+    id: 'fuel',
+    title: '加油费用',
+    type: 'fuel',
+    suggestedCost: 300,
+    icon: '⛽',
+    description: '燃油加注费用'
+  },
+  {
+    id: 'parking',
+    title: '停车费用',
+    type: 'parking',
+    suggestedCost: 50,
+    icon: '🅿️',
+    description: '停车场费用'
   },
 
   // 保险 (Insurance)

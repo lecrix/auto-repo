@@ -28,8 +28,8 @@ Page({
     coverage_end: formatDate(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())),
 
     type: 'maintenance',
-    typeKeys: ['maintenance', 'repair', 'modification', 'preparation', 'insurance'],
-    typeLabels: ['常规保养', '故障维修', '改装升级', '整备翻新', '车辆保险'],
+    typeKeys: ['maintenance', 'repair', 'modification', 'fuel', 'parking', 'insurance'],
+    typeLabels: ['常规保养', '故障维修', '改装升级', '加油费用', '停车费用', '车辆保险'],
     typeIndex: 0,
     templates: MAINTENANCE_TEMPLATES,
     selectedTemplateId: '',

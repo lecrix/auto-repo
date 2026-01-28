@@ -29,7 +29,8 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
     maintenance: '保养',
     repair: '维修',
     modification: '改装',
-    preparation: '整备',
+    fuel: '加油',
+    parking: '停车',
     insurance: '保险'
   };
 
