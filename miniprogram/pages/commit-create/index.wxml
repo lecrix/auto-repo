@@ -46,16 +46,12 @@
       <input class="input" value="{{insurance_company}}" placeholder="如: 平安保险" data-field="insurance_company" bindinput="onInput" />
     </view>
     <view class="form-group">
-      <view class="label">商业险费用 (元)</view>
-      <input class="input" type="digit" value="{{commercial_insurance}}" placeholder="0" data-field="commercial_insurance" bindinput="onInput" />
-    </view>
-    <view class="form-group">
       <view class="label">交强险费用 (元)</view>
       <input class="input" type="digit" value="{{compulsory_insurance}}" placeholder="0" data-field="compulsory_insurance" bindinput="onInput" />
     </view>
     <view class="form-group">
-      <view class="label">总费用 (元)</view>
-      <input class="input" type="digit" value="{{insurance_total}}" placeholder="0" data-field="insurance_total" bindinput="onInput" />
+      <view class="label">商业险费用 (元)</view>
+      <input class="input" type="digit" value="{{commercial_insurance}}" placeholder="0" data-field="commercial_insurance" bindinput="onInput" />
     </view>
    </block>
 

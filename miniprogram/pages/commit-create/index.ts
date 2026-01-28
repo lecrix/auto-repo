@@ -22,9 +22,8 @@ Page({
     
     // Insurance specific fields
     insurance_company: '',
-    commercial_insurance: '',
     compulsory_insurance: '',
-    insurance_total: '',
+    commercial_insurance: '',
 
     type: 'maintenance',
     typeKeys: ['maintenance', 'repair', 'modification', 'fuel', 'parking', 'inspection', 'other', 'insurance'],
@@ -64,14 +63,12 @@ Page({
       if (commit.type === 'insurance') {
         // Parse insurance info
         const companyMatch = message.match(/公司: (.+)/)
-        const commercialMatch = message.match(/商业险: ¥(.+)/)
         const compulsoryMatch = message.match(/交强险: ¥(.+)/)
-        const totalMatch = message.match(/总费用: ¥(.+)/)
+        const commercialMatch = message.match(/商业险: ¥(.+)/)
 
         if (companyMatch) insuranceData['insurance_company'] = companyMatch[1]
-        if (commercialMatch) insuranceData['commercial_insurance'] = commercialMatch[1]
         if (compulsoryMatch) insuranceData['compulsory_insurance'] = compulsoryMatch[1]
-        if (totalMatch) insuranceData['insurance_total'] = totalMatch[1]
+        if (commercialMatch) insuranceData['commercial_insurance'] = commercialMatch[1]
 
         // Strip insurance info from message for display
         const splitMsg = message.split('\n\n【保险信息】')
@@ -100,9 +97,19 @@ Page({
 
   onInput(e: any) {
     const field = e.currentTarget.dataset.field
+    const value = e.detail.value
     this.setData({
-      [field]: e.detail.value
+      [field]: value
     })
+
+    // Auto-calculate total for insurance
+    if (this.data.type === 'insurance' && (field === 'compulsory_insurance' || field === 'commercial_insurance')) {
+      const compulsory = Number(field === 'compulsory_insurance' ? value : this.data.compulsory_insurance) || 0
+      const commercial = Number(field === 'commercial_insurance' ? value : this.data.commercial_insurance) || 0
+      this.setData({
+        cost_total: String(compulsory + commercial)
+      })
+    }
   },
 
   bindDateChange(e: any) {
@@ -137,7 +144,7 @@ Page({
 
   async onSubmit() {
     const { repoId, title, message, mileage, cost_total, type, selectedDate,
-            insurance_company, commercial_insurance, compulsory_insurance, insurance_total,
+            insurance_company, commercial_insurance, compulsory_insurance,
             isEditMode, editCommitId } = this.data
     
     if (!title) {
@@ -152,7 +159,7 @@ Page({
 
       let finalMessage = message
       if (type === 'insurance') {
-          finalMessage += `\n\n【保险信息】\n公司: ${insurance_company}\n商业险: ¥${commercial_insurance}\n交强险: ¥${compulsory_insurance}\n总费用: ¥${insurance_total}`
+          finalMessage += `\n\n【保险信息】\n公司: ${insurance_company}\n交强险: ¥${compulsory_insurance}\n商业险: ¥${commercial_insurance}`
       }
 
       const commitData = {
