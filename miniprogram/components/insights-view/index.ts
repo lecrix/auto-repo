@@ -46,6 +46,8 @@ Component({
                     modification: '改装',
                     fuel: '加油',
                     parking: '停车',
+                    inspection: '年检',
+                    other: '其他',
                     insurance: '保险'
                 }
 

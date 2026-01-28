@@ -1,7 +1,7 @@
 export interface MaintenanceTemplate {
   id: string;
   title: string;
-  type: 'maintenance' | 'repair' | 'modification' | 'fuel' | 'parking' | 'insurance';
+  type: 'maintenance' | 'repair' | 'modification' | 'fuel' | 'parking' | 'inspection' | 'other' | 'insurance';
   suggestedCost: number;
   suggestedMileageInterval?: number;
   icon: string;
@@ -60,31 +60,7 @@ export const MAINTENANCE_TEMPLATES: MaintenanceTemplate[] = [
     icon: '❄️',
     description: '更换防冻冷却液'
   },
-  {
-    id: 'annual_inspection',
-    title: '年检',
-    type: 'maintenance',
-    suggestedCost: 300,
-    icon: '📋',
-    description: '车辆年度检验'
-  },
-  {
-    id: 'fuel_cost',
-    title: '加油',
-    type: 'maintenance',
-    suggestedCost: 400,
-    icon: '⛽',
-    description: '燃油加油记录'
-  },
-  {
-    id: 'parking_cost',
-    title: '停车费',
-    type: 'maintenance',
-    suggestedCost: 20,
-    icon: '🅿️',
-    description: '停车费用记录'
-  },
-
+  
   // 维修 (Repair)
   {
     id: 'brake_pads',
@@ -128,6 +104,22 @@ export const MAINTENANCE_TEMPLATES: MaintenanceTemplate[] = [
     suggestedCost: 50,
     icon: '🅿️',
     description: '停车场费用'
+  },
+  {
+    id: 'inspection',
+    title: '年检费用',
+    type: 'inspection',
+    suggestedCost: 300,
+    icon: '📋',
+    description: '车辆年度检验费用'
+  },
+  {
+    id: 'other',
+    title: '其他费用',
+    type: 'other',
+    suggestedCost: 100,
+    icon: '💰',
+    description: '其他杂项费用'
   },
 
   // 保险 (Insurance)
