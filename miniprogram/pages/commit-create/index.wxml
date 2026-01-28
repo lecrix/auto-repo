@@ -57,20 +57,6 @@
       <view class="label">总费用 (元)</view>
       <input class="input" type="digit" value="{{insurance_total}}" placeholder="0" data-field="insurance_total" bindinput="onInput" />
     </view>
-    <view class="row">
-      <view class="form-group half">
-        <view class="label">起保日期</view>
-        <picker mode="date" value="{{coverage_start}}" data-field="coverage_start" bindchange="bindDateChange">
-          <view class="picker">{{coverage_start}}</view>
-        </picker>
-      </view>
-      <view class="form-group half">
-        <view class="label">到期日期</view>
-        <picker mode="date" value="{{coverage_end}}" data-field="coverage_end" bindchange="bindDateChange">
-          <view class="picker">{{coverage_end}}</view>
-        </picker>
-      </view>
-    </view>
    </block>
 
    <view class="section-title">详情内容</view>
