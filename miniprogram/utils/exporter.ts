@@ -46,12 +46,18 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
     csv += `${date},${type},${title},${mileage},${totalCost},${message}\n`;
   });
 
-  // Generate filename with timestamp
-  const timestamp = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hour = String(now.getHours()).padStart(2, '0');
+  const minute = String(now.getMinutes()).padStart(2, '0');
+  const second = String(now.getSeconds()).padStart(2, '0');
+  const timestamp = `${year}${month}${day}_${hour}${minute}${second}`;
+  
   const sanitizedRepoName = repoName.replace(/[^\w\u4e00-\u9fa5]/g, '_');
-  const fileName = `${sanitizedRepoName}_维保记录_${timestamp}.xls`;
+  const fileName = `${sanitizedRepoName}_${timestamp}.xls`;
 
-  // Save file using WeChat FileSystemManager
   const fs = wx.getFileSystemManager();
   const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
 
@@ -65,9 +71,15 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
       },
       fail: (err: any) => {
         console.error('Failed to write CSV file:', err);
-        reject(new Error('文件保存失败'));
+        
+        if (err.errMsg && err.errMsg.includes('EBUSY')) {
+          reject(new Error('文件被占用，请关闭已打开的Excel文件后重试'));
+        } else {
+          reject(new Error(`文件保存失败: ${err.errMsg || '未知错误'}`));
+        }
       }
     });
+  });
   });
 };
 
