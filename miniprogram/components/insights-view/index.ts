@@ -40,6 +40,21 @@ Component({
                     getRepoTrends(id, 6)
                 ])
 
+                const typeMap: { [key: string]: string } = {
+                    maintenance: '保养',
+                    repair: '维修',
+                    modification: '改装',
+                    preparation: '整备',
+                    insurance: '保险'
+                }
+
+                if (stats && stats.composition) {
+                    stats.composition = stats.composition.map((item: any) => ({
+                        ...item,
+                        name: typeMap[item.name] || item.name
+                    }))
+                }
+
                 if (trends && trends.months && trends.months.length > 0) {
                     const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
                     const maxMileage = Math.max(...trends.months.map((m: any) => m.mileage || 0))

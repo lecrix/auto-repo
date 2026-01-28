@@ -20,8 +20,12 @@
   <view class="chart-section" wx:if="{{trends && trends.months && trends.months.length > 0}}">
     <view class="section-title">趋势分析 (最近6个月)</view>
     <wxs module="utils">
-    module.exports.parseInt = function(s) {
-      return parseInt(s);
+    module.exports.getMonthNumber = function(monthStr) {
+      if (!monthStr || typeof monthStr !== 'string') return '';
+      var parts = monthStr.split('-');
+      if (parts.length < 2) return '';
+      var month = parseInt(parts[1]);
+      return isNaN(month) ? '' : month;
     }
     </wxs>
     <view class="trend-container">
@@ -33,7 +37,7 @@
             <view class="bar-wrapper">
               <view class="bar" style="height: {{item.cost / (trends.maxCost || 1) * 100}}%"></view>
             </view>
-            <view class="bar-label">{{utils.parseInt(item.month.split('-')[1])}}月</view>
+            <view class="bar-label">{{utils.getMonthNumber(item.month)}}月</view>
             <view class="bar-value">¥{{item.cost}}</view>
           </view>
         </view>
@@ -47,7 +51,7 @@
             <view class="bar-wrapper">
               <view class="bar mileage" style="height: {{item.mileage / (trends.maxMileage || 1) * 100}}%"></view>
             </view>
-            <view class="bar-label">{{utils.parseInt(item.month.split('-')[1])}}月</view>
+            <view class="bar-label">{{utils.getMonthNumber(item.month)}}月</view>
             <view class="bar-value">{{item.mileage}}km</view>
           </view>
         </view>
