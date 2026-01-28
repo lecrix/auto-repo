@@ -35,7 +35,7 @@ async def create_repo(repo: Repo):
             "repo_id": repo_id,
             "title": "购车费用",
             "message": f"车辆购买成本：¥{repo.purchase_cost}",
-            "type": "other",
+            "type": "purchase",
             "mileage": repo.current_mileage if repo.current_mileage else None,
             "cost": {
                 "parts": float(repo.purchase_cost),
@@ -363,9 +363,6 @@ async def get_repo_stats(repo_id: str):
     ]
     composition = await db.commits.aggregate(composition_pipeline).to_list(length=10)
     chart_data = [{"name": item["_id"], "value": item["value"]} for item in composition]
-    
-    if purchase_cost > 0:
-        chart_data.append({"name": "purchase", "value": purchase_cost})
     
     for item in chart_data:
         item["percentage"] = round((item["value"] / total_cost) * 100, 1) if total_cost > 0 else 0
