@@ -26,8 +26,8 @@ Page({
     commercial_insurance: '',
 
     type: 'maintenance',
-    typeKeys: ['maintenance', 'repair', 'modification', 'fuel', 'parking', 'inspection', 'other', 'insurance'],
-    typeLabels: ['常规保养', '故障维修', '改装升级', '加油费用', '停车费用', '年检费用', '其他费用', '车辆保险'],
+    typeKeys: ['maintenance', 'repair', 'modification', 'fuel', 'parking', 'inspection', 'other', 'insurance', 'purchase'],
+    typeLabels: ['常规保养', '故障维修', '改装升级', '加油费用', '停车费用', '年检费用', '其他费用', '车辆保险', '购车费用'],
     typeIndex: 0,
     templates: MAINTENANCE_TEMPLATES,
     selectedTemplateId: '',
@@ -37,7 +37,7 @@ Page({
   },
 
   async onLoad(options: any) {
-    this.data.repoId = options.repoId
+    this.setData({ repoId: options.repoId })
     
     if (options.mode === 'edit' && options.id) {
       this.setData({

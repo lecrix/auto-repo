@@ -6,6 +6,7 @@ Page({
     loading: true,
     startX: 0,
     startY: 0,
+    lastThrottleTime: 0,
     // Nav Bar Data
     navHeight: 60,
     menuTop: 24,
@@ -38,36 +39,18 @@ Page({
 
   async loadRepos() {
     try {
-      const repos = await getRepos()
-      // Calculate vehicle age and initialize offsetX for each repo
-      const formattedRepos = (repos as any[]).map(r => {
-        let vehicle_age = ''
-        if (r.register_date) {
-          const now = new Date()
-          const regDate = new Date(r.register_date)
-          let years = now.getFullYear() - regDate.getFullYear()
-          let months = now.getMonth() - regDate.getMonth()
-          if (months < 0) {
-            years--
-            months += 12
-          }
-          if (years > 0) {
-            vehicle_age = months > 0 ? `${years}年${months}个月` : `${years}年`
-          } else if (months > 0) {
-            vehicle_age = `${months}个月`
-          }
-        }
-        return {
-          ...r,
-          vehicle_age,
-          offsetX: 0
-        }
+      const repos: any[] = await getRepos()
+      repos.forEach((r: any) => { r.offsetX = 0 })
+      this.setData({ repos })
+    } catch (err: any) {
+      console.error('Failed to load repos:', err)
+      wx.showToast({
+        title: err.message || '加载失败',
+        icon: 'none',
+        duration: 2500
       })
-      this.setData({
-        repos: formattedRepos,
-        loading: false
-      })
-    } catch (e) {
+      this.setData({ repos: [] })
+    } finally {
       this.setData({ loading: false })
     }
   },
@@ -108,9 +91,8 @@ Page({
           wx.showLoading({ title: 'Deleting...' })
           try {
             await deleteRepo(id)
-            const repos = this.data.repos
-            repos.splice(index, 1)
-            this.setData({ repos })
+            const newRepos = this.data.repos.filter((_, i) => i !== index)
+            this.setData({ repos: newRepos })
             wx.showToast({ title: '已删除', icon: 'success' })
           } catch (err) {
             wx.showToast({ title: '删除失败', icon: 'none' })
@@ -134,24 +116,31 @@ Page({
 
   touchMove(e: any) {
     if (e.touches.length === 1) {
+      const now = Date.now()
+      if (now - this.data.lastThrottleTime < 16) return
+      
       const index = e.currentTarget.dataset.index
       const moveX = e.touches[0].clientX
       const disX = this.data.startX - moveX
 
-      // Basic vertical scroll check
       const moveY = e.touches[0].clientY
       const disY = Math.abs(this.data.startY - moveY)
-      if (disY > 20) return // Vertical scroll, ignore horizontal
+      if (disY > 20) return
 
       let offsetX = 0
-      if (disX > 0) { // Sliding Left
-        offsetX = -Math.min(disX, 140) // Max width of buttons (70*2)
+      if (disX > 0) {
+        offsetX = -Math.min(disX, 140)
       } else {
         offsetX = 0
       }
 
-      const key = `repos[${index}].offsetX`
-      this.setData({ [key]: offsetX })
+      const currentOffsetX = this.data.repos[index]?.offsetX || 0
+      if (currentOffsetX === offsetX) return
+
+      this.setData({ 
+        [`repos[${index}].offsetX`]: offsetX,
+        lastThrottleTime: now
+      })
     }
   },
 
@@ -174,32 +163,62 @@ Page({
      }
    },
 
-   onShowHelp() {
-     const helpContent = `1. 创建车辆
-点击"+"按钮，输入车型、年份等信息，建立你的第一个爱车档案。
+    onShowHelp() {
+      const helpContent = `📚 快速入门
 
-2. 记录维保
-进入车辆详情页面，点击"新建Commit"按钮记录每次保养、维修、改装或零件更换。每条记录都会自动更新车辆的当前里程。
+🚗 车辆管理
+• 点击「+」按钮创建车辆档案
+• 填写车型、车牌、购车日期、购车费用等基础信息
+• 「购车时里程」记录提车时的里程数（用于计算实际行驶里程）
+• 向左滑动车辆卡片可以编辑或删除
 
-3. 使用模板
-常见维保项目（如换机油、轮胎保养等）已有模板，选择模板可快速填写，大幅节省时间。
 
-4. 查看历史
-车辆详情页展示所有维保记录的时间线，一目了然查看爱车的成长历程。
+📝 记录维保
+• 进入车辆详情页，点击「新建Commit」
+• 选择记录类型：
+  - 常规保养（换机油、滤芯等）
+  - 维修（故障修理）
+  - 改装（加装配件）
+  - 加油（油费记录）
+  - 停车（停车费）
+  - 购车费用（自动生成，也可手动添加）
+• 填写日期、里程、费用、备注等信息
+• 可使用快捷模板快速填写常见项目
 
-5. 导出与分享
-在车辆详情页点击"导出"按钮，生成数据报告便于备份或分享给朋友。
 
-6. 数据管理
-向左滑动车辆卡片，可快速编辑或删除车辆记录。所有数据都自动保存到云端。`
+📊 数据统计
+车辆详情页的「数据统计」栏目包含：
+• 总花费 = 购车费用 + 所有维保记录费用
+• 每公里成本 = 总花费 ÷ 行驶里程
+• 每公里油费 = 所有加油费用 ÷ 行驶里程
+• 月度花费趋势图（可查看历史支出变化）
 
-     wx.showModal({
-       title: '📖 使用帮助',
-       content: helpContent,
-       showCancel: false,
-       confirmText: '知道了',
-       confirmColor: '#2c3e50',
-       success: () => {}
-     })
-   }
+
+🕐 时间线
+• 按时间倒序展示所有维保记录
+• 每条记录显示：类型、日期、费用
+• 点击记录查看详细信息
+• 长按可编辑或删除记录
+
+
+💾 导出功能
+• 在车辆详情页点击「导出」按钮
+• 生成Excel格式数据报告
+• 可通过微信发送给好友或保存备份
+
+
+💡 小贴士
+• 购车费用会自动计入总花费统计
+• 每次新建记录，当前里程会自动更新
+• 行驶里程 = 当前里程 - 购车时里程`
+
+      wx.showModal({
+        title: '📖 使用帮助',
+        content: helpContent,
+        showCancel: false,
+        confirmText: '知道了',
+        confirmColor: '#2c3e50',
+        success: () => {}
+      })
+    }
 })

@@ -1,10 +1,5 @@
 <custom-nav />
 
-<!-- Help Button (Fixed top-right) -->
-<view class="help-button" bindtap="onShowHelp" title="使用帮助">
-  <text class="help-icon">❓</text>
-</view>
-
 <view class="container">
 
   <view class="repo-list">
@@ -48,6 +43,12 @@
       <view class="add-card ripple" bindtap="goToCreate">
         <text class="add-icon">+</text>
         <text class="add-text">添加车辆</text>
+      </view>
+
+      <!-- Help Button (Bottom) -->
+      <view class="help-button-bottom" bindtap="onShowHelp" title="使用帮助">
+        <text class="help-icon">❓</text>
+        <text class="help-text">使用帮助</text>
       </view>
 
     </block>

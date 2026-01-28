@@ -1,6 +1,7 @@
 import { getRepoDetail, getCommits } from '../../services/api'
-import { formatTime } from '../../utils/util'
 import { exportToCSV, shareCSV } from '../../utils/exporter'
+import { formatLocalDate, formatLocalDateTime } from '../../utils/date'
+import { calculateDaysLeft, formatDaysLeft, calculateVehicleAge, isDueWarning } from '../../utils/vehicle'
 
 Page({
   data: {
@@ -34,68 +35,31 @@ Page({
         getCommits(this.data.repoId, this.data.filters)
       ])
 
-      // Format timestamps
-      const formatDate = (ts: number) => ts ? new Date(ts).toISOString().split('T')[0] : '--';
+      const formatDate = (ts: number) => ts ? formatLocalDate(ts) : '--'
 
-      // Calculate days until expiry (negative = overdue)
-      const calcDaysLeft = (ts: number): number | null => {
-        if (!ts) return null;
-        const now = Date.now();
-        return Math.ceil((ts - now) / (24 * 60 * 60 * 1000));
-      };
-
-      // Calculate vehicle age in years and months
-      const calcVehicleAge = (registerTs: number): string => {
-        if (!registerTs) return '--';
-        const now = new Date();
-        const regDate = new Date(registerTs);
-        let years = now.getFullYear() - regDate.getFullYear();
-        let months = now.getMonth() - regDate.getMonth();
-        if (months < 0) {
-          years--;
-          months += 12;
-        }
-        if (years > 0) {
-          return months > 0 ? `${years}年${months}个月` : `${years}年`;
-        }
-        return `${months}个月`;
-      };
-
-      // Format days left for display
-      const formatDaysLeft = (days: number | null): string => {
-        if (days === null) return '--';
-        if (days < 0) return `已过期${Math.abs(days)}天`;
-        if (days === 0) return '今天到期';
-        return `${days}天`;
-      };
-
-      // Inject formatted dates into repo object for view
       if (repo) {
-        repo.formatted_register_date = formatDate(repo.register_date);
-        repo.vehicle_age = calcVehicleAge(repo.register_date);
+        repo.formatted_register_date = formatDate(repo.register_date)
+        repo.vehicle_age = calculateVehicleAge(repo.register_date)
         
-        // Calculate driven distance
-        const drivenDistance = repo.current_mileage - (repo.initial_mileage || 0);
-        repo.driven_distance = drivenDistance;
+        const drivenMileage = repo.current_mileage - (repo.initial_mileage || 0)
+        repo.driven_mileage = drivenMileage
 
-        // Calculate days left for each expiry
-        const inspectionDays = calcDaysLeft(repo.inspection_expiry);
-        const compulsoryDays = calcDaysLeft(repo.compulsory_insurance_expiry);
-        const commercialDays = calcDaysLeft(repo.commercial_insurance_expiry);
+        const inspectionDays = calculateDaysLeft(repo.inspection_expiry)
+        const compulsoryDays = calculateDaysLeft(repo.compulsory_insurance_expiry)
+        const commercialDays = calculateDaysLeft(repo.commercial_insurance_expiry)
 
-        repo.inspection_days_left = formatDaysLeft(inspectionDays);
-        repo.compulsory_days_left = formatDaysLeft(compulsoryDays);
-        repo.commercial_days_left = formatDaysLeft(commercialDays);
+        repo.inspection_days_left = formatDaysLeft(inspectionDays)
+        repo.compulsory_days_left = formatDaysLeft(compulsoryDays)
+        repo.commercial_days_left = formatDaysLeft(commercialDays)
 
-        // Warning flags (< 30 days or overdue)
-        repo.inspection_warning = inspectionDays !== null && inspectionDays < 30;
-        repo.compulsory_warning = compulsoryDays !== null && compulsoryDays < 30;
-        repo.commercial_warning = commercialDays !== null && commercialDays < 30;
+        repo.inspection_warning = isDueWarning(inspectionDays)
+        repo.compulsory_warning = isDueWarning(compulsoryDays)
+        repo.commercial_warning = isDueWarning(commercialDays)
       }
 
       const formattedCommits = (commits as any[]).map(c => ({
         ...c,
-        date: formatTime(new Date(c.timestamp))
+        date: formatLocalDateTime(c.timestamp)
       }))
 
       this.setData({
@@ -148,9 +112,17 @@ Page({
   },
 
   async handleExport() {
-    if (this.data.commits.length === 0) {
+    if (!this.data.commits || this.data.commits.length === 0) {
       wx.showToast({
         title: '暂无记录可导出',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (!this.data.repo || !this.data.repo.name) {
+      wx.showToast({
+        title: '车辆信息缺失',
         icon: 'none'
       })
       return

@@ -14,6 +14,10 @@
       <view class="label">每公里成本</view>
       <view class="value">¥{{stats.cost_per_km || 0}}</view>
     </view>
+    <view class="metric-card">
+      <view class="label">每公里油费</view>
+      <view class="value">¥{{stats.fuel_cost_per_km || 0}}</view>
+    </view>
   </view>
 
   <!-- 2. Trend Charts Section -->
@@ -43,19 +47,7 @@
         </view>
       </view>
 
-       <!-- Mileage Trend -->
-       <view class="trend-chart">
-         <view class="trend-label">月度里程</view>
-        <view class="trend-bars">
-          <view class="trend-bar-item" wx:for="{{trends.months}}" wx:key="month">
-            <view class="bar-wrapper">
-              <view class="bar mileage" style="height: {{item.mileage / (trends.maxMileage || 1) * 100}}%"></view>
-            </view>
-            <view class="bar-label">{{utils.getMonthNumber(item.month)}}月</view>
-            <view class="bar-value">{{item.mileage}}km</view>
-          </view>
-        </view>
-      </view>
+       <!-- Mileage Trend - Removed per user request -->
     </view>
   </view>
 

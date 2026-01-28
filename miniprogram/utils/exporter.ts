@@ -4,6 +4,8 @@
  * Uses WeChat FileSystemManager for local storage and sharing
  */
 
+import { formatLocalDate } from './date'
+
 interface ExportCommit {
   _id?: string;
   title: string;
@@ -37,7 +39,7 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
   };
 
   commits.forEach(commit => {
-    const date = formatDate(commit.timestamp);
+    const date = formatLocalDate(commit.timestamp);
     const type = typeMap[commit.type] || commit.type;
     const title = escapeCSV(commit.title);
     const mileage = commit.mileage || 0;
@@ -131,24 +133,9 @@ export const shareCSV = (filePath: string) => {
 const escapeCSV = (value: string): string => {
   if (!value) return '';
   
-  // If value contains comma, quote, or newline, wrap in quotes and escape quotes
   if (value.includes(',') || value.includes('"') || value.includes('\n')) {
     return `"${value.replace(/"/g, '""')}"`;
   }
   
   return value;
-};
-
-/**
- * Format timestamp to YYYY-MM-DD
- */
-const formatDate = (timestamp: number): string => {
-  if (!timestamp) return '--';
-  
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
 };

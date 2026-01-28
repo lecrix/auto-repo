@@ -30,16 +30,8 @@
     </view>
 
     <view class="cost-section" wx:if="{{commit.cost}}">
-        <view class="cost-row">
-            <text>配件费</text>
-            <text>¥ {{commit.cost.parts}}</text>
-        </view>
-        <view class="cost-row">
-            <text>工时费</text>
-            <text>¥ {{commit.cost.labor}}</text>
-        </view>
         <view class="total-row">
-            <text>总计</text>
+            <text>总计费用</text>
             <text class="total-price">¥ {{commit.cost.parts + commit.cost.labor}}</text>
         </view>
     </view>

@@ -201,29 +201,32 @@
   margin-top: var(--spacing-xl);
 }
 
-/* Help Button */
-.help-button {
-  position: fixed;
-  top: 60px;
-  right: 16px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--primary-color);
+/* Help Button (Bottom) */
+.help-button-bottom {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
-  z-index: 999;
+  gap: 8px;
   transition: all 0.2s var(--ease-out-expo);
 }
 
-.help-button:active {
-  transform: scale(0.92);
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+.help-button-bottom:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .help-icon {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
+}
+
+.help-text {
+  font-size: 15px;
+  color: var(--text-main);
+  font-weight: 500;
 }

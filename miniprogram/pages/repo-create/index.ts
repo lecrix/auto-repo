@@ -39,6 +39,7 @@ Page({
     name: '',
     vin: '',
     current_mileage: '',
+    initial_mileage: '',
     purchase_cost: '',
 
     // Color
@@ -54,6 +55,7 @@ Page({
 
     // Date fields (Strings YYYY-MM-DD for picker)
     register_date: '',
+    purchase_date: '',
     compulsory_start: '',
     compulsory_insurance_expiry: '',
     commercial_start: '',
@@ -82,9 +84,11 @@ Page({
         name: repo.name,
         vin: repo.vin || '',
         current_mileage: repo.current_mileage,
+        initial_mileage: repo.initial_mileage || 0,
         purchase_cost: repo.purchase_cost || '',
         color: repo.color || '#2c3e50',
         register_date: formatTs(repo.register_date),
+        purchase_date: formatTs(repo.purchase_date),
         compulsory_insurance_expiry: formatTs(repo.compulsory_insurance_expiry),
         compulsory_start: formatTs(repo.compulsory_start),
         commercial_insurance_expiry: formatTs(repo.commercial_insurance_expiry),
@@ -177,7 +181,7 @@ Page({
   },
 
    async onSubmit() {
-     const { repoId, name, vin, current_mileage, purchase_cost, color, register_date, compulsory_insurance_expiry, compulsory_start, commercial_insurance_expiry, commercial_start, inspection_expiry, inspection_start } = this.data
+     const { repoId, name, vin, current_mileage, initial_mileage, purchase_cost, color, register_date, purchase_date, compulsory_insurance_expiry, compulsory_start, commercial_insurance_expiry, commercial_start, inspection_expiry, inspection_start } = this.data
 
      if (!name) {
        wx.showToast({ title: '请输入车辆名称', icon: 'none' })
@@ -189,10 +193,11 @@ Page({
        vin,
        color,
        current_mileage: Number(current_mileage) || 0,
-       initial_mileage: Number(current_mileage) || 0,
+       initial_mileage: Number(initial_mileage) || 0,
        purchase_cost: purchase_cost ? Number(purchase_cost) : undefined,
        // Convert dates to Timestamps (ms)
        register_date: register_date ? new Date(register_date).getTime() : null,
+       purchase_date: purchase_date ? new Date(purchase_date).getTime() : null,
        compulsory_insurance_expiry: compulsory_insurance_expiry ? new Date(compulsory_insurance_expiry).getTime() : null,
        compulsory_start: compulsory_start ? new Date(compulsory_start).getTime() : null,
        commercial_insurance_expiry: commercial_insurance_expiry ? new Date(commercial_insurance_expiry).getTime() : null,

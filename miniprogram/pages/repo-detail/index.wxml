@@ -22,9 +22,22 @@
         <!-- Left Column: Mileage & Register Date -->
         <view class="header-left">
           <view class="mileage-block">
-            <text class="mileage-label">总里程</text>
-            <text class="mileage-value">{{repo.current_mileage}}</text>
-            <text class="mileage-unit">km</text>
+            <view class="mileage-row">
+              <view class="mileage-item">
+                <text class="mileage-label">总里程</text>
+                <view class="mileage-value-wrap">
+                  <text class="mileage-value">{{repo.current_mileage}}</text>
+                  <text class="mileage-unit">km</text>
+                </view>
+              </view>
+              <view class="mileage-item">
+                <text class="mileage-label">行驶里程</text>
+                <view class="mileage-value-wrap">
+                  <text class="mileage-value">{{repo.driven_mileage}}</text>
+                  <text class="mileage-unit">km</text>
+                </view>
+              </view>
+            </view>
           </view>
           <view class="register-info">
             <view class="info-row">
@@ -95,10 +108,9 @@
                 <view class="commit-content" bindtap="goToCommitDetail" data-id="{{item._id}}">
                     <view class="commit-header">
                     <text class="commit-title">{{item.title}}</text>
-                    <text class="commit-miles">{{item.mileage}} km</text>
+                    <text class="commit-miles">¥{{item.cost ? (item.cost.parts || 0) + (item.cost.labor || 0) : 0}}</text>
                     </view>
                     <view class="commit-meta">
-                    <text class="commit-cost">¥{{item.cost ? (item.cost.parts || 0) + (item.cost.labor || 0) : 0}}</text>
                     <text class="commit-date">{{item.date}}</text>
                     </view>
                 </view>

@@ -17,6 +17,11 @@
     </view>
 
    <view class="form-group">
+     <view class="label">购车时里程</view>
+     <input class="input" type="number" placeholder="0" data-field="initial_mileage" value="{{initial_mileage}}" bindinput="onInput" />
+   </view>
+
+   <view class="form-group">
      <view class="label">购车费用 (可选)</view>
      <input class="input" type="number" placeholder="购车成本（元）" data-field="purchase_cost" value="{{purchase_cost}}" bindinput="onInput" />
    </view>
@@ -45,6 +50,15 @@
     <picker mode="date" bindchange="onDateChange" data-field="register_date">
       <view class="picker {{register_date ? '' : 'placeholder'}}">
         {{register_date || '请选择日期'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <view class="label">购车日期</view>
+    <picker mode="date" bindchange="onDateChange" data-field="purchase_date">
+      <view class="picker {{purchase_date ? '' : 'placeholder'}}">
+        {{purchase_date || '请选择日期'}}
       </view>
     </picker>
   </view>

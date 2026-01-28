@@ -1,5 +1,6 @@
 import { getCommitDetail, deleteCommit } from '../../services/api'
 import { formatTime } from '../../utils/util'
+import { formatLocalDateTime } from '../../utils/date'
 
 Page({
   data: {
@@ -21,7 +22,7 @@ Page({
     if (options.commitId) {
         const commit: any = await getCommitDetail(options.commitId)
         if (commit) {
-            commit.date = formatTime(new Date(commit.timestamp))
+            commit.date = formatLocalDateTime(commit.timestamp)
             this.setData({ commit })
         }
     }
