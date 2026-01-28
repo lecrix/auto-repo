@@ -48,7 +48,8 @@ Component({
                     parking: '停车',
                     inspection: '年检',
                     other: '其他',
-                    insurance: '保险'
+                    insurance: '保险',
+                    purchase: '购车'
                 }
 
                 if (stats && stats.composition) {

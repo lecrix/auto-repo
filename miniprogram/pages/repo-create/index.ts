@@ -82,11 +82,15 @@ Page({
         name: repo.name,
         vin: repo.vin || '',
         current_mileage: repo.current_mileage,
+        purchase_cost: repo.purchase_cost || '',
         color: repo.color || '#2c3e50',
         register_date: formatTs(repo.register_date),
         compulsory_insurance_expiry: formatTs(repo.compulsory_insurance_expiry),
+        compulsory_start: formatTs(repo.compulsory_start),
         commercial_insurance_expiry: formatTs(repo.commercial_insurance_expiry),
-        inspection_expiry: formatTs(repo.inspection_expiry)
+        commercial_start: formatTs(repo.commercial_start),
+        inspection_expiry: formatTs(repo.inspection_expiry),
+        inspection_start: formatTs(repo.inspection_start)
       })
     } catch (e) {
       console.error(e)
@@ -173,7 +177,7 @@ Page({
   },
 
    async onSubmit() {
-     const { repoId, name, vin, current_mileage, purchase_cost, color, register_date, compulsory_insurance_expiry, commercial_insurance_expiry, inspection_expiry } = this.data
+     const { repoId, name, vin, current_mileage, purchase_cost, color, register_date, compulsory_insurance_expiry, compulsory_start, commercial_insurance_expiry, commercial_start, inspection_expiry, inspection_start } = this.data
 
      if (!name) {
        wx.showToast({ title: '请输入车辆名称', icon: 'none' })
@@ -190,8 +194,11 @@ Page({
        // Convert dates to Timestamps (ms)
        register_date: register_date ? new Date(register_date).getTime() : null,
        compulsory_insurance_expiry: compulsory_insurance_expiry ? new Date(compulsory_insurance_expiry).getTime() : null,
+       compulsory_start: compulsory_start ? new Date(compulsory_start).getTime() : null,
        commercial_insurance_expiry: commercial_insurance_expiry ? new Date(commercial_insurance_expiry).getTime() : null,
-       inspection_expiry: inspection_expiry ? new Date(inspection_expiry).getTime() : null
+       commercial_start: commercial_start ? new Date(commercial_start).getTime() : null,
+       inspection_expiry: inspection_expiry ? new Date(inspection_expiry).getTime() : null,
+       inspection_start: inspection_start ? new Date(inspection_start).getTime() : null
      }
 
      wx.showLoading({ title: 'Saving...' })

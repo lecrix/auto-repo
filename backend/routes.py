@@ -25,7 +25,28 @@ async def create_repo(repo: Repo):
     db = get_db()
     repo_dict = repo.dict(exclude={"id"})
     result = await db.repos.insert_one(repo_dict)
-    repo_dict["_id"] = str(result.inserted_id)
+    repo_id = str(result.inserted_id)
+    repo_dict["_id"] = repo_id
+    
+    # Auto-create purchase record if purchase_cost exists
+    if repo.purchase_cost and repo.purchase_cost > 0:
+        from datetime import datetime
+        purchase_commit = {
+            "repo_id": repo_id,
+            "title": "购车费用",
+            "message": f"车辆购买成本：¥{repo.purchase_cost}",
+            "type": "other",
+            "mileage": repo.current_mileage if repo.current_mileage else None,
+            "cost": {
+                "parts": float(repo.purchase_cost),
+                "labor": 0.0,
+                "currency": "CNY"
+            },
+            "closes_issues": [],
+            "timestamp": repo.register_date if repo.register_date else datetime.now().timestamp() * 1000
+        }
+        await db.commits.insert_one(purchase_commit)
+    
     return repo_dict
 
 @router.get("/repos/{repo_id}", response_model=Repo)
@@ -341,8 +362,13 @@ async def get_repo_stats(repo_id: str):
         }}
     ]
     composition = await db.commits.aggregate(composition_pipeline).to_list(length=10)
-    # Format for charts: [{"name": "Maintenance", "value": 1200}, ...]
     chart_data = [{"name": item["_id"], "value": item["value"]} for item in composition]
+    
+    if purchase_cost > 0:
+        chart_data.append({"name": "purchase", "value": purchase_cost})
+    
+    for item in chart_data:
+        item["percentage"] = round((item["value"] / total_cost) * 100, 1) if total_cost > 0 else 0
 
     return {
         "total_cost": total_cost,

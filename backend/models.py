@@ -48,6 +48,9 @@ class Repo(BaseModel):
     branch: str = "main"
     register_date: Optional[float] = None     # Registration timestamp
     compulsory_insurance_expiry: Optional[float] = None  # Compulsory Insurance expiry
+    compulsory_start: Optional[float] = None  # Compulsory Insurance start date
     commercial_insurance_expiry: Optional[float] = None  # Commercial Insurance expiry
+    commercial_start: Optional[float] = None  # Commercial Insurance start date
     inspection_expiry: Optional[float] = None # Inspection expiry timestamp
+    inspection_start: Optional[float] = None  # Inspection start date
     created_at: float = Field(default_factory=lambda: datetime.now().timestamp() * 1000)

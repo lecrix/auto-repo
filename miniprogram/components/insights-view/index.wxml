@@ -65,15 +65,15 @@
     <view class="chart-container">
       <!-- TODO: Integrate uCharts here later -->
       <!-- For now, use simple bar list visualization -->
-      <view class="simple-chart" wx:if="{{stats.composition && stats.composition.length > 0}}">
-         <view class="chart-row" wx:for="{{stats.composition}}" wx:key="name">
-            <view class="row-label">{{item.name}}</view>
-            <view class="row-bar-area">
-                <view class="row-bar" style="width: {{item.value / stats.total_cost * 100}}%"></view>
-            </view>
-            <view class="row-val">¥{{item.value}}</view>
-         </view>
-      </view>
+       <view class="simple-chart" wx:if="{{stats.composition && stats.composition.length > 0}}">
+          <view class="chart-row" wx:for="{{stats.composition}}" wx:key="name">
+             <view class="row-label">{{item.name}}</view>
+             <view class="row-bar-area">
+                 <view class="row-bar" style="width: {{item.percentage}}%"></view>
+             </view>
+             <view class="row-val">¥{{item.value}} ({{item.percentage}}%)</view>
+          </view>
+       </view>
       <view class="empty-state" wx:else>
         暂无数据
       </view>
