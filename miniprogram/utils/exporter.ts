@@ -80,7 +80,6 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
       }
     });
   });
-  });
 };
 
 /**
