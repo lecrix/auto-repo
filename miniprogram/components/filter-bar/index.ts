@@ -7,8 +7,8 @@ Component({
   },
   
   data: {
-    typeKeys: ['', 'maintenance', 'repair', 'modification'],
-    typeLabels: ['全部类型', '常规保养', '故障维修', '改装升级'],
+    typeKeys: ['', 'maintenance', 'repair', 'modification', 'fuel', 'parking', 'inspection', 'other', 'insurance'],
+    typeLabels: ['全部类型', '常规保养', '故障维修', '改装升级', '加油费用', '停车费用', '年检费用', '其他费用', '车辆保险'],
     typeIndex: 0,
     searchQuery: '',
     mileageMin: '',
