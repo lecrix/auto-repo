@@ -143,7 +143,7 @@ async def create_commit(commit: Commit):
     # Update current_mileage and current_head pointer on the Repo
     # FIX: Only update if the new commit's mileage is greater than current (prevent rollback when backfilling)
     current_repo = await db.repos.find_one({"_id": ObjectId(commit.repo_id)})
-    if current_repo and commit.mileage > current_repo.get("current_mileage", 0):
+    if current_repo and commit.mileage is not None and commit.mileage > current_repo.get("current_mileage", 0):
         await db.repos.update_one(
             {"_id": ObjectId(commit.repo_id)},
             {"$set": {
