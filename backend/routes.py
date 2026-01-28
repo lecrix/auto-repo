@@ -178,16 +178,62 @@ async def create_commit(commit: Commit):
     return commit_dict
 
 @router.get("/commits/{commit_id}", response_model=Commit)
-async def get_commit_detail(commit_id: str):
+async def get_commit(commit_id: str):
     db = get_db()
-    try:
-        commit = await db.commits.find_one({"_id": ObjectId(commit_id)})
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid ID")
+    
+    commit = await db.commits.find_one({"_id": ObjectId(commit_id)})
+    if not commit:
+        raise HTTPException(status_code=404, detail="Commit not found")
+    
+    commit["_id"] = str(commit["_id"])
+    
+    return commit
 
-    if commit:
-        commit["_id"] = str(commit["_id"])
-        return commit
+@router.put("/commits/{commit_id}")
+async def update_commit(commit_id: str, commit: Commit):
+    db = get_db()
+    
+    existing = await db.commits.find_one({"_id": ObjectId(commit_id)})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Commit not found")
+    
+    update_data = commit.dict(exclude_unset=True, exclude={"id"})
+    
+    await db.commits.update_one(
+        {"_id": ObjectId(commit_id)},
+        {"$set": update_data}
+    )
+    
+    if "mileage" in update_data and update_data["mileage"]:
+        repo = await db.repos.find_one({"_id": ObjectId(commit.repo_id)})
+        if repo and update_data["mileage"] > repo.get("current_mileage", 0):
+            await db.repos.update_one(
+                {"_id": ObjectId(commit.repo_id)},
+                {"$set": {
+                    "current_mileage": update_data["mileage"],
+                    "current_head": update_data.get("title", existing.get("title"))
+                }}
+            )
+    
+    updated = await db.commits.find_one({"_id": ObjectId(commit_id)})
+    updated["_id"] = str(updated["_id"])
+    
+    return updated
+
+@router.delete("/commits/{commit_id}")
+async def delete_commit(commit_id: str):
+    db = get_db()
+    
+    commit = await db.commits.find_one({"_id": ObjectId(commit_id)})
+    if not commit:
+        raise HTTPException(status_code=404, detail="Commit not found")
+    
+    result = await db.commits.delete_one({"_id": ObjectId(commit_id)})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=500, detail="Failed to delete commit")
+    
+    return {"message": "Commit deleted successfully", "id": commit_id}
     raise HTTPException(status_code=404, detail="Commit not found")
 
 # --- Issues (Reminders/Tasks) ---
