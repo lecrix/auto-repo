@@ -22,20 +22,19 @@ interface ExportCommit {
  * @param repoName - Vehicle name for filename
  */
 export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
-  // CSV header (Chinese column names)
-  const BOM = '\ufeff'; // UTF-8 BOM for Excel compatibility
-  let csv = BOM + '日期,类型,标题,里程(km),零件费用(元),人工费用(元),总费用(元),备注\n';
+  const BOM = '\ufeff';
+  let csv = BOM + '日期,类型,标题,里程(km),费用(元),备注\n';
 
-  // Type mapping
   const typeMap: { [key: string]: string } = {
     maintenance: '保养',
     repair: '维修',
-    modification: '改装'
+    modification: '改装',
+    preparation: '整备',
+    insurance: '保险'
   };
 
-  // Generate rows
   commits.forEach(commit => {
-    const date = commit.date || formatDate(commit.timestamp);
+    const date = formatDate(commit.timestamp);
     const type = typeMap[commit.type] || commit.type;
     const title = escapeCSV(commit.title);
     const mileage = commit.mileage || 0;
@@ -44,7 +43,7 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
     const totalCost = costParts + costLabor;
     const message = escapeCSV(commit.message || '');
 
-    csv += `${date},${type},${title},${mileage},${costParts},${costLabor},${totalCost},${message}\n`;
+    csv += `${date},${type},${title},${mileage},${totalCost},${message}\n`;
   });
 
   // Generate filename with timestamp
