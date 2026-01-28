@@ -4,7 +4,7 @@
   <view class="detail-card" wx:if="{{commit}}">
     <view class="header-row">
         <view class="title">{{commit.title}}</view>
-        <view class="type-tag">{{commit.type}}</view>
+        <view class="type-tag">{{typeMap[commit.type] || commit.type}}</view>
     </view>
     
     <view class="info-row">

@@ -348,9 +348,6 @@ async def get_repo_stats(repo_id: str):
         total_parts = res.get("total_parts", 0)
         total_labor = res.get("total_labor", 0)
         total_cost = total_parts + total_labor
-    
-    purchase_cost = repo.get("purchase_cost", 0) or 0
-    total_cost = total_cost + purchase_cost
         
     # 3. Cost Composition (for Pie Chart)
     # Simple grouping by 'type' (Maintenance, Modification, Repair)

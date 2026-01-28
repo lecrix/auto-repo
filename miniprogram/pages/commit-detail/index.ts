@@ -3,7 +3,18 @@ import { formatTime } from '../../utils/util'
 
 Page({
   data: {
-    commit: null as any
+    commit: null as any,
+    typeMap: {
+      maintenance: '常规保养',
+      repair: '维修',
+      modification: '改装',
+      fuel: '加油',
+      parking: '停车',
+      inspection: '年检',
+      other: '其他',
+      insurance: '保险',
+      purchase: '购车费用'
+    }
   },
 
   async onLoad(options: any) {
