@@ -62,6 +62,9 @@ Page({
     commercial_insurance_expiry: '',
     inspection_start: '', // Last Inspection Date
     inspection_expiry: '',
+    inspection_start: '', // Last Inspection Date
+
+    image: '',
 
     // Manual date edit
     showManualExpiry: false,
@@ -88,6 +91,7 @@ Page({
       this.setData({
         name: repo.name,
         vin: repo.vin || '',
+        image: repo.image || '',
         current_mileage: repo.current_mileage,
         initial_mileage: repo.initial_mileage || 0,
         purchase_cost: repo.purchase_cost || '',
@@ -185,8 +189,51 @@ Page({
     wx.showToast({ title: '请在下方选择新日期', icon: 'none' })
   },
 
+  chooseImage() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const filePath = res.tempFiles[0].tempFilePath
+        this.uploadImage(filePath)
+      }
+    })
+  },
+
+  async uploadImage(filePath: string) {
+    wx.showLoading({ title: '上传图片...' })
+    try {
+      const result = await wx.cloud.uploadFile({
+        cloudPath: `repos/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`,
+        filePath
+      })
+      this.setData({ image: result.fileID })
+      wx.showToast({ title: '上传成功', icon: 'success' })
+    } catch (err) {
+      console.error('Image upload failed:', err)
+      wx.showToast({ title: '上传失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  deleteImage() {
+    this.setData({ image: '' })
+  },
+
+  previewImage() {
+    if (this.data.image) {
+      wx.previewImage({
+        urls: [this.data.image],
+        current: this.data.image
+      })
+    }
+  },
+
    async onSubmit() {
-     const { repoId, name, vin, current_mileage, initial_mileage, purchase_cost, color, register_date, purchase_date, compulsory_insurance_expiry, compulsory_start, commercial_insurance_expiry, commercial_start, inspection_expiry, inspection_start } = this.data
+     const { repoId, name, vin, image, current_mileage, initial_mileage, purchase_cost, color, register_date, purchase_date, compulsory_insurance_expiry, compulsory_start, commercial_insurance_expiry, commercial_start, inspection_expiry, inspection_start } = this.data
 
      if (!name) {
        wx.showToast({ title: '请输入车辆名称', icon: 'none' })
@@ -196,6 +243,7 @@ Page({
      const payload = {
        name,
        vin,
+       image,
        color,
        current_mileage: Number(current_mileage) || 0,
        initial_mileage: Number(initial_mileage) || 0,

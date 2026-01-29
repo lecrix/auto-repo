@@ -61,6 +61,7 @@ class Repo(BaseModel):
     user_openid: Optional[str] = None
     name: str
     vin: Optional[str] = None
+    image: Optional[str] = None
     color: str = "#2c3e50"
     current_mileage: int = 0
     initial_mileage: int = 0

@@ -1,6 +1,6 @@
 .container {
   padding: var(--spacing-lg);
-  padding-top: var(--nav-height);
+  /* padding-top removed to avoid duplication with custom-nav spacer */
   background: var(--bg-color);
   min-height: 100vh;
 }

@@ -26,6 +26,17 @@
      <input class="input" type="number" placeholder="购车成本（元）" data-field="purchase_cost" value="{{purchase_cost}}" bindinput="onInput" />
    </view>
 
+   <view class="form-group">
+     <view class="label">车辆图片 (选填)</view>
+     <view class="image-uploader" bindtap="chooseImage" wx:if="{{!image}}">
+       <text class="add-icon">+</text>
+     </view>
+     <view class="image-preview" wx:else>
+       <image src="{{image}}" mode="aspectFill" class="uploaded-image" bindtap="previewImage" />
+       <view class="delete-btn" catchtap="deleteImage">×</view>
+     </view>
+   </view>
+
    <view class="section-title">车辆卡片外观</view>
   <view class="form-group">
     <view class="label">背景颜色</view>

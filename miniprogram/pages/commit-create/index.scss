@@ -1,6 +1,6 @@
 .container {
   padding: var(--spacing-lg);
-  padding-top: var(--nav-height); /* Standardized Top Padding */
+  /* padding-top removed to avoid double spacing with custom-nav spacer */
 }
 
 .page-header {
@@ -50,7 +50,7 @@
   padding: 14px 16px;
   border-radius: 12px;
   font-size: 16px;
-  color: var(--text-main);
+  color: #2c3e50; /* Fixed dark text for white input background */
   box-shadow: var(--shadow-sm);
   border: 1px solid transparent;
   transition: all 0.3s;
@@ -135,7 +135,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--card-bg); /* Adapt to dark mode */
   padding: var(--spacing-sm);
   border-radius: 16rpx;
   margin-right: var(--spacing-md);
@@ -222,7 +222,7 @@
 .add-image {
   width: 200rpx;
   height: 200rpx;
-  background: white;
+  background: var(--card-bg); /* Adapt to dark mode */
   border: 2px dashed var(--border-color);
   border-radius: 12px;
   display: flex;

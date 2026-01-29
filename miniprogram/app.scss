@@ -46,22 +46,22 @@ page {
 
 $dark-theme-vars: (
   --primary-color: #5dade2,
-  --accent-color: #3498db,
-  --success-color: #2ecc71,
-  --bg-color: #121212,
-  --card-bg: #1e1e1e,
-  --text-main: #e0e0e0,
-  --text-secondary: #adb5bd,
-  --text-light: #6c757d,
-  --border-color: #2d2d2d,
-  --divider-color: #3d3d3d,
-  --nav-bg: rgba(245, 247, 250, 0.95), /* Fixed light bg for nav */
-  --nav-text: #2c3e50, /* Fixed dark text for nav */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.3),
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4),
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5),
-  --shadow-glow: 0 0 16px rgba(93, 173, 226, 0.3),
-  --gradient-primary: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)
+  --accent-color: #58a6ff, /* GitHub Blue */
+  --success-color: #238636, /* GitHub Green */
+  --bg-color: #0f172a,      /* Deep Blue/Slate 900 */
+  --card-bg: #1e293b,       /* Slate 800 */
+  --text-main: #f1f5f9,     /* Slate 100 */
+  --text-secondary: #94a3b8, /* Slate 400 */
+  --text-light: #64748b,    /* Slate 500 */
+  --border-color: #334155,  /* Slate 700 */
+  --divider-color: #1e293b, /* GitHub Border Muted */
+  --nav-bg: rgba(245, 247, 250, 0.95), /* Keep nav light as requested */
+  --nav-text: #2c3e50, /* Keep nav text dark */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3),
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+  --shadow-glow: 0 0 16px rgba(56, 189, 248, 0.2), /* Sky Blue Glow */
+  --gradient-primary: linear-gradient(135deg, #1e293b 0%, #334155 100%)
 );
 
 @media (prefers-color-scheme: dark) {

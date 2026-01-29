@@ -1,10 +1,8 @@
 .container {
   padding: var(--spacing-lg);
-  /* Revert to standard padding */
-  /* padding-top set dynamically inline */
-  min-height: 100vh;
   background: var(--bg-color);
   box-sizing: border-box;
+  /* Removed min-height: 100vh to prevent unnecessary scrolling */
 }
 
 .fixed-header {
@@ -83,8 +81,26 @@
   box-shadow: var(--shadow-md);
 }
 
-.card-content {
+.card-inner-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+}
+
+.repo-image {
+  width: 100px;
+  height: 75px; /* 4:3 Aspect Ratio */
+  border-radius: 12px;
+  margin-left: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-content {
+  flex: 1;
+  min-width: 0; /* Prevent text overflow issues */
 }
 
 /* Swipe Actions (Right Side - revealed when swiping left) */
@@ -98,7 +114,6 @@
   /* Below card */
 }
 
-/* Repo Info Row */
 .repo-info {
   display: flex;
   align-items: center;
@@ -145,13 +160,38 @@
 }
 
 .repo-name {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
   color: white;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Add Card Button */
+.repo-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.mileage {
+  font-size: 16px;
+  font-weight: 700;
+  opacity: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  
+  /* Badge/Plate Style */
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  font-family: "DIN Condensed", "Roboto Condensed", sans-serif; /* Condensed font looks more "technical" */
+}
 .add-card {
   display: flex;
   flex-direction: column;
@@ -227,7 +267,7 @@
 
 .help-text {
   font-size: 15px;
-  color: var(--text-main);
+  color: #2c3e50;
   font-weight: 500;
 }
 
@@ -256,6 +296,6 @@
 
 .settings-text {
   font-size: 15px;
-  color: var(--text-main);
+  color: #2c3e50;
   font-weight: 500;
 }

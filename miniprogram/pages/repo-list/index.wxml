@@ -29,12 +29,15 @@
         </view>
 
         <view class="repo-card" style="background: {{item.color || '#2c3e50'}}; transform: translateX({{item.offsetX || 0}}px)" bindtap="goToDetail" data-id="{{item._id}}" data-index="{{index}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-          <view class="card-content">
-            <view class="repo-name">{{item.name}}</view>
-            <view class="repo-info">
-              <text class="mileage">{{item.current_mileage}} km</text>
-              <text class="vehicle-age" wx:if="{{item.vehicle_age}}">{{item.vehicle_age}}</text>
+          <view class="card-inner-layout">
+            <view class="card-content">
+              <view class="repo-name">{{item.name}}</view>
+              <view class="repo-info">
+                <text class="mileage">{{item.current_mileage}} km</text>
+                <text class="vehicle-age" wx:if="{{item.vehicle_age}}">{{item.vehicle_age}}</text>
+              </view>
             </view>
+            <image class="repo-image" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}" />
           </view>
         </view>
       </view>

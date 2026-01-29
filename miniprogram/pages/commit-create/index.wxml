@@ -1,7 +1,7 @@
 <view class="container {{themeClass}}">
   <custom-nav showBack="{{true}}" />
   
-  <view class="section-title">快速模板</view>
+  <view class="label">快速模板</view>
   <scroll-view class="template-selector" scroll-x="{{true}}" enable-flex="{{true}}">
     <view class="template-item {{selectedTemplateId === item.id ? 'active' : ''}}"
           wx:for="{{templates}}" wx:key="id"
@@ -40,7 +40,7 @@
    </view>
   
    <block wx:if="{{type === 'insurance'}}">
-    <view class="section-title">保险信息</view>
+    <view class="label">保险信息</view>
     <view class="form-group">
       <view class="label">保险公司</view>
       <input class="input" value="{{insurance_company}}" placeholder="如: 平安保险" data-field="insurance_company" bindinput="onInput" />
@@ -54,8 +54,6 @@
       <input class="input" type="digit" value="{{commercial_insurance}}" placeholder="0" data-field="commercial_insurance" bindinput="onInput" />
     </view>
    </block>
-
-   <view class="section-title">详情内容</view>
 
    <view class="form-group">
      <view class="label">详细描述</view>

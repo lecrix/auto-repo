@@ -8,7 +8,7 @@
 .repo-header {
   background: var(--gradient-primary);
   color: white;
-  margin: 12px var(--spacing-md) 0;
+  margin: 12px var(--spacing-md) 24rpx; /* Increased bottom margin significantly */
   /* Add 12px top spacing */
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: 20px;
@@ -35,7 +35,7 @@
 }
 
 .header-left {
-  flex: 1;
+  flex: 1.4; /* Give more space to left side */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -50,7 +50,7 @@
 
 .mileage-row {
   display: flex;
-  gap: 16px;
+  gap: 48px; /* Further increased gap */
 }
 
 .mileage-item {
@@ -122,6 +122,8 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  justify-content: center;
+  padding-bottom: 12px; /* Visually lift the content up */
 }
 
 .expiry-item {
@@ -129,19 +131,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1); /* Slightly more visible bg */
   border-radius: 8px;
 }
 
 .expiry-label {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8); /* Brighter label */
 }
 
 .expiry-val {
   font-size: 13px;
   font-weight: 600;
-  color: #4ade80;
+  color: #4ade80; /* Revert to green default */
 }
 
 .expiry-val.warn {
@@ -199,7 +201,7 @@
 .name {
   font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: 1.5px; /* Increased spacing */
   font-family: var(--font-family);
   /* Ensure global font */
 }
@@ -491,6 +493,7 @@
         height: 2px;
         background: var(--primary-color);
         border-radius: 2px;
+      }
     }
   }
 }
@@ -508,5 +511,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
 }
