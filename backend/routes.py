@@ -474,23 +474,45 @@ async def get_repo_trends(repo_id: str, months: int = 12):
                 }
             }
         }},
-        {"$group": {
-            "_id": "$month",
-            "total_cost": {"$sum": {"$add": [{"$ifNull": ["$cost.parts", 0]}, {"$ifNull": ["$cost.labor", 0]}]}},
-            "max_mileage": {"$max": "$mileage"},
-            "count": {"$sum": 1}
-        }},
-        {"$sort": {"_id": 1}}
+        {"$facet": {
+            "all_costs": [
+                {"$group": {
+                    "_id": "$month",
+                    "total_cost": {"$sum": {"$add": [{"$ifNull": ["$cost.parts", 0]}, {"$ifNull": ["$cost.labor", 0]}]}},
+                    "max_mileage": {"$max": "$mileage"},
+                    "count": {"$sum": 1}
+                }},
+                {"$sort": {"_id": 1}}
+            ],
+            "fuel_costs": [
+                {"$match": {"type": "fuel"}},
+                {"$group": {
+                    "_id": "$month",
+                    "fuel_cost": {"$sum": {"$add": [{"$ifNull": ["$cost.parts", 0]}, {"$ifNull": ["$cost.labor", 0]}]}}
+                }},
+                {"$sort": {"_id": 1}}
+            ]
+        }}
     ]
     
-    trends = await db.commits.aggregate(pipeline).to_list(length=100)
+    result = await db.commits.aggregate(pipeline).to_list(length=1)
+    
+    if not result or len(result) == 0:
+        return {"months": [], "total_months": 0}
+    
+    all_costs = result[0].get("all_costs", [])
+    fuel_costs = result[0].get("fuel_costs", [])
+    
+    fuel_map = {item["_id"]: item["fuel_cost"] for item in fuel_costs}
     
     monthly_data = []
-    for item in trends:
+    for item in all_costs:
+        month = item["_id"]
         monthly_data.append({
-            "month": item["_id"],
+            "month": month,
             "cost": item["total_cost"],
             "mileage": item["max_mileage"],
+            "fuel_cost": fuel_map.get(month, 0),
             "count": item["count"]
         })
     

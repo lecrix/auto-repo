@@ -62,10 +62,11 @@ Component({
                 if (trends && trends.months && trends.months.length > 0) {
                     const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
                     const maxMileage = Math.max(...trends.months.map((m: any) => m.mileage || 0))
+                    const maxFuelCost = Math.max(...trends.months.map((m: any) => m.fuel_cost || 0))
                     this.setData({
                         stats,
                         issues,
-                        trends: { ...trends, maxCost, maxMileage }
+                        trends: { ...trends, maxCost, maxMileage, maxFuelCost }
                     })
                 } else {
                     this.setData({ stats, issues, trends })
