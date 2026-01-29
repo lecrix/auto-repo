@@ -68,6 +68,11 @@ Page({
     editingField: ''
   },
 
+  onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+  },
+
   async onLoad(options: any) {
     if (options.repoId) {
       wx.setNavigationBarTitle({ title: '编辑车辆档案' })

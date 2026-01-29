@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import db_manager
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="AutoRepo API", version="1.0.0")
 
@@ -28,3 +31,6 @@ async def root():
 
 from routes import router as api_router
 app.include_router(api_router, prefix="/api", tags=["core"])
+
+from auth import router as auth_router
+app.include_router(auth_router, prefix="/api/auth", tags=["auth"])

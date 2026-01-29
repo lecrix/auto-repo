@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{themeClass}}">
   <custom-nav showBack="{{true}}" />
   
   <view class="section-title">快速模板</view>
@@ -60,6 +60,21 @@
    <view class="form-group">
      <view class="label">详细描述</view>
      <textarea class="textarea" value="{{message}}" placeholder="详细的施工内容、使用的零件品牌等..." data-field="message" bindinput="onInput" />
+   </view>
+
+   <view class="form-group">
+     <view class="label">照片 (最多9张)</view>
+     <view class="image-uploader">
+       <view class="image-list">
+         <view class="image-item" wx:for="{{images}}" wx:key="index">
+           <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}" />
+           <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+         </view>
+         <view class="add-image" wx:if="{{images.length < 9}}" bindtap="chooseImage">
+           <text class="add-icon">+</text>
+         </view>
+       </view>
+     </view>
    </view>
 
    <view class="form-group">

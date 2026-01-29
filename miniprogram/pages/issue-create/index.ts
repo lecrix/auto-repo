@@ -11,7 +11,12 @@ Page({
         pIndex: 1
     },
 
-    onLoad(options: any) {
+    onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+  },
+
+  onLoad(options: any) {
         this.data.repoId = options.repoId
     },
 

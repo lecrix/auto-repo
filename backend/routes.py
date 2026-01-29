@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Depends
 from typing import List, Optional, Dict, Any
 from models import Repo, Commit, Issue, CommitPatch, IssuePatch
 from database import get_db
 from bson import ObjectId
+from auth import get_current_user
 import re
 
 router = APIRouter()
@@ -17,21 +18,38 @@ def parse_oid(id_str: str, name: str = "id") -> ObjectId:
 # --- Repos (Cars) ---
 
 @router.get("/repos", response_model=List[Repo])
-async def get_repos():
+async def get_repos(user_openid: str = Depends(get_current_user)):
     db = get_db()
     repos = []
-    # For Phase 1, we just return all repos
-    # In real app, we would filter by user_openid
-    cursor = db.repos.find()
+    # Filter by user_openid for multi-tenant support
+    cursor = db.repos.find({"user_openid": user_openid})
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
         repos.append(doc)
+    
+    # Data migration: If no repos found, check for legacy data without user_openid
+    if not repos:
+        legacy_cursor = db.repos.find({"user_openid": None})
+        legacy_count = 0
+        async for doc in legacy_cursor:
+            legacy_count += 1
+            doc["_id"] = str(doc["_id"])
+            repos.append(doc)
+        
+        # Assign legacy data to current user
+        if legacy_count > 0:
+            await db.repos.update_many(
+                {"user_openid": None},
+                {"$set": {"user_openid": user_openid}}
+            )
+    
     return repos
 
 @router.post("/repos", response_model=Repo)
-async def create_repo(repo: Repo):
+async def create_repo(repo: Repo, user_openid: str = Depends(get_current_user)):
     db = get_db()
     repo_dict = repo.dict(exclude={"id"})
+    repo_dict["user_openid"] = user_openid
     result = await db.repos.insert_one(repo_dict)
     repo_id = str(result.inserted_id)
     repo_dict["_id"] = repo_id
@@ -41,6 +59,7 @@ async def create_repo(repo: Repo):
         from datetime import datetime
         purchase_commit = {
             "repo_id": repo_id,
+            "user_openid": user_openid,
             "title": "购车费用",
             "message": f"车辆购买成本：¥{repo.purchase_cost}",
             "type": "purchase",
@@ -58,9 +77,9 @@ async def create_repo(repo: Repo):
     return repo_dict
 
 @router.get("/repos/{repo_id}", response_model=Repo)
-async def get_repo(repo_id: str):
+async def get_repo(repo_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
-    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
         
     if repo:
         repo["_id"] = str(repo["_id"])
@@ -68,33 +87,33 @@ async def get_repo(repo_id: str):
     raise HTTPException(status_code=404, detail="Repo not found")
 
 @router.put("/repos/{repo_id}")
-async def update_repo(repo_id: str, repo: Repo):
+async def update_repo(repo_id: str, repo: Repo, user_openid: str = Depends(get_current_user)):
     db = get_db()
-    existing = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+    existing = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
         
     if not existing:
         raise HTTPException(status_code=404, detail="Repo not found")
         
-    update_data = repo.dict(exclude_unset=True, exclude={"id", "created_at"})
+    update_data = repo.dict(exclude_unset=True, exclude={"id", "created_at", "user_openid"})
     
     await db.repos.update_one(
-        {"_id": parse_oid(repo_id, "repo_id")},
+        {"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid},
         {"$set": update_data}
     )
     return {"status": "updated", "id": repo_id}
 
 @router.delete("/repos/{repo_id}")
-async def delete_repo(repo_id: str):
+async def delete_repo(repo_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
-    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
 
     if not repo:
         raise HTTPException(status_code=404, detail="Repo not found")
 
-    await db.repos.delete_one({"_id": parse_oid(repo_id, "repo_id")})
+    await db.repos.delete_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
 
-    await db.commits.delete_many({"repo_id": repo_id})
-    await db.issues.delete_many({"repo_id": repo_id})
+    await db.commits.delete_many({"repo_id": repo_id, "user_openid": user_openid})
+    await db.issues.delete_many({"repo_id": repo_id, "user_openid": user_openid})
 
     return {"status": "deleted", "id": repo_id}
 
@@ -104,6 +123,7 @@ async def delete_repo(repo_id: str):
 @router.get("/commits", response_model=List[Commit])
 async def get_commits(
     repo_id: str,
+    user_openid: str = Depends(get_current_user),
     type: Optional[str] = None,
     mileage_min: Optional[int] = None,
     mileage_max: Optional[int] = None,
@@ -112,7 +132,12 @@ async def get_commits(
     search: Optional[str] = None
 ):
     db = get_db()
-    query: dict = {"repo_id": repo_id}
+    
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found or access denied")
+    
+    query: dict = {"repo_id": repo_id, "user_openid": user_openid}
     
     if type:
         query["type"] = type
@@ -149,9 +174,15 @@ async def get_commits(
     return commits
 
 @router.post("/commits", response_model=Commit)
-async def create_commit(commit: Commit):
+async def create_commit(commit: Commit, user_openid: str = Depends(get_current_user)):
     db = get_db()
+    
+    repo = await db.repos.find_one({"_id": parse_oid(commit.repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found or access denied")
+    
     commit_dict = commit.dict(exclude={"id"})
+    commit_dict["user_openid"] = user_openid
     
     result = await db.commits.insert_one(commit_dict)
     commit_dict["_id"] = str(result.inserted_id)
@@ -160,6 +191,7 @@ async def create_commit(commit: Commit):
         update_result = await db.repos.update_one(
             {
                 "_id": parse_oid(commit.repo_id, "repo_id"),
+                "user_openid": user_openid,
                 "current_mileage": {"$lt": commit.mileage}
             },
             {"$set": {
@@ -173,7 +205,8 @@ async def create_commit(commit: Commit):
         await db.issues.update_many(
             {
                 "_id": {"$in": issue_oids},
-                "repo_id": commit.repo_id
+                "repo_id": commit.repo_id,
+                "user_openid": user_openid
             },
             {"$set": {
                 "status": "closed", 
@@ -186,6 +219,7 @@ async def create_commit(commit: Commit):
         await db.issues.update_many(
             {
                 "repo_id": commit.repo_id,
+                "user_openid": user_openid,
                 "status": "open",
                 "due_mileage": {"$ne": None, "$lte": commit.mileage}
             },
@@ -195,10 +229,10 @@ async def create_commit(commit: Commit):
     return commit_dict
 
 @router.get("/commits/{commit_id}", response_model=Commit)
-async def get_commit(commit_id: str):
+async def get_commit(commit_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
-    commit = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id")})
+    commit = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
     if not commit:
         raise HTTPException(status_code=404, detail="Commit not found")
     
@@ -207,10 +241,10 @@ async def get_commit(commit_id: str):
     return commit
 
 @router.put("/commits/{commit_id}")
-async def update_commit(commit_id: str, patch: CommitPatch):
+async def update_commit(commit_id: str, patch: CommitPatch, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
-    existing = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id")})
+    existing = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
     if not existing:
         raise HTTPException(status_code=404, detail="Commit not found")
     
@@ -220,62 +254,62 @@ async def update_commit(commit_id: str, patch: CommitPatch):
         raise HTTPException(status_code=400, detail="No valid fields to update")
     
     await db.commits.update_one(
-        {"_id": parse_oid(commit_id, "commit_id")},
+        {"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid},
         {"$set": clean_data}
     )
     
     if "mileage" in clean_data and clean_data["mileage"]:
         repo_id = existing.get("repo_id")
         if repo_id:
-            repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+            repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
             if repo and clean_data["mileage"] > repo.get("current_mileage", 0):
                 await db.repos.update_one(
-                    {"_id": parse_oid(repo_id, "repo_id")},
+                    {"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid},
                     {"$set": {
                         "current_mileage": clean_data["mileage"],
                         "current_head": clean_data.get("title", existing.get("title"))
                     }}
                 )
     
-    updated = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id")})
+    updated = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
     updated["_id"] = str(updated["_id"])
     
     return updated
 
 @router.delete("/commits/{commit_id}")
-async def delete_commit(commit_id: str):
+async def delete_commit(commit_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
-    commit = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id")})
+    commit = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
     if not commit:
         raise HTTPException(status_code=404, detail="Commit not found")
     
     repo_id = commit.get("repo_id")
     
-    result = await db.commits.delete_one({"_id": parse_oid(commit_id, "commit_id")})
+    result = await db.commits.delete_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
     
     if result.deleted_count == 0:
         raise HTTPException(status_code=500, detail="Failed to delete commit")
     
     if repo_id:
         latest_commit = await db.commits.find_one(
-            {"repo_id": repo_id},
+            {"repo_id": repo_id, "user_openid": user_openid},
             sort=[("mileage", -1)]
         )
         
         if latest_commit:
             await db.repos.update_one(
-                {"_id": parse_oid(repo_id, "repo_id")},
+                {"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid},
                 {"$set": {
                     "current_mileage": latest_commit.get("mileage", 0),
                     "current_head": latest_commit.get("title", "")
                 }}
             )
         else:
-            repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+            repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
             if repo:
                 await db.repos.update_one(
-                    {"_id": parse_oid(repo_id, "repo_id")},
+                    {"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid},
                     {"$set": {
                         "current_mileage": repo.get("initial_mileage", 0),
                         "current_head": ""
@@ -287,7 +321,8 @@ async def delete_commit(commit_id: str):
         await db.issues.update_many(
             {
                 "_id": {"$in": issue_ids},
-                "repo_id": repo_id
+                "repo_id": repo_id,
+                "user_openid": user_openid
             },
             {"$set": {
                 "status": "open",
@@ -301,21 +336,31 @@ async def delete_commit(commit_id: str):
 # --- Issues (Reminders/Tasks) ---
 
 @router.post("/repos/{repo_id}/issues", response_model=Issue)
-async def create_issue(repo_id: str, issue: Issue):
+async def create_issue(repo_id: str, issue: Issue, user_openid: str = Depends(get_current_user)):
     db = get_db()
-    issue.repo_id = repo_id # Ensure repo_id matches path
+    
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found or access denied")
+    
+    issue.repo_id = repo_id
     issue_dict = issue.dict(exclude={"id"})
+    issue_dict["user_openid"] = user_openid
     
     result = await db.issues.insert_one(issue_dict)
     issue_dict["_id"] = str(result.inserted_id)
     return issue_dict
 
 @router.get("/repos/{repo_id}/issues", response_model=List[Issue])
-async def get_issues(repo_id: str, status: Optional[str] = None):
+async def get_issues(repo_id: str, user_openid: str = Depends(get_current_user), status: Optional[str] = None):
     db = get_db()
     
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found or access denied")
+    
     pipeline = [
-        {"$match": {"repo_id": repo_id}},
+        {"$match": {"repo_id": repo_id, "user_openid": user_openid}},
     ]
     
     if status:
@@ -347,7 +392,7 @@ async def get_issues(repo_id: str, status: Optional[str] = None):
     return issues
 
 @router.patch("/issues/{issue_id}", response_model=Issue)
-async def update_issue(issue_id: str, patch: IssuePatch = Body(...)):
+async def update_issue(issue_id: str, patch: IssuePatch = Body(...), user_openid: str = Depends(get_current_user)):
     db = get_db()
     
     clean_data = patch.model_dump(exclude_unset=True)
@@ -356,11 +401,11 @@ async def update_issue(issue_id: str, patch: IssuePatch = Body(...)):
         raise HTTPException(status_code=400, detail="No valid fields to update")
     
     await db.issues.update_one(
-        {"_id": parse_oid(issue_id, "issue_id")},
+        {"_id": parse_oid(issue_id, "issue_id"), "user_openid": user_openid},
         {"$set": clean_data}
     )
     
-    updated_doc = await db.issues.find_one({"_id": parse_oid(issue_id, "issue_id")})
+    updated_doc = await db.issues.find_one({"_id": parse_oid(issue_id, "issue_id"), "user_openid": user_openid})
     if updated_doc:
         updated_doc["_id"] = str(updated_doc["_id"])
         return updated_doc
@@ -369,17 +414,17 @@ async def update_issue(issue_id: str, patch: IssuePatch = Body(...)):
 # --- Insights / Stats ---
 
 @router.get("/repos/{repo_id}/stats")
-async def get_repo_stats(repo_id: str):
+async def get_repo_stats(repo_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
-    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
     if not repo:
         raise HTTPException(status_code=404, detail="Repo not found")
         
     current_mileage = repo.get("current_mileage", 0)
     
     pipeline = [
-        {"$match": {"repo_id": repo_id}},
+        {"$match": {"repo_id": repo_id, "user_openid": user_openid}},
         {"$facet": {
             "totals": [
                 {"$group": {
@@ -444,14 +489,14 @@ async def get_repo_stats(repo_id: str):
     }
 
 @router.get("/repos/{repo_id}/trends")
-async def get_repo_trends(repo_id: str, months: int = 12):
+async def get_repo_trends(repo_id: str, user_openid: str = Depends(get_current_user), months: int = 12):
     """
     Monthly trend aggregation for line charts
     Returns: mileage progression and cost trends by month
     """
     db = get_db()
     
-    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id")})
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
     if not repo:
         raise HTTPException(status_code=404, detail="Repo not found")
     
@@ -464,6 +509,7 @@ async def get_repo_trends(repo_id: str, months: int = 12):
     pipeline = [
         {"$match": {
             "repo_id": repo_id,
+            "user_openid": user_openid,
             "timestamp": {"$gte": start_timestamp}
         }},
         {"$addFields": {
@@ -520,4 +566,165 @@ async def get_repo_trends(repo_id: str, months: int = 12):
         "months": monthly_data,
         "total_months": len(monthly_data)
     }
+
+@router.get("/repos/{repo_id}/export/pdf")
+async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_current_user)):
+    """
+    Export vehicle maintenance history to PDF with Chinese font support
+    """
+    from fastapi.responses import StreamingResponse
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from io import BytesIO
+    from datetime import datetime
+    import os
+    
+    chinese_font_name = 'ChineseFont'
+    chinese_font_registered = False
+    
+    font_paths = [
+        'C:/Windows/Fonts/msyh.ttc',
+        'C:/Windows/Fonts/simsun.ttc',
+        'C:/Windows/Fonts/simhei.ttf',
+        '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',
+        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+        '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
+        '/System/Library/Fonts/PingFang.ttc',
+        '/Library/Fonts/Arial Unicode.ttf',
+    ]
+    
+    for font_path in font_paths:
+        if os.path.exists(font_path):
+            try:
+                pdfmetrics.registerFont(TTFont(chinese_font_name, font_path))
+                chinese_font_registered = True
+                break
+            except Exception:
+                continue
+    
+    if not chinese_font_registered:
+        chinese_font_name = 'Helvetica'
+    
+    db = get_db()
+    
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found")
+    
+    commits_cursor = db.commits.find({"repo_id": repo_id, "user_openid": user_openid}).sort("timestamp", -1)
+    commits = []
+    async for doc in commits_cursor:
+        doc["_id"] = str(doc["_id"])
+        commits.append(doc)
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.75*inch, bottomMargin=0.75*inch)
+    
+    story = []
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontName=chinese_font_name,
+        fontSize=24,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=30,
+        alignment=TA_CENTER
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontName=chinese_font_name,
+        fontSize=14,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=10
+    )
+    
+    story.append(Paragraph(f"车辆维护记录 - {repo.get('name', 'Unknown')}", title_style))
+    story.append(Spacer(1, 0.2*inch))
+    
+    info_data = [
+        ["车辆信息", ""],
+        ["车辆名称", repo.get('name', 'N/A')],
+        ["车架号", repo.get('vin', 'N/A')],
+        ["当前里程", f"{repo.get('current_mileage', 0)} km"],
+        ["导出日期", datetime.now().strftime('%Y-%m-%d')]
+    ]
+    
+    info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+    info_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+    ]))
+    
+    story.append(info_table)
+    story.append(Spacer(1, 0.3*inch))
+    
+    if commits:
+        story.append(Paragraph("维护记录", heading_style))
+        story.append(Spacer(1, 0.1*inch))
+        
+        commit_data = [["日期", "标题", "类型", "里程 (km)", "费用 (元)"]]
+        
+        type_map = {
+            'maintenance': '常规保养',
+            'repair': '维修',
+            'modification': '改装',
+            'fuel': '加油',
+            'parking': '停车',
+            'inspection': '年检',
+            'insurance': '保险',
+            'purchase': '购车费用',
+            'other': '其他'
+        }
+        
+        for commit in commits:
+            date = datetime.fromtimestamp(commit.get('timestamp', 0) / 1000).strftime('%Y-%m-%d')
+            title = commit.get('title', 'N/A')
+            commit_type = type_map.get(commit.get('type', ''), commit.get('type', 'N/A'))
+            mileage = str(commit.get('mileage', '-'))
+            cost = commit.get('cost', {})
+            total_cost = cost.get('parts', 0) + cost.get('labor', 0)
+            
+            commit_data.append([date, title, commit_type, mileage, f"¥{total_cost:.2f}"])
+        
+        commit_table = Table(commit_data, colWidths=[1.2*inch, 2*inch, 1*inch, 1*inch, 1*inch])
+        commit_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('FONTSIZE', (0, 1), (-1, -1), 9)
+        ]))
+        
+        story.append(commit_table)
+    
+    doc.build(story)
+    buffer.seek(0)
+    
+    filename = f"{repo.get('name', 'vehicle')}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 

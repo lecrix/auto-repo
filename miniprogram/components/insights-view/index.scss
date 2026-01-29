@@ -1,6 +1,6 @@
 .insights-container {
     padding: 24px;
-    background: #f8f9fa;
+    background: var(--bg-color); /* Was #f8f9fa */
 }
 
 /* 1. Metrics Grid */
@@ -12,10 +12,10 @@
 }
 
 .metric-card {
-    background: white;
+    background: var(--card-bg); /* Was white */
     padding: 16px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,8 +23,8 @@
 }
 
 .metric-card.main {
-    background: #2c3e50;
-    /* Primary color */
+    background: var(--primary-color);
+    background: var(--gradient-primary);
 }
 
 .metric-card.main .label {
@@ -37,7 +37,7 @@
 
 .label {
     font-size: 11px;
-    color: #888;
+    color: var(--text-secondary); /* Was #888 */
     text-transform: uppercase;
     font-weight: 600;
     margin-bottom: 4px;
@@ -46,7 +46,7 @@
 .value {
     font-size: 18px;
     font-weight: 700;
-    color: #333;
+    color: var(--text-main); /* Was #333 */
 }
 
 .unit {
@@ -57,20 +57,20 @@
 
 /* 2. Chart Section */
 .chart-section {
-    background: white;
+    background: var(--card-bg); /* Was white */
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-sm);
 }
 
 .section-title {
     font-size: 16px;
     font-weight: 700;
     margin-bottom: 16px;
-    color: #333;
+    color: var(--text-main); /* Was #333 */
     padding-left: 8px;
-    border-left: 4px solid #2c3e50;
+    border-left: 4px solid var(--primary-color);
 }
 
 /* Simple Chart Visualization */
@@ -89,21 +89,21 @@
 .row-label {
     width: 100px;
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary); /* Was #666 */
     text-align: right;
 }
 
 .row-bar-area {
     flex: 1;
     height: 8px;
-    background: #f0f0f0;
+    background: var(--bg-color); /* Was #f0f0f0 */
     border-radius: 4px;
     overflow: hidden;
 }
 
 .row-bar {
     height: 100%;
-    background: #3498db;
+    background: var(--accent-color);
     border-radius: 4px;
 }
 
@@ -111,23 +111,23 @@
     width: 60px;
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-main); /* Was #333 */
     text-align: right;
 }
 
 .empty-state {
     padding: 30px;
     text-align: center;
-    color: #999;
+    color: var(--text-light); /* Was #999 */
     font-size: 14px;
-    background: #f9f9f9;
+    background: var(--bg-color); /* Was #f9f9f9 */
     border-radius: 8px;
-    border: 1px dashed #ddd;
+    border: 1px dashed var(--border-color); /* Was #ddd */
 }
 
 .add-hint {
     margin-top: 8px;
-    color: #3498db;
+    color: var(--accent-color);
     font-size: 14px;
     font-weight: 600;
     padding: 8px;
@@ -138,7 +138,7 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--divider-color); /* Was #eee */
 
     &:last-child {
         border-bottom: none;
@@ -153,7 +153,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ccc;
+    background: var(--text-light); /* Was #ccc */
 
     &.high {
         background: #e74c3c;
@@ -165,7 +165,7 @@
     }
 
     &.low {
-        background: #2ecc71;
+        background: var(--success-color);
     }
 }
 
@@ -176,13 +176,13 @@
 .issue-title {
     font-size: 14px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-main); /* Was #333 */
     margin-bottom: 2px;
 }
 
 .issue-meta {
     font-size: 11px;
-    color: #999;
+    color: var(--text-secondary); /* Was #999 */
 }
 
 .issue-action {
@@ -190,7 +190,7 @@
 }
 
 .btn-check {
-    color: #2ecc71;
+    color: var(--success-color);
     font-weight: bold;
     font-size: 18px;
     padding: 4px;
@@ -266,3 +266,4 @@
     color: var(--text-light);
     font-weight: 600;
 }
+

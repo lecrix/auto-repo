@@ -177,3 +177,67 @@
   color: var(--text-secondary);
   transition: color var(--transition-fast);
 }
+
+.image-uploader {
+  margin-top: var(--spacing-sm);
+}
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.image-item {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-color);
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32rpx;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.add-image {
+  width: 200rpx;
+  height: 200rpx;
+  background: white;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  
+  &:active {
+    transform: scale(0.95);
+    border-color: var(--primary-color);
+  }
+}
+
+.add-icon {
+  font-size: 80rpx;
+  color: var(--text-secondary);
+  font-weight: 200;
+}

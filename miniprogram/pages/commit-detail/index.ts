@@ -18,6 +18,11 @@ Page({
     }
   },
 
+  onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+  },
+
   async onLoad(options: any) {
     if (options.commitId) {
         const commit: any = await getCommitDetail(options.commitId)
@@ -68,5 +73,16 @@ Page({
 
   goBack() {
     wx.navigateBack()
+  },
+
+  previewImage(e: any) {
+    const index = e.currentTarget.dataset.index
+    const { commit } = this.data
+    if (!commit || !commit.images) return
+
+    wx.previewImage({
+      current: commit.images[index],
+      urls: commit.images
+    })
   }
 })

@@ -3,7 +3,7 @@
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(245, 247, 250, 0.95);
+    background: var(--nav-bg);
     backdrop-filter: blur(10px);
     z-index: 9999;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -18,7 +18,7 @@
     /* Compact font size */
     font-weight: 800;
     /* Extra bold */
-    color: var(--text-main);
+    color: var(--nav-text);
     letter-spacing: -0.5px;
     /* Tight tracking */
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Guangdong', 'Helvetica Neue', sans-serif;
@@ -43,7 +43,7 @@
 .back-btn {
     font-size: 20px;
     padding: 0 12px;
-    color: var(--text-main);
+    color: var(--nav-text);
     font-weight: 600;
     line-height: 1;
 }

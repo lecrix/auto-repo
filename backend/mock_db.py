@@ -50,25 +50,73 @@ class MockCollection:
         
         filtered = []
         for item in self.data:
-            match = True
-            for k, v in query.items():
-                if k == "_id" and isinstance(v, ObjectId):
-                     if str(item.get("_id")) != str(v):
-                         match = False; break
-                elif k == "_id" and isinstance(v, dict) and "$in" in v:
-                     # Handle $in query for _id
-                     target_ids = [str(tid) for tid in v["$in"]]
-                     if str(item.get("_id")) not in target_ids:
-                         match = False; break
-                elif isinstance(v, dict) and "$ne" in v:
-                    if item.get(k) == v["$ne"]:
-                         match = False; break
-                elif item.get(k) != v:
-                    match = False
-                    break
+            match = self._match_document(item, query)
             if match:
                 filtered.append(item)
         return MockCursor(filtered)
+    
+    def _match_document(self, item, query):
+        """Check if document matches query with MongoDB operator support"""
+        for k, v in query.items():
+            if k == "$or":
+                # Logical OR operator
+                if not isinstance(v, list):
+                    return False
+                or_match = False
+                for or_clause in v:
+                    if self._match_document(item, or_clause):
+                        or_match = True
+                        break
+                if not or_match:
+                    return False
+            elif k == "$and":
+                # Logical AND operator
+                if not isinstance(v, list):
+                    return False
+                for and_clause in v:
+                    if not self._match_document(item, and_clause):
+                        return False
+            elif k == "_id" and isinstance(v, ObjectId):
+                if str(item.get("_id")) != str(v):
+                    return False
+            elif k == "_id" and isinstance(v, dict) and "$in" in v:
+                # Handle $in query for _id
+                target_ids = [str(tid) for tid in v["$in"]]
+                if str(item.get("_id")) not in target_ids:
+                    return False
+            elif isinstance(v, dict):
+                # Handle comparison operators
+                field_value = item.get(k)
+                if "$gte" in v:
+                    if field_value is None or field_value < v["$gte"]:
+                        return False
+                if "$lte" in v:
+                    if field_value is None or field_value > v["$lte"]:
+                        return False
+                if "$gt" in v:
+                    if field_value is None or field_value <= v["$gt"]:
+                        return False
+                if "$lt" in v:
+                    if field_value is None or field_value >= v["$lt"]:
+                        return False
+                if "$ne" in v:
+                    if field_value == v["$ne"]:
+                        return False
+                if "$in" in v:
+                    if field_value not in v["$in"]:
+                        return False
+                if "$regex" in v:
+                    import re
+                    pattern = v["$regex"]
+                    options = v.get("$options", "")
+                    flags = 0
+                    if "i" in options:
+                        flags |= re.IGNORECASE
+                    if not re.search(pattern, str(field_value) if field_value else "", flags):
+                        return False
+            elif item.get(k) != v:
+                return False
+        return True
 
     async def find_one(self, query):
         cursor = self.find(query)
@@ -137,51 +185,120 @@ class MockCollection:
         Result.deleted_count = deleted_count
         return Result()
     
-    # Very basic aggregation for stats
+    # Enhanced aggregation pipeline support
     def aggregate(self, pipeline):
-        # Only support specific stats pipeline used in routes.py
-        # This is hardcoded for the specific use case of Phase 3
-        # Pipeline 0: match repo_id
-        # Pipeline 1: group total costs
+        """Support MongoDB aggregation pipeline stages"""
+        data = list(self.data)
         
-        # This is too complex to mock generically, returning empty valid structure
-        # or trying to implement basic match/group
-        
-        # Let's try to interpret the first $match
-        filtered = self.data
-        if len(pipeline) > 0 and "$match" in pipeline[0]:
-            match_q = pipeline[0]["$match"]
-            # reusing find logic
-            c = self.find(match_q)
-            filtered = c.data
+        for stage in pipeline:
+            if "$match" in stage:
+                # Filter documents
+                matched = []
+                for doc in data:
+                    if self._match_document(doc, stage["$match"]):
+                        matched.append(doc)
+                data = matched
             
-        if len(pipeline) > 1 and "$group" in pipeline[1]:
-            # Hardcoded logic for the specific stats endpoint
-            total_parts = sum(doc.get("cost", {}).get("parts", 0) for doc in filtered)
-            total_labor = sum(doc.get("cost", {}).get("labor", 0) for doc in filtered)
-            count = len(filtered)
+            elif "$facet" in stage:
+                # Multiple parallel aggregations
+                result = {}
+                for facet_name, facet_pipeline in stage["$facet"].items():
+                    facet_result = self._execute_pipeline(data, facet_pipeline)
+                    result[facet_name] = facet_result
+                return MockCursor([result])
             
-            # Use 'type' grouping if _id is type (for composition)
-            group_id = pipeline[1]["$group"]["_id"]
-            
-            if group_id == "$type":
-                 # Composition chart
-                 groups = {}
-                 for doc in filtered:
-                     t = doc.get("type", "Other")
-                     cost = doc.get("cost", {}).get("parts", 0) + doc.get("cost", {}).get("labor", 0)
-                     groups[t] = groups.get(t, 0) + cost
-                 
-                 return MockCursor([{"_id": k, "value": v} for k, v in groups.items()])
-            else:
-                # Summary stats
-                return MockCursor([{
-                    "total_parts": total_parts,
-                    "total_labor": total_labor,
-                    "count": count
-                }])
+            elif "$group" in stage:
+                # Group documents
+                group_spec = stage["$group"]
+                group_id = group_spec["_id"]
                 
-        return MockCursor(filtered)
+                if group_id is None:
+                    # Group all into one
+                    result = {"_id": None}
+                    for field, expr in group_spec.items():
+                        if field == "_id":
+                            continue
+                        result[field] = self._apply_accumulator(expr, data)
+                    return MockCursor([result])
+                elif isinstance(group_id, str) and group_id.startswith("$"):
+                    # Group by field
+                    field_name = group_id[1:]
+                    groups = {}
+                    for doc in data:
+                        key = doc.get(field_name)
+                        if key not in groups:
+                            groups[key] = []
+                        groups[key].append(doc)
+                    
+                    results = []
+                    for key, docs in groups.items():
+                        result = {"_id": key}
+                        for field, expr in group_spec.items():
+                            if field == "_id":
+                                continue
+                            result[field] = self._apply_accumulator(expr, docs)
+                        results.append(result)
+                    return MockCursor(results)
+            
+            elif "$sort" in stage:
+                # Sort documents
+                sort_spec = stage["$sort"]
+                for field, direction in reversed(list(sort_spec.items())):
+                    data.sort(key=lambda x: x.get(field, 0), reverse=(direction == -1))
+            
+            elif "$project" in stage:
+                # Project fields
+                projected = []
+                for doc in data:
+                    new_doc = {}
+                    for field, value in stage["$project"].items():
+                        if value == 1:
+                            new_doc[field] = doc.get(field)
+                        elif value == 0:
+                            continue
+                        else:
+                            # Expression evaluation (simplified)
+                            new_doc[field] = value
+                    projected.append(new_doc)
+                data = projected
+        
+        return MockCursor(data)
+    
+    def _execute_pipeline(self, data, pipeline):
+        """Execute a sub-pipeline (for $facet)"""
+        cursor = MockCursor(data)
+        temp_collection = MockCollection("temp", self.db)
+        temp_collection.data = data
+        result_cursor = temp_collection.aggregate(pipeline)
+        return result_cursor.data
+    
+    def _apply_accumulator(self, expr, docs):
+        """Apply accumulator expression like $sum, $max, $avg"""
+        if isinstance(expr, dict):
+            if "$sum" in expr:
+                field_or_val = expr["$sum"]
+                if isinstance(field_or_val, int):
+                    return field_or_val * len(docs)
+                elif isinstance(field_or_val, str) and field_or_val.startswith("$"):
+                    field_path = field_or_val[1:].split(".")
+                    total = 0
+                    for doc in docs:
+                        val = doc
+                        for part in field_path:
+                            val = val.get(part, 0) if isinstance(val, dict) else 0
+                        total += val or 0
+                    return total
+            elif "$max" in expr:
+                field = expr["$max"][1:] if expr["$max"].startswith("$") else expr["$max"]
+                return max((doc.get(field, 0) for doc in docs), default=0)
+            elif "$avg" in expr:
+                field = expr["$avg"][1:] if expr["$avg"].startswith("$") else expr["$avg"]
+                values = [doc.get(field, 0) for doc in docs if doc.get(field) is not None]
+                return sum(values) / len(values) if values else 0
+            elif "$push" in expr:
+                field = expr["$push"][1:] if isinstance(expr["$push"], str) and expr["$push"].startswith("$") else expr["$push"]
+                return [doc.get(field) for doc in docs]
+        return None
 
 
 class MockDatabase:

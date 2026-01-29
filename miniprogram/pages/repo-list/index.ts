@@ -14,6 +14,9 @@ Page({
   },
 
   async onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+    
     this.setData({ loading: true })
     this.initNavBar()
     await this.loadRepos()
@@ -220,5 +223,9 @@ Page({
         confirmColor: '#2c3e50',
         success: () => {}
       })
+    },
+
+    goToSettings() {
+      wx.navigateTo({ url: '/pages/settings/index' })
     }
 })

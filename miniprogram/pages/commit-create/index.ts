@@ -19,8 +19,8 @@ Page({
     message: '',
     mileage: '',
     cost_total: '',
+    images: [] as string[],
     
-    // Insurance specific fields
     insurance_company: '',
     compulsory_insurance: '',
     commercial_insurance: '',
@@ -37,6 +37,9 @@ Page({
   },
 
   async onLoad(options: any) {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+
     this.setData({ repoId: options.repoId })
     
     if (options.mode === 'edit' && options.id) {
@@ -85,6 +88,7 @@ Page({
         type: commit.type,
         typeIndex: typeIndex >= 0 ? typeIndex : 0,
         selectedDate: formatDate(new Date(commit.timestamp)),
+        images: commit.images || [],
         ...insuranceData
       })
     } catch (err) {
@@ -143,7 +147,7 @@ Page({
   },
 
   async onSubmit() {
-    const { repoId, title, message, mileage, cost_total, type, selectedDate,
+    const { repoId, title, message, mileage, cost_total, type, selectedDate, images,
             insurance_company, commercial_insurance, compulsory_insurance,
             isEditMode, editCommitId } = this.data
     
@@ -162,13 +166,14 @@ Page({
           finalMessage += `\n\n【保险信息】\n公司: ${insurance_company}\n交强险: ¥${compulsory_insurance}\n商业险: ¥${commercial_insurance}`
       }
 
-      const commitData = {
+      const commitData: any = {
           repo_id: repoId,
           title,
           message: finalMessage,
           mileage: mileage ? Number(mileage) : undefined,
           type,
           timestamp,
+          images,
           cost: {
               parts: Number(cost_total) || 0,
               labor: 0,
@@ -197,6 +202,60 @@ Page({
     } finally {
       wx.hideLoading()
     }
+  },
+
+  chooseImage() {
+    wx.chooseMedia({
+      count: 9 - this.data.images.length,
+      mediaType: ['image'],
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const filePaths = res.tempFiles.map(file => file.tempFilePath)
+        this.uploadImages(filePaths)
+      }
+    })
+  },
+
+  async uploadImages(filePaths: string[]) {
+    wx.showLoading({ title: '上传图片...' })
+    
+    try {
+      const uploadedUrls: string[] = []
+      
+      for (const filePath of filePaths) {
+        const result = await wx.cloud.uploadFile({
+          cloudPath: `commits/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`,
+          filePath
+        })
+        uploadedUrls.push(result.fileID)
+      }
+      
+      this.setData({
+        images: [...this.data.images, ...uploadedUrls]
+      })
+      
+      wx.showToast({ title: '上传成功', icon: 'success' })
+    } catch (err) {
+      console.error('Image upload failed:', err)
+      wx.showToast({ title: '上传失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  deleteImage(e: any) {
+    const index = e.currentTarget.dataset.index
+    const images = this.data.images.filter((_, i) => i !== index)
+    this.setData({ images })
+  },
+
+  previewImage(e: any) {
+    const url = e.currentTarget.dataset.url
+    wx.previewImage({
+      urls: this.data.images,
+      current: url
+    })
   },
 
   onCancel() {

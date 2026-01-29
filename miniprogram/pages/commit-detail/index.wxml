@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{themeClass}}">
   <custom-nav showBack="{{true}}" />
 
   <view class="detail-card" wx:if="{{commit}}">
@@ -27,6 +27,21 @@
     <view class="section-label">详细描述</view>
     <view class="message-box">
         {{commit.message || '无详细描述'}}
+    </view>
+
+    <view class="images-section" wx:if="{{commit.images && commit.images.length > 0}}">
+      <view class="section-label">相关图片</view>
+      <view class="images-grid">
+        <image 
+          wx:for="{{commit.images}}" 
+          wx:key="index" 
+          src="{{item}}" 
+          class="image-item" 
+          mode="aspectFill"
+          bindtap="previewImage"
+          data-index="{{index}}"
+        />
+      </view>
     </view>
 
     <view class="cost-section" wx:if="{{commit.cost}}">

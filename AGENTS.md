@@ -10,10 +10,12 @@
 - **Frontend**: WeChat Mini Program (TypeScript + SCSS)
 - **Backend**: FastAPI (Python 3.9+) with MongoDB/MockDB
 - **Architecture**: RESTful API, async/await patterns throughout
+- **Authentication**: JWT-based WeChat login
+- **Storage**: WeChat Cloud for images (cloud1-5g2vgpovd2d7461b)
 
 **Core Concepts**:
 - `Repo` = Vehicle
-- `Commit` = Maintenance/modification record
+- `Commit` = Maintenance/modification record (now supports images)
 - `Issue` = Scheduled maintenance task/reminder
 - `HEAD` = Current vehicle state (mileage, condition)
 
@@ -27,6 +29,12 @@
 ```bash
 cd backend
 pip install -r requirements.txt
+
+# Create .env file with required variables (see backend/.env.example)
+# WECHAT_APPID=<your_appid>
+# WECHAT_SECRET=<your_secret>
+# JWT_SECRET=<random_secret_key>
+
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -83,13 +91,13 @@ auto-repo/
 │   └── requirements.txt        # Python dependencies
 │
 ├── miniprogram/                # WeChat Mini Program
-│   ├── app.ts                  # App lifecycle, cloud init
+│   ├── app.ts                  # App lifecycle, cloud init, auto-login
 │   ├── app.scss                # Global styles (CSS variables)
 │   ├── pages/                  # UI pages
 │   │   ├── repo-list/          # Vehicle list
 │   │   ├── repo-detail/        # Timeline + insights + issues
 │   │   ├── repo-create/        # Add/edit vehicle
-│   │   ├── commit-create/      # Add maintenance record
+│   │   ├── commit-create/      # Add maintenance record (with image upload)
 │   │   ├── commit-detail/      # Record details
 │   │   └── issue-create/       # Add maintenance reminder
 │   ├── components/             # Reusable components
@@ -97,7 +105,8 @@ auto-repo/
 │   │   ├── insights-view/      # Data visualizations
 │   │   └── dashboard-widget/   # High-priority alerts
 │   ├── services/
-│   │   └── api.ts              # Backend API wrapper (request helper)
+│   │   ├── api.ts              # Backend API wrapper (request helper)
+│   │   └── auth.ts             # WeChat login & JWT token management
 │   └── utils/
 │       └── util.ts             # Shared utilities (formatTime, etc.)
 │
@@ -415,13 +424,18 @@ this.setData({ loading: false })
 - **ObjectId handling**: Always convert to string for JSON serialization
 
 ### Authentication
-- **Phase 1**: No authentication (all users see all data)
-- **Future**: Will filter by `user_openid` from WeChat login
+- **Current**: JWT-based WeChat login implemented
+- **Token storage**: Local storage (`autorepo_token`, `autorepo_openid`)
+- **Token expiry**: 7 days
+- **Multi-tenancy**: All routes filter by `user_openid`
+- **Data migration**: Legacy data (no `user_openid`) assigned to first user who logs in
+- **Auto-login**: App automatically obtains JWT on launch via `services/auth.ts`
 
 ### Business Logic
 - **Auto HEAD update**: Creating a commit updates repo's `current_mileage` and `current_head` (only if new mileage > current)
 - **Issue automation**: Commits can close issues via `closes_issues` field
 - **Mileage triggers**: When commit mileage ≥ issue's `due_mileage`, issue priority → "high"
+- **Image upload**: Commits support up to 9 images uploaded to WeChat Cloud storage
 
 ---
 
@@ -458,5 +472,5 @@ this.setData({ loading: false })
 
 ---
 
-*Last Updated: 2026-01-26*
+*Last Updated: 2026-01-29*
 *Maintained by: AutoRepo Team*

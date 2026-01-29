@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{themeClass}}">
   <!-- Skeleton Loading -->
   <block wx:if="{{loading}}">
     <skeleton-loader type="detail" />
@@ -93,9 +93,15 @@
         <view class="commit-log">
             <view class="log-header">
                 <view class="log-title">整备记录</view>
-                <view class="export-btn" bindtap="handleExport">
-                    <text class="export-icon">📊</text>
-                    <text class="export-text">导出</text>
+                <view class="export-btns">
+                    <view class="export-btn" bindtap="handleExport">
+                        <text class="export-icon">📊</text>
+                        <text class="export-text">CSV</text>
+                    </view>
+                    <view class="export-btn pdf-btn" bindtap="handleExportPDF">
+                        <text class="export-icon">📄</text>
+                        <text class="export-text">PDF</text>
+                    </view>
                 </view>
             </view>
             

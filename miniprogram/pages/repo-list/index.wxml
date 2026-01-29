@@ -1,6 +1,6 @@
 <custom-nav />
 
-<view class="container">
+<view class="container {{themeClass}}">
 
   <view class="repo-list">
     <!-- Skeleton Loading -->
@@ -49,6 +49,12 @@
       <view class="help-button-bottom" bindtap="onShowHelp" title="使用帮助">
         <text class="help-icon">❓</text>
         <text class="help-text">使用帮助</text>
+      </view>
+      
+      <!-- Settings Button -->
+      <view class="settings-button" bindtap="goToSettings">
+        <text class="settings-icon">⚙️</text>
+        <text class="settings-text">设置</text>
       </view>
 
     </block>

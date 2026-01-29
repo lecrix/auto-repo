@@ -1,3 +1,5 @@
+import { wxLogin, clearAuth } from './auth'
+
 interface ApiConfig {
   baseURL: string
   timeout: number
@@ -17,6 +19,8 @@ const config: ApiConfig = {
   retryCount: 1
 }
 
+let isReloginInProgress = false
+
 export function setBaseURL(url: string) {
   config.baseURL = url
 }
@@ -35,21 +39,82 @@ class RequestError extends Error implements ApiError {
   }
 }
 
-const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = config.retryCount) => {
+async function handleUnauthorized(
+  url: string,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  data?: any
+): Promise<any> {
+  if (isReloginInProgress) {
+    return Promise.reject(new RequestError('UNAUTHORIZED', '正在重新登录...', 401))
+  }
+
+  isReloginInProgress = true
+  clearAuth()
+
   return new Promise((resolve, reject) => {
-    const requestTask = wx.request({
+    wx.showModal({
+      title: '登录已过期',
+      content: '是否重新登录？',
+      confirmText: '重新登录',
+      cancelText: '取消',
+      success: async (modalRes) => {
+        if (modalRes.confirm) {
+          try {
+            wx.showLoading({ title: '登录中...' })
+            await wxLogin()
+            wx.hideLoading()
+            wx.showToast({ title: '登录成功', icon: 'success' })
+            isReloginInProgress = false
+            
+            const result = await request(url, method, data)
+            resolve(result)
+          } catch (err) {
+            wx.hideLoading()
+            isReloginInProgress = false
+            wx.showToast({ title: '登录失败', icon: 'none' })
+            reject(new RequestError('UNAUTHORIZED', '重新登录失败', 401))
+          }
+        } else {
+          isReloginInProgress = false
+          wx.reLaunch({ url: '/pages/repo-list/index' })
+          reject(new RequestError('UNAUTHORIZED', '用户取消登录', 401))
+        }
+      },
+      fail: () => {
+        isReloginInProgress = false
+        reject(new RequestError('UNAUTHORIZED', '登录已过期', 401))
+      }
+    })
+  })
+}
+
+const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = config.retryCount): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const headers: Record<string, string> = {
+      'content-type': 'application/json'
+    }
+    
+    const token = wx.getStorageSync('autorepo_token')
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+    
+    wx.request({
       url: `${config.baseURL}${url}`,
       method,
       data,
       timeout: config.timeout,
-      header: {
-        'content-type': 'application/json'
-      },
-      success: (res: any) => {
+      header: headers,
+      success: async (res: any) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data)
         } else if (res.statusCode === 401) {
-          reject(new RequestError('UNAUTHORIZED', '未授权，请重新登录', res.statusCode))
+          try {
+            const result = await handleUnauthorized(url, method, data)
+            resolve(result)
+          } catch (err) {
+            reject(err)
+          }
         } else if (res.statusCode === 403) {
           reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
         } else if (res.statusCode === 404) {

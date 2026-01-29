@@ -10,6 +10,7 @@ class Cost(BaseModel):
 class Issue(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     repo_id: str
+    user_openid: Optional[str] = None
     title: str
     description: Optional[str] = None
     status: str = "open"
@@ -36,6 +37,8 @@ class IssuePatch(BaseModel):
 class Commit(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
     repo_id: str
+    user_openid: Optional[str] = None
+    images: list[str] = Field(default_factory=list)
     title: str
     message: Optional[str] = None
     mileage: Optional[int] = None
@@ -55,6 +58,7 @@ class CommitPatch(BaseModel):
 
 class Repo(BaseModel):
     id: Optional[str] = Field(alias="_id", default=None)
+    user_openid: Optional[str] = None
     name: str
     vin: Optional[str] = None
     color: str = "#2c3e50"

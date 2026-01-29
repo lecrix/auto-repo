@@ -271,15 +271,20 @@
   color: var(--text-main);
 }
 
+.export-btns {
+  display: flex;
+  gap: 12rpx;
+}
+
 .export-btn {
   display: flex;
   align-items: center;
   gap: 6rpx;
-  padding: 12rpx 24rpx;
+  padding: 12rpx 20rpx;
   background: var(--gradient-accent);
   color: white;
   border-radius: 20rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s var(--ease-out-expo);
@@ -287,6 +292,10 @@
   &:active {
     transform: scale(0.95);
     box-shadow: var(--shadow-md);
+  }
+
+  &.pdf-btn {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   }
 }
 

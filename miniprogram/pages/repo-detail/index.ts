@@ -18,6 +18,9 @@ Page({
   },
 
   async onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+
     this.setData({ loading: true })
     await this.loadData()
   },
@@ -164,5 +167,75 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  handleExportPDF() {
+    if (!this.data.commits || this.data.commits.length === 0) {
+      wx.showToast({
+        title: '暂无记录可导出',
+        icon: 'none'
+      })
+      return
+    }
+
+    const token = wx.getStorageSync('autorepo_token')
+    if (!token) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+      return
+    }
+
+    wx.showLoading({ title: '生成PDF...' })
+
+    const baseURL = 'http://localhost:8001/api'
+    
+    wx.downloadFile({
+      url: `${baseURL}/repos/${this.data.repoId}/export/pdf`,
+      header: {
+        'Authorization': `Bearer ${token}`
+      },
+      success: (res) => {
+        wx.hideLoading()
+        if (res.statusCode === 200) {
+          wx.openDocument({
+            filePath: res.tempFilePath,
+            fileType: 'pdf',
+            showMenu: true,
+            success: () => {
+              console.log('PDF opened successfully')
+            },
+            fail: (err) => {
+              console.error('Failed to open PDF:', err)
+              wx.showToast({
+                title: '打开PDF失败',
+                icon: 'none'
+              })
+            }
+          })
+        } else if (res.statusCode === 401) {
+          wx.removeStorageSync('autorepo_token')
+          wx.removeStorageSync('autorepo_openid')
+          wx.showToast({
+            title: '登录已过期',
+            icon: 'none'
+          })
+        } else {
+          wx.showToast({
+            title: '导出失败',
+            icon: 'none'
+          })
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('Download failed:', err)
+        wx.showToast({
+          title: '下载失败，请检查网络',
+          icon: 'none'
+        })
+      }
+    })
   }
 })

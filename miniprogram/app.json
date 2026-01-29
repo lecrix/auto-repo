@@ -1,4 +1,6 @@
 {
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "usingComponents": {
     "custom-nav": "/components/custom-nav/index",
     "dashboard-widget": "/components/dashboard-widget/index",
@@ -13,7 +15,8 @@
     "pages/repo-detail/index",
     "pages/commit-create/index",
     "pages/commit-detail/index",
-    "pages/issue-create/index"
+    "pages/issue-create/index",
+    "pages/settings/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

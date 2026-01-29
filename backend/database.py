@@ -23,24 +23,25 @@ class DatabaseManager:
 
     async def create_indexes(self) -> None:
         """Create database indexes for common queries"""
-        # MockDatabase doesn't support indexes
         if not self.client:
             return
         
-        # Index for commits queries (repo_id + timestamp descending)
+        await self.db.repos.create_index("user_openid")
+        
         await self.db.commits.create_index([
+            ("user_openid", 1),
             ("repo_id", 1),
             ("timestamp", -1)
         ])
         
-        # Index for issues queries (repo_id + status)
         await self.db.issues.create_index([
+            ("user_openid", 1),
             ("repo_id", 1),
             ("status", 1)
         ])
         
-        # Index for issues mileage trigger queries
         await self.db.issues.create_index([
+            ("user_openid", 1),
             ("repo_id", 1),
             ("due_mileage", 1),
             ("status", 1)

@@ -1,0 +1,12 @@
+{
+  "light": {
+    "bgColor": "#f8f9fa",
+    "textMain": "#2c3e50",
+    "primaryColor": "#3498db"
+  },
+  "dark": {
+    "bgColor": "#121212",
+    "textMain": "#e0e0e0",
+    "primaryColor": "#5dade2"
+  }
+}
