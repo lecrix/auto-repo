@@ -13,12 +13,12 @@ interface ApiError {
   originalError?: any
 }
 
-const isDevelopment = false  // 开发时改为 true
+const isDevelopment = false
 
 const config: ApiConfig = {
   baseURL: isDevelopment 
-    ? 'http://localhost:8001/api'  // 本地开发
-    : 'https://autorepo-backend-xxxxx.ap-shanghai.app.tcloudbase.com/api',  // 生产环境
+    ? 'http://localhost:8001/api'
+    : 'https://autorepo-backend-222389-8-1397748195.sh.run.tcloudbase.com/api',
   
   timeout: 10000,
   retryCount: 1
