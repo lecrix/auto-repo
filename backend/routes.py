@@ -672,10 +672,13 @@ async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_curren
         info_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey)
         ]))
@@ -705,20 +708,24 @@ async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_curren
                 date = datetime.fromtimestamp(commit.get('timestamp', 0) / 1000).strftime('%Y-%m-%d')
                 title = commit.get('title', 'N/A')
                 commit_type = type_map.get(commit.get('type', ''), commit.get('type', 'N/A'))
-                mileage = str(commit.get('mileage', '-'))
+                mileage = commit.get('mileage')
+                mileage_display = "/" if not mileage else str(mileage)
                 cost = commit.get('cost', {})
                 total_cost = cost.get('parts', 0) + cost.get('labor', 0)
                 
-                commit_data.append([date, title, commit_type, mileage, f"¥{total_cost:.2f}"])
+                commit_data.append([date, title, commit_type, mileage_display, f"¥{total_cost:.2f}"])
             
             commit_table = Table(commit_data, colWidths=[1.2*inch, 2*inch, 1*inch, 1*inch, 1*inch])
             commit_table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
                 ('FONTSIZE', (0, 0), (-1, 0), 10),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                 ('GRID', (0, 0), (-1, -1), 1, colors.grey),
                 ('FONTSIZE', (0, 1), (-1, -1), 9)
