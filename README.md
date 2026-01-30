@@ -26,6 +26,12 @@
 
 ## 🎉 What's New in v2.0 (2026-01-29)
 
+### 🚀 Production Deployment
+*   **WeChat Cloud Run**: Full support for serverless deployment
+*   **Zero-Config Network**: Direct internal link access (No domain/ICP required)
+*   **Auto-Scaling**: Scale to zero when idle for maximum cost efficiency
+*   **Docker Ready**: Optimized Dockerfile for cloud environment
+
 ### 🔐 Multi-User Authentication
 *   **WeChat One-Click Login**: Automatic login on app launch
 *   **JWT Authentication**: 7-day token validity
@@ -181,12 +187,18 @@ auto-repo/
 - [x] **Phase 3**: Image upload & PDF export
 - [x] **Phase 3.5**: Data Visualization, Costs & Task Management
 - [x] **Phase 4**: Bug Fixes & UX Improvements (2026-01)
-- [ ] **Phase 5**: Cloud Deployment (WeChat Cloud Hosting)
+- [x] **Phase 5**: Cloud Deployment (WeChat Cloud Hosting)
 - [ ] **Phase 6**: Social Sharing Features & Community
 
 ## 🔧 Recent Updates
 
-### v2.0 (2026-01-29) - Production-Ready Multi-Tenant Release
+### v2.0 (2026-01-30) - Production Deployment Release
+**Deployment & Infrastructure**:
+- ✅ WeChat Cloud Run support (Dockerfile optimization)
+- ✅ `wx.cloud.callContainer` integration (Zero-domain access)
+- ✅ Multi-environment configuration (Dev/Device/Prod)
+- ✅ Comprehensive [Deployment Guide](./DEPLOY.md)
+
 **Authentication & Security**:
 - ✅ JWT-based WeChat login system
 - ✅ Multi-tenant data isolation (user_openid filtering)
@@ -240,6 +252,7 @@ auto-repo/
 ## 📚 Documentation
 
 - [AGENTS.md](./AGENTS.md) - Development guide for AI assistants
+- [DEPLOY.md](./DEPLOY.md) - Cloud deployment guide
 - [docs/WORK_SUMMARY.md](./docs/WORK_SUMMARY.md) - Detailed development summary
 - [docs/TESTING_GUIDE.md](./docs/TESTING_GUIDE.md) - Comprehensive testing instructions
 - [docs/FEATURE_SUMMARY.md](./docs/FEATURE_SUMMARY.md) - Complete feature documentation

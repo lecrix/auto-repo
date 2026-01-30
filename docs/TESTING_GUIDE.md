@@ -1,7 +1,7 @@
 # AutoRepo 测试指南
 
-> **版本**: v2.0  
-> **更新日期**: 2026-01-29
+> **版本**: v2.1  
+> **更新日期**: 2026-01-30
 
 ---
 
@@ -11,7 +11,8 @@
 2. [后端测试](#后端测试)
 3. [前端测试](#前端测试)
 4. [集成测试](#集成测试)
-5. [常见问题](#常见问题)
+5. [云托管部署验证](#云托管部署验证)
+6. [常见问题](#常见问题)
 
 ---
 
@@ -37,6 +38,9 @@ JWT_SECRET=your-random-secret-key-at-least-32-characters
 
 # 数据库配置（可选）
 MONGO_URL=mongodb://localhost:27017
+
+# 环境模式 (development/production)
+ENVIRONMENT=development
 ```
 
 ⚠️ **注意**: 
@@ -69,20 +73,16 @@ Warning: Could not connect to MongoDB. Using Mock Database.
 确保 `miniprogram/app.ts` 中的云环境 ID 正确：
 ```typescript
 wx.cloud.init({
-  env: 'cloud1-5g2vgpovd2d7461b',  // 替换为你的云环境 ID
+  // env: 'cloud1-5g2vgpovd2d7461b',  // 替换为你的云环境 ID (选填)
   traceUser: true
 })
 ```
 
-#### 配置后端地址
-在 `miniprogram/services/api.ts` 中配置：
+#### 配置环境模式
+在 `miniprogram/config.ts` 中配置：
 ```typescript
-const config: ApiConfig = {
-  baseURL: 'http://localhost:8000/api',  // 本地测试
-  // baseURL: 'https://your-domain.com/api',  // 生产环境
-  timeout: 10000,
-  retryCount: 1
-}
+// 模式选择: 'dev' (本地开发), 'device' (真机调试), 'prod' (云托管-生产环境)
+const CURRENT_MODE: 'dev' | 'device' | 'prod' = 'dev'
 ```
 
 ---
@@ -388,6 +388,27 @@ Auto-login failed: [错误信息]
 
 ---
 
+## ☁️ 云托管部署验证
+
+**目的**: 验证生产环境部署是否成功
+
+**前提**: 
+1. 已在微信云托管部署后端服务 (参考 `DEPLOY.md`)
+2. 前端配置 `CURRENT_MODE = 'prod'`
+
+**步骤**:
+1. 开发者工具上传代码并设为体验版
+2. 手机扫码打开体验版
+3. 观察是否能自动登录
+
+**预期结果**:
+- ✅ 自动登录成功 (Token 获取正常)
+- ✅ 车辆列表加载成功 (接口调用正常)
+- ✅ 无需开启"开发调试"模式也能访问
+- ✅ 速度体验：首次打开可能有几秒冷启动延迟，之后响应迅速
+
+---
+
 ## ❓ 常见问题
 
 ### 问题 1: 401 Unauthorized 错误
@@ -421,7 +442,7 @@ wx.removeStorageSync('autorepo_openid')
    ```typescript
    // app.ts
    wx.cloud.init({
-     env: 'cloud1-5g2vgpovd2d7461b',  // 确认正确
+     // env: 'cloud1-5g2vgpovd2d7461b',  // 确认正确
      traceUser: true
    })
    ```
@@ -534,7 +555,7 @@ Requests per second: 50 (吞吐量)
 ```markdown
 # 测试报告
 
-**测试日期**: 2026-01-29  
+**测试日期**: 2026-01-30  
 **测试人员**: [姓名]  
 **环境**: [开发/测试/生产]
 
@@ -564,5 +585,6 @@ Requests per second: 50 (吞吐量)
 
 ---
 
-*测试指南版本: v2.0*  
-*最后更新: 2026-01-29*
+*测试指南版本: v2.1*  
+*最后更新: 2026-01-30*
+
