@@ -11,7 +11,7 @@ App<IAppOption>({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        env: 'cloud1-5g2vgpovd2d7461b',
+        // env: 'your-env-id', // 默认为当前环境，如需指定特定环境请在此填入环境ID
         traceUser: true,
       })
     }

@@ -7,31 +7,39 @@
  */
 
 // ==================== 配置开关 ====================
-// 设置为 true 启用真机调试模式，false 使用开发工具模式
-const USE_DEVICE_DEBUG = true
+// 模式选择: 'dev' (开发工具), 'device' (真机调试), 'prod' (云托管-生产环境)
+const CURRENT_MODE: 'dev' | 'device' | 'prod' = 'prod'
 
 // ==================== 环境配置 ====================
 const ENV_CONFIG = {
-  // 开发工具模式 (模拟器)
-  development: {
+  // 开发工具模式 (模拟器) - 本地 Docker 或直接运行
+  dev: {
     baseURL: 'http://localhost:8000/api',
+    useCloudRun: false,
     description: '开发工具模拟器 (localhost)'
   },
 
   // 真机调试模式 (需要使用局域网IP)
   device: {
-    baseURL: 'http://192.168.1.196:8000/api',
+    baseURL: 'http://192.168.1.196:8000/api', // 请修改为您电脑的局域网IP
+    useCloudRun: false,
     description: '真机调试 (局域网IP)'
+  },
+
+  // 生产环境 (微信云托管) - 免域名访问
+  prod: {
+    baseURL: '/api', // 云托管内部路径前缀
+    useCloudRun: true,
+    description: '生产环境 (微信云托管)'
   }
 }
 
 // ==================== 导出配置 ====================
-const currentEnv = USE_DEVICE_DEBUG ? 'device' : 'development'
-
 export const config = {
-  baseURL: ENV_CONFIG[currentEnv].baseURL,
-  environment: currentEnv,
-  description: ENV_CONFIG[currentEnv].description
+  baseURL: ENV_CONFIG[CURRENT_MODE].baseURL,
+  useCloudRun: ENV_CONFIG[CURRENT_MODE].useCloudRun,
+  environment: CURRENT_MODE,
+  description: ENV_CONFIG[CURRENT_MODE].description
 }
 
 // 方便调试时查看当前配置

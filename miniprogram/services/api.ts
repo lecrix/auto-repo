@@ -92,14 +92,64 @@ async function handleUnauthorized(
 const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = config.retryCount): Promise<any> => {
   return new Promise((resolve, reject) => {
     const headers: Record<string, string> = {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
+      // 'X-WX-SERVICE': 'springboot-service' // 如果您的服务名不是默认的，可以在这里指定，或者在 callContainer config 中指定
     }
     
     const token = wx.getStorageSync('autorepo_token')
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
+
+    // 处理云托管调用 (生产环境)
+    if (config.useCloudRun) {
+      wx.cloud.callContainer({
+        config: {
+          env: '' // 留空则使用当前小程序绑定的环境
+        },
+        path: `${config.baseURL}${url}`, // e.g., /api/repos
+        method,
+        header: headers,
+        data,
+        success: async (res: any) => {
+          // 云托管返回的 res.data 才是实际的响应体
+          // res.statusCode 是 HTTP 状态码
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data)
+          } else if (res.statusCode === 401) {
+             try {
+               const result = await handleUnauthorized(url, method, data)
+               resolve(result)
+             } catch (err) {
+               reject(err)
+             }
+          } else if (res.statusCode === 403) {
+             reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
+          } else if (res.statusCode === 404) {
+             reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
+          } else if (res.statusCode >= 500) {
+             reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
+          } else {
+             // 错误处理逻辑复用
+             const detail = res.data && res.data.detail
+             let errorMsg = '请求失败'
+             if (typeof detail === 'string') {
+               errorMsg = detail
+             } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+               errorMsg = detail[0].msg
+             }
+             reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
+          }
+        },
+        fail: (err: any) => {
+           console.error('Cloud API Error:', err)
+           reject(new RequestError('NETWORK_ERROR', '云服务连接失败', undefined, err))
+        }
+      })
+      return // 结束执行，不运行下方的 wx.request
+    }
     
+    // 处理本地/普通 HTTP 请求 (开发环境)
     wx.request({
       url: `${config.baseURL}${url}`,
       method,
