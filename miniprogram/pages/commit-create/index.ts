@@ -37,9 +37,6 @@ Page({
   },
 
   async onLoad(options: any) {
-    const app = getApp<IAppOption>()
-    this.setData({ themeClass: app.globalData.themeClass || '' })
-
     this.setData({ repoId: options.repoId })
     
     if (options.mode === 'edit' && options.id) {
@@ -52,6 +49,11 @@ Page({
     } else {
       wx.setNavigationBarTitle({ title: '新建记录' })
     }
+  },
+
+  onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
   },
 
   async loadCommitDetail(id: string) {

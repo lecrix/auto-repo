@@ -198,9 +198,9 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
-  border: 2px dashed #bbb;
+  border: 2px dashed var(--border-color);
   border-radius: 16px;
-  color: #999;
+  color: var(--text-secondary);
   transition: all 0.2s var(--ease-out-expo);
   min-height: 140px;
   /* Match card height */
@@ -216,7 +216,7 @@
 .add-card:active {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background: rgba(44, 62, 80, 0.05);
+  background: var(--bg-color);
   transform: scale(0.98);
 }
 
@@ -225,14 +225,14 @@
   font-size: 36px;
   font-weight: 400;
   line-height: 1;
-  color: #ccc;
+  color: var(--text-light);
 }
 
 .add-text {
   font-size: 16px;
   font-weight: 500;
   margin-top: 8px;
-  color: #bbb;
+  color: var(--text-secondary);
 }
 
 .loading {
@@ -245,9 +245,9 @@
 .help-button-bottom {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,7 +257,7 @@
 
 .help-button-bottom:active {
   transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .help-icon {
@@ -267,16 +267,16 @@
 
 .help-text {
   font-size: 15px;
-  color: #2c3e50;
+  color: var(--text-main);
   font-weight: 500;
 }
 
 .settings-button {
   margin-top: var(--spacing-sm);
   padding: var(--spacing-md);
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,7 +286,7 @@
 
 .settings-button:active {
   transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .settings-icon {
@@ -296,6 +296,6 @@
 
 .settings-text {
   font-size: 15px;
-  color: #2c3e50;
+  color: var(--text-main);
   font-weight: 500;
 }

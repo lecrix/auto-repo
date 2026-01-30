@@ -17,8 +17,7 @@
     "pages/commit-detail/index",
     "pages/issue-create/index",
     "pages/settings/index",
-    "pages/help/index",
-    "pages/network-test/index"
+    "pages/help/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

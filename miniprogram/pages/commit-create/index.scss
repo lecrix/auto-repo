@@ -46,13 +46,13 @@
 }
 
 .input, .picker, .textarea {
-  background: white;
+  background: var(--card-bg);
   padding: 14px 16px;
   border-radius: 12px;
   font-size: 16px;
-  color: #2c3e50; /* Fixed dark text for white input background */
+  color: var(--text-main);
   box-shadow: var(--shadow-sm);
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
   transition: all 0.3s;
 }
 

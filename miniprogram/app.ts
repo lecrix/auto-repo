@@ -26,6 +26,14 @@ App<IAppOption>({
     }
 
     this.initTheme()
+    this.watchSystemTheme()
+  },
+
+  onShow() {
+    const currentTheme = this.globalData.theme
+    if (currentTheme === 'auto') {
+      this.updateTheme('auto')
+    }
   },
 
   initTheme() {
@@ -33,22 +41,45 @@ App<IAppOption>({
     this.updateTheme(theme)
   },
 
+  watchSystemTheme() {
+    wx.onThemeChange((res: { theme: 'light' | 'dark' }) => {
+      console.log('[Theme] System theme changed to:', res.theme)
+      if (this.globalData.theme === 'auto') {
+        this.updateTheme('auto')
+      }
+    })
+  },
+
   updateTheme(theme: 'auto' | 'light' | 'dark') {
+    console.log('[Theme] updateTheme called:', theme)
     this.globalData.theme = theme
     
-    const isDark = theme === 'dark' || (theme === 'auto' && wx.getSystemInfoSync().theme === 'dark')
+    const systemTheme = wx.getSystemInfoSync().theme
+    const isDark = theme === 'dark' || (theme === 'auto' && systemTheme === 'dark')
     const themeClass = isDark ? 'theme-dark' : ''
     this.globalData.themeClass = themeClass
 
+    console.log('[Theme] Calculated:', { theme, systemTheme, isDark, themeClass })
+
     const pages = getCurrentPages()
-    pages.forEach(page => {
-      page.setData({ themeClass })
-      
-      wx.setNavigationBarColor({
-        frontColor: '#000000',
-        backgroundColor: '#ffffff',
-        animation: { duration: 200, timingFunc: 'easeIn' }
-      })
+    console.log('[Theme] Page count:', pages.length)
+    
+    pages.forEach((page, index) => {
+      try {
+        console.log(`[Theme] Updating page ${index}:`, page.route)
+        page.setData({ themeClass })
+      } catch (err) {
+        console.error(`[Theme] Failed to update page ${index}:`, err)
+      }
+    })
+
+    const navConfig = isDark 
+      ? { frontColor: '#ffffff' as '#ffffff', backgroundColor: '#1e293b' }
+      : { frontColor: '#000000' as '#000000', backgroundColor: '#ffffff' }
+
+    wx.setNavigationBarColor({
+      ...navConfig,
+      animation: { duration: 200, timingFunc: 'easeIn' }
     })
   }
 })

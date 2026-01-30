@@ -24,10 +24,10 @@
 }
 
 .detail-card {
-  background: white;
+  background: var(--card-bg);
   padding: var(--spacing-lg);
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .header-row {
@@ -73,10 +73,11 @@
 
 .value.code {
   font-family: monospace;
-  background: #f5f5f5;
+  background: var(--bg-color);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 13px;
+  color: var(--text-main);
 }
 
 .value.highlight {
@@ -86,7 +87,7 @@
 
 .divider {
   height: 1px;
-  background: #f0f0f0;
+  background: var(--border-color);
   margin: var(--spacing-lg) 0;
 }
 
@@ -109,7 +110,7 @@
 }
 
 .cost-section {
-  border-top: 1px dashed #e0e0e0;
+  border-top: 1px dashed var(--border-color);
   padding-top: var(--spacing-lg);
 }
 
@@ -165,10 +166,10 @@
 }
 
 .edit-btn {
-  background: white;
+  background: var(--card-bg);
   color: var(--text-main);
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .delete-btn {

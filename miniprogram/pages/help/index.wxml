@@ -1,4 +1,4 @@
-<view class="help-page">
+<view class="help-page {{themeClass}}">
   <view class="help-header">
     <view class="back-btn" bindtap="goBack">❮</view>
     <text class="help-title">使用帮助</text>

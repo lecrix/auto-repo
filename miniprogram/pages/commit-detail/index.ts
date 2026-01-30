@@ -23,6 +23,11 @@ Page({
     this.setData({ themeClass: app.globalData.themeClass || '' })
   },
 
+  onShow() {
+    const app = getApp<IAppOption>()
+    this.setData({ themeClass: app.globalData.themeClass || '' })
+  },
+
   async onLoad(options: any) {
     if (options.commitId) {
       try {
