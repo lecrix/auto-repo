@@ -657,7 +657,7 @@ async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_curren
             spaceAfter=10
         )
         
-        story.append(Paragraph(f"车辆维护记录 - {repo.get('name', 'Unknown')}", title_style))
+        story.append(Paragraph(f"车辆整备记录 - {repo.get('name', 'Unknown')}", title_style))
         story.append(Spacer(1, 0.2*inch))
         
         info_data = [
@@ -687,7 +687,7 @@ async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_curren
         story.append(Spacer(1, 0.3*inch))
         
         if commits:
-            story.append(Paragraph("维护记录", heading_style))
+            story.append(Paragraph("整备记录", heading_style))
             story.append(Spacer(1, 0.1*inch))
             
             commit_data = [["日期", "标题", "类型", "里程 (km)", "费用 (元)"]]
