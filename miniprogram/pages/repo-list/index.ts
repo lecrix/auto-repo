@@ -17,7 +17,9 @@ Page({
     const app = getApp<IAppOption>()
     this.setData({ themeClass: app.globalData.themeClass || '' })
     
-    this.setData({ loading: true })
+    if (this.data.repos.length === 0) {
+      this.setData({ loading: true })
+    }
     this.initNavBar()
     await this.loadRepos()
   },
@@ -43,7 +45,11 @@ Page({
   async loadRepos() {
     try {
       const repos: any[] = await getRepos()
-      repos.forEach((r: any) => { r.offsetX = 0 })
+      const existingRepos = this.data.repos
+      repos.forEach((r: any) => {
+        const existing = existingRepos.find((e: any) => e._id === r._id)
+        r.offsetX = existing?.offsetX || 0
+      })
       this.setData({ repos })
     } catch (err: any) {
       console.error('Failed to load repos:', err)
@@ -52,10 +58,17 @@ Page({
         icon: 'none',
         duration: 2500
       })
-      this.setData({ repos: [] })
+      if (this.data.repos.length === 0) {
+        this.setData({ repos: [] })
+      }
     } finally {
       this.setData({ loading: false })
     }
+  },
+
+  onImageError(e: any) {
+    const index = e.currentTarget.dataset.index
+    this.setData({ [`repos[${index}].image`]: '' })
   },
 
   goToCreate() {
@@ -167,62 +180,7 @@ Page({
    },
 
     onShowHelp() {
-      const helpContent = `📚 快速入门
-
-🚗 车辆管理
-• 点击「+」按钮创建车辆档案
-• 填写车型、车牌、购车日期、购车费用等基础信息
-• 「购车时里程」记录提车时的里程数（用于计算实际行驶里程）
-• 向左滑动车辆卡片可以编辑或删除
-
-
-📝 记录维保
-• 进入车辆详情页，点击「新建Commit」
-• 选择记录类型：
-  - 常规保养（换机油、滤芯等）
-  - 维修（故障修理）
-  - 改装（加装配件）
-  - 加油（油费记录）
-  - 停车（停车费）
-  - 购车费用（自动生成，也可手动添加）
-• 填写日期、里程、费用、备注等信息
-• 可使用快捷模板快速填写常见项目
-
-
-📊 数据统计
-车辆详情页的「数据统计」栏目包含：
-• 总花费 = 购车费用 + 所有维保记录费用
-• 每公里成本 = 总花费 ÷ 行驶里程
-• 每公里油费 = 所有加油费用 ÷ 行驶里程
-• 月度花费趋势图（可查看历史支出变化）
-
-
-🕐 时间线
-• 按时间倒序展示所有维保记录
-• 每条记录显示：类型、日期、费用
-• 点击记录查看详细信息
-• 长按可编辑或删除记录
-
-
-💾 导出功能
-• 在车辆详情页点击「导出」按钮
-• 生成Excel格式数据报告
-• 可通过微信发送给好友或保存备份
-
-
-💡 小贴士
-• 购车费用会自动计入总花费统计
-• 每次新建记录，当前里程会自动更新
-• 行驶里程 = 当前里程 - 购车时里程`
-
-      wx.showModal({
-        title: '📖 使用帮助',
-        content: helpContent,
-        showCancel: false,
-        confirmText: '知道了',
-        confirmColor: '#2c3e50',
-        success: () => {}
-      })
+      wx.navigateTo({ url: '/pages/help/index' })
     },
 
     goToSettings() {

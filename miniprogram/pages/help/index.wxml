@@ -1,0 +1,69 @@
+<view class="help-page">
+  <view class="help-header">
+    <view class="back-btn" bindtap="goBack">❮</view>
+    <text class="help-title">使用帮助</text>
+  </view>
+
+  <scroll-view class="help-content" scroll-y="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="content-inner">
+      <view class="help-section">
+        <view class="section-title">🚗 车辆管理</view>
+        <view class="help-item">• 点击「+」按钮创建车辆档案</view>
+        <view class="help-item">• 填写车型、车牌、购车日期、购车费用等基础信息</view>
+        <view class="help-item">• 「购车时里程」记录提车时的里程数（用于计算实际行驶里程）</view>
+        <view class="help-item">• 向左滑动车辆卡片可以编辑或删除</view>
+      </view>
+
+      <view class="help-section">
+        <view class="section-title">📝 记录维保</view>
+        <view class="help-item">• 进入车辆详情页，点击「新建Commit」</view>
+        <view class="help-item">• 选择记录类型：</view>
+        <view class="help-subitem">- 常规保养（换机油、滤芯等）</view>
+        <view class="help-subitem">- 维修（故障修理）</view>
+        <view class="help-subitem">- 改装（加装配件）</view>
+        <view class="help-subitem">- 加油（油费记录）</view>
+        <view class="help-subitem">- 停车（停车费）</view>
+        <view class="help-subitem">- 购车费用（自动生成，也可手动添加）</view>
+        <view class="help-item">• 填写日期、里程、费用、备注等信息</view>
+        <view class="help-item">• 可使用快捷模板快速填写常见项目</view>
+      </view>
+
+      <view class="help-section">
+        <view class="section-title">📊 数据统计</view>
+        <view class="help-item">车辆详情页的「数据统计」栏目包含：</view>
+        <view class="help-item">• 总花费 = 购车费用 + 所有维保记录费用</view>
+        <view class="help-item">• 每公里成本 = 总花费 ÷ 行驶里程</view>
+        <view class="help-item">• 每公里油费 = 所有加油费用 ÷ 行驶里程</view>
+        <view class="help-item">• 月度花费趋势图（可查看历史支出变化）</view>
+      </view>
+
+      <view class="help-section">
+        <view class="section-title">🕐 时间线</view>
+        <view class="help-item">• 按时间倒序展示所有维保记录</view>
+        <view class="help-item">• 每条记录显示：类型、日期、费用</view>
+        <view class="help-item">• 点击记录查看详细信息</view>
+        <view class="help-item">• 长按可编辑或删除记录</view>
+      </view>
+
+      <view class="help-section">
+        <view class="section-title">💾 导出功能</view>
+        <view class="help-item">• 在车辆详情页点击「导出」按钮</view>
+        <view class="help-item">• 生成PDF格式数据报告</view>
+        <view class="help-item">• 可通过微信发送给好友或保存备份</view>
+      </view>
+
+      <view class="help-section">
+        <view class="section-title">💡 小贴士</view>
+        <view class="help-item">• 购车费用会自动计入总花费统计</view>
+        <view class="help-item">• 每次新建记录，当前里程会自动更新</view>
+        <view class="help-item">• 行驶里程 = 当前里程 - 购车时里程</view>
+      </view>
+
+      <view class="bottom-spacer"></view>
+    </view>
+  </scroll-view>
+
+  <view class="help-footer">
+    <button class="close-btn" bindtap="goBack">知道了</button>
+  </view>
+</view>

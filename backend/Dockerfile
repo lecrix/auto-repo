@@ -4,6 +4,11 @@ FROM python:3.10-slim
 # Set working directory inside container
 WORKDIR /app
 
+# Install Chinese fonts for PDF export
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-wqy-microhei \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements file first (for cache efficiency)
 COPY requirements.txt .
 

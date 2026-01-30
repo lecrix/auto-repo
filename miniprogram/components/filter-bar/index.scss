@@ -8,46 +8,56 @@
 
 .filter-row {
   display: flex;
+  align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
 }
 
 .filter-item {
   flex: 1;
+  min-width: 0;
   
   &.search {
     flex: 2;
   }
   
   &.half {
-    flex: 0.5;
+    flex: 1;
   }
 }
 
 .picker {
   display: flex;
   align-items: center;
-  padding: 16rpx;
+  padding: 16rpx 20rpx;
   background: var(--bg-color);
-  border-radius: 8rpx;
+  border-radius: 12rpx;
+  white-space: nowrap;
+  height: 72rpx;
+  box-sizing: border-box;
 }
 
 .filter-label {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: var(--text-secondary);
   margin-right: 8rpx;
+  flex-shrink: 0;
 }
 
 .filter-value {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: var(--text-main);
+  flex-shrink: 0;
 }
 
 .search-input {
-  padding: 16rpx;
+  padding: 0 20rpx;
   background: var(--bg-color);
-  border-radius: 8rpx;
-  font-size: 28rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  box-sizing: border-box;
 }
 
 .advanced-toggle {
@@ -55,7 +65,6 @@
   padding: 16rpx;
   color: var(--accent-color);
   font-size: 26rpx;
-  cursor: pointer;
 }
 
 .advanced-filters {
@@ -65,11 +74,14 @@
 }
 
 .input {
-  padding: 16rpx;
+  padding: 0 20rpx;
   background: var(--bg-color);
-  border-radius: 8rpx;
-  font-size: 28rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
   width: 100%;
+  height: 72rpx;
+  line-height: 72rpx;
+  box-sizing: border-box;
 }
 
 .button-row {
@@ -81,8 +93,9 @@
 .btn-reset, .btn-apply {
   flex: 1;
   padding: 20rpx;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   font-size: 28rpx;
+  line-height: 1;
 }
 
 .btn-reset {

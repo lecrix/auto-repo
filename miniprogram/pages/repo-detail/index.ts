@@ -191,6 +191,9 @@ Page({
 
     const baseURL = 'http://localhost:8001/api'
     
+    const repoName = this.data.repo?.name || 'vehicle'
+    const fileName = `车辆维护记录-${repoName}.pdf`
+
     wx.downloadFile({
       url: `${baseURL}/repos/${this.data.repoId}/export/pdf`,
       header: {
@@ -199,42 +202,43 @@ Page({
       success: (res) => {
         wx.hideLoading()
         if (res.statusCode === 200) {
-          wx.openDocument({
-            filePath: res.tempFilePath,
-            fileType: 'pdf',
-            showMenu: true,
+          const fs = wx.getFileSystemManager()
+          const savedPath = `${wx.env.USER_DATA_PATH}/${fileName}`
+          
+          fs.saveFile({
+            tempFilePath: res.tempFilePath,
+            filePath: savedPath,
             success: () => {
-              console.log('PDF opened successfully')
+              wx.openDocument({
+                filePath: savedPath,
+                fileType: 'pdf',
+                showMenu: true,
+                fail: (err) => {
+                  console.error('Failed to open PDF:', err)
+                  wx.showToast({ title: '打开PDF失败', icon: 'none' })
+                }
+              })
             },
-            fail: (err) => {
-              console.error('Failed to open PDF:', err)
-              wx.showToast({
-                title: '打开PDF失败',
-                icon: 'none'
+            fail: () => {
+              wx.openDocument({
+                filePath: res.tempFilePath,
+                fileType: 'pdf',
+                showMenu: true
               })
             }
           })
         } else if (res.statusCode === 401) {
           wx.removeStorageSync('autorepo_token')
           wx.removeStorageSync('autorepo_openid')
-          wx.showToast({
-            title: '登录已过期',
-            icon: 'none'
-          })
+          wx.showToast({ title: '登录已过期', icon: 'none' })
         } else {
-          wx.showToast({
-            title: '导出失败',
-            icon: 'none'
-          })
+          wx.showToast({ title: `导出失败 (${res.statusCode})`, icon: 'none' })
         }
       },
       fail: (err) => {
         wx.hideLoading()
         console.error('Download failed:', err)
-        wx.showToast({
-          title: '下载失败，请检查网络',
-          icon: 'none'
-        })
+        wx.showToast({ title: '下载失败，请检查网络', icon: 'none' })
       }
     })
   }

@@ -37,7 +37,7 @@
                 <text class="vehicle-age" wx:if="{{item.vehicle_age}}">{{item.vehicle_age}}</text>
               </view>
             </view>
-            <image class="repo-image" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}" />
+            <image class="repo-image" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}" lazy-load="{{true}}" binderror="onImageError" data-index="{{index}}" />
           </view>
         </view>
       </view>
