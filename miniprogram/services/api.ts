@@ -13,13 +13,8 @@ interface ApiError {
   originalError?: any
 }
 
-const isDevelopment = false
-
 const config: ApiConfig = {
-  baseURL: isDevelopment 
-    ? 'http://localhost:8001/api'
-    : 'https://autorepo-backend-222389-8-1397748195.sh.run.tcloudbase.com/api',
-  
+  baseURL: 'http://localhost:8001/api',
   timeout: 10000,
   retryCount: 1
 }
