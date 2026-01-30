@@ -60,9 +60,8 @@ Page({
     compulsory_insurance_expiry: '',
     commercial_start: '',
     commercial_insurance_expiry: '',
-    inspection_start: '', // Last Inspection Date
+    inspection_start: '',
     inspection_expiry: '',
-    inspection_start: '', // Last Inspection Date
 
     image: '',
 
@@ -79,7 +78,7 @@ Page({
   async onLoad(options: any) {
     if (options.repoId) {
       wx.setNavigationBarTitle({ title: '编辑车辆档案' })
-      this.data.repoId = options.repoId
+      this.setData({ repoId: options.repoId })
       await this.loadRepoData(options.repoId)
     }
   },

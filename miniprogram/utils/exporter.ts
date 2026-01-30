@@ -44,8 +44,8 @@ export const exportToCSV = (commits: ExportCommit[], repoName: string) => {
     const type = typeMap[commit.type] || commit.type;
     const title = escapeCSV(commit.title);
     const mileage = commit.mileage || 0;
-    const costParts = commit.cost?.parts || 0;
-    const costLabor = commit.cost?.labor || 0;
+    const costParts = commit.cost ? commit.cost.parts : 0;
+    const costLabor = commit.cost ? commit.cost.labor : 0;
     const totalCost = costParts + costLabor;
     const message = escapeCSV(commit.message || '');
 

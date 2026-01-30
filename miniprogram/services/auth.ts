@@ -1,3 +1,5 @@
+import { config as envConfig } from '../config'
+
 interface LoginResponse {
   token: string
   openid: string
@@ -12,7 +14,7 @@ export async function wxLogin(): Promise<LoginResponse> {
       success: async (res) => {
         if (res.code) {
           try {
-            const baseURL = wx.getStorageSync('api_base_url') || 'http://localhost:8001/api'
+            const baseURL = envConfig.baseURL
             const response: any = await new Promise((resolve, reject) => {
               wx.request({
                 url: `${baseURL}/auth/login`,

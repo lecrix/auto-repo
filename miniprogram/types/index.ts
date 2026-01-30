@@ -54,3 +54,48 @@ export interface ApiResponse<T> {
   data?: T
   error?: string
 }
+
+export interface FilterOptions {
+  type?: string
+  search?: string
+  mileageMin?: number
+  mileageMax?: number
+  dateStart?: number
+  dateEnd?: number
+}
+
+export interface InsuranceData {
+  insurance_company: string
+  compulsory_insurance: string
+  commercial_insurance: string
+}
+
+export interface CompositionItem {
+  name: string
+  value: number
+  percentage: number
+}
+
+export interface StatsResponse {
+  total_cost: number
+  total_mileage: number
+  driven_mileage: number
+  cost_per_km: number
+  fuel_cost_per_km: number
+  composition: CompositionItem[]
+}
+
+export interface MonthData {
+  month: string
+  cost: number
+  mileage: number
+  fuel_cost?: number
+}
+
+export interface TrendsResponse {
+  months: MonthData[]
+  total_months: number
+  maxCost?: number
+  maxMileage?: number
+  maxFuelCost?: number
+}

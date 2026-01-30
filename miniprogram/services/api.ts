@@ -1,4 +1,5 @@
 import { wxLogin, clearAuth } from './auth'
+import { config as envConfig } from '../config'
 
 interface ApiConfig {
   baseURL: string
@@ -14,7 +15,7 @@ interface ApiError {
 }
 
 const config: ApiConfig = {
-  baseURL: 'http://localhost:8001/api',
+  baseURL: envConfig.baseURL,
   timeout: 10000,
   retryCount: 1
 }

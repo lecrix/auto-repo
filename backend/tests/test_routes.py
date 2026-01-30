@@ -4,24 +4,27 @@ from bson import ObjectId
 
 @pytest.mark.asyncio
 async def test_root_endpoint(test_client):
-    """Test GET / returns welcome message."""
     response = test_client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "AutoRepo Backend is Running"}
 
 
 @pytest.mark.asyncio
-async def test_get_repos_empty(test_client):
-    """Test GET /api/repos returns empty list initially."""
-    response = test_client.get("/api/repos")
+async def test_get_repos_empty(test_client, auth_headers):
+    response = test_client.get("/api/repos", headers=auth_headers)
     assert response.status_code == 200
     assert response.json() == []
 
 
 @pytest.mark.asyncio
-async def test_create_repo(test_client, test_repo_data):
-    """Test POST /api/repos creates new repo."""
-    response = test_client.post("/api/repos", json=test_repo_data)
+async def test_get_repos_unauthorized(test_client):
+    response = test_client.get("/api/repos")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_create_repo(test_client, test_repo_data, auth_headers):
+    response = test_client.post("/api/repos", json=test_repo_data, headers=auth_headers)
     assert response.status_code == 200
     
     data = response.json()
@@ -33,12 +36,11 @@ async def test_create_repo(test_client, test_repo_data):
 
 
 @pytest.mark.asyncio
-async def test_get_repo_detail(test_client, test_repo_data):
-    """Test GET /api/repos/{id} returns repo details."""
-    create_response = test_client.post("/api/repos", json=test_repo_data)
+async def test_get_repo_detail(test_client, test_repo_data, auth_headers):
+    create_response = test_client.post("/api/repos", json=test_repo_data, headers=auth_headers)
     repo_id = create_response.json()["_id"]
     
-    response = test_client.get(f"/api/repos/{repo_id}")
+    response = test_client.get(f"/api/repos/{repo_id}", headers=auth_headers)
     assert response.status_code == 200
     
     data = response.json()
@@ -47,15 +49,12 @@ async def test_get_repo_detail(test_client, test_repo_data):
 
 
 @pytest.mark.asyncio
-async def test_create_commit(test_client, test_repo_data, test_commit_data):
-    """Test POST /api/commits creates commit and updates repo HEAD."""
-    # Create repo first
-    repo_response = test_client.post("/api/repos", json=test_repo_data)
+async def test_create_commit(test_client, test_repo_data, test_commit_data, auth_headers):
+    repo_response = test_client.post("/api/repos", json=test_repo_data, headers=auth_headers)
     repo_id = repo_response.json()["_id"]
     
-    # Create commit with repo_id
     commit_payload = {**test_commit_data, "repo_id": repo_id}
-    response = test_client.post("/api/commits", json=commit_payload)
+    response = test_client.post("/api/commits", json=commit_payload, headers=auth_headers)
     
     assert response.status_code == 200
     data = response.json()
@@ -66,19 +65,15 @@ async def test_create_commit(test_client, test_repo_data, test_commit_data):
 
 
 @pytest.mark.asyncio
-async def test_commit_updates_head(test_client, test_repo_data, test_commit_data):
-    """Test that creating commit updates repo's current_mileage."""
-    # Create repo
-    repo_response = test_client.post("/api/repos", json=test_repo_data)
+async def test_commit_updates_head(test_client, test_repo_data, test_commit_data, auth_headers):
+    repo_response = test_client.post("/api/repos", json=test_repo_data, headers=auth_headers)
     repo_id = repo_response.json()["_id"]
     repo_before = repo_response.json()
     
-    # Create commit
     commit_payload = {**test_commit_data, "repo_id": repo_id}
-    test_client.post("/api/commits", json=commit_payload)
+    test_client.post("/api/commits", json=commit_payload, headers=auth_headers)
     
-    # Check repo was updated
-    repo_after_response = test_client.get(f"/api/repos/{repo_id}")
+    repo_after_response = test_client.get(f"/api/repos/{repo_id}", headers=auth_headers)
     repo_after = repo_after_response.json()
     
     assert repo_after["current_mileage"] == test_commit_data["mileage"]

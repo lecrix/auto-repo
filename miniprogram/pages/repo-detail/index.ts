@@ -2,6 +2,7 @@ import { getRepoDetail, getCommits } from '../../services/api'
 import { exportToCSV, shareCSV } from '../../utils/exporter'
 import { formatLocalDate, formatLocalDateTime } from '../../utils/date'
 import { calculateDaysLeft, formatDaysLeft, calculateVehicleAge, isDueWarning } from '../../utils/vehicle'
+import { config as envConfig } from '../../config'
 
 Page({
   data: {
@@ -189,9 +190,9 @@ Page({
 
     wx.showLoading({ title: '生成PDF...' })
 
-    const baseURL = 'http://localhost:8001/api'
+    const baseURL = envConfig.baseURL
     
-    const repoName = this.data.repo?.name || 'vehicle'
+    const repoName = this.data.repo ? this.data.repo.name : 'vehicle'
     const fileName = `车辆维护记录-${repoName}.pdf`
 
     wx.downloadFile({

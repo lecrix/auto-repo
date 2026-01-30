@@ -17,8 +17,8 @@ Page({
   },
 
   onLoad(options: any) {
-        this.data.repoId = options.repoId
-    },
+    this.setData({ repoId: options.repoId })
+  },
 
     onInput(e: any) {
         const field = e.currentTarget.dataset.field

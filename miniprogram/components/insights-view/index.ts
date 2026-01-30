@@ -73,10 +73,16 @@ Component({
                 }
             } catch (e) {
                 console.error('Failed to load insights data', e)
+                wx.showToast({
+                    title: '数据加载失败',
+                    icon: 'none'
+                })
                 try {
                     const stats = await getRepoStats(id)
                     this.setData({ stats })
-                } catch (ex) { }
+                } catch (ex) {
+                    console.error('Failed to load fallback stats', ex)
+                }
             } finally {
                 this.setData({ loading: false })
             }

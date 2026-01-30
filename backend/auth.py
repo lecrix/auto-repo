@@ -3,14 +3,28 @@ from datetime import datetime, timedelta
 from typing import Optional
 import httpx
 import jwt
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from pydantic import BaseModel
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 WECHAT_APPID = os.getenv("WECHAT_APPID", "")
 WECHAT_SECRET = os.getenv("WECHAT_SECRET", "")
-JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
+JWT_SECRET = os.getenv("JWT_SECRET", "")
+
+if not JWT_SECRET:
+    if ENVIRONMENT == "production":
+        raise RuntimeError("JWT_SECRET environment variable is required in production")
+    JWT_SECRET = "dev-secret-key-insecure-do-not-use-in-production"
+
+if len(JWT_SECRET) < 32:
+    if ENVIRONMENT == "production":
+        raise RuntimeError("JWT_SECRET must be at least 32 characters for security")
+
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_DAYS = 7
 
@@ -20,11 +34,15 @@ class LoginRequest(BaseModel):
 
 
 async def wechat_code_to_session(code: str) -> dict:
-    # DEV MODE: If no credentials configured, allow mock login
     if not WECHAT_APPID or not WECHAT_SECRET:
-        print(f"WARNING: WeChat credentials not set. Mocking login for code: {code}")
+        if ENVIRONMENT == "production":
+            raise HTTPException(
+                status_code=500,
+                detail="WeChat credentials not configured on server"
+            )
+        print(f"DEV MODE: Mocking WeChat login for code: {code}")
         return {
-            "openid": "mock_user_openid_12345",
+            "openid": "mock_user_openid_12345",  # Fixed openid for dev consistency
             "session_key": "mock_session_key",
             "unionid": "mock_unionid"
         }
@@ -85,12 +103,14 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> str:
 
 
 @router.post("/login")
-async def login(request: LoginRequest):
+@limiter.limit("5/minute")
+async def login(request: Request, login_req: LoginRequest):
     """
     WeChat Mini Program login endpoint.
     Exchanges WeChat auth code for JWT token.
+    Rate limited to 5 requests per minute per IP.
     """
-    data = await wechat_code_to_session(request.code)
+    data = await wechat_code_to_session(login_req.code)
     openid = data["openid"]
     token = create_access_token(openid)
     return {"token": token, "openid": openid}

@@ -25,11 +25,19 @@ Page({
 
   async onLoad(options: any) {
     if (options.commitId) {
+      try {
         const commit: any = await getCommitDetail(options.commitId)
         if (commit) {
-            commit.date = formatLocalDateTime(commit.timestamp)
-            this.setData({ commit })
+          commit.date = formatLocalDateTime(commit.timestamp)
+          this.setData({ commit })
         }
+      } catch (error) {
+        console.error('Failed to load commit detail:', error)
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        })
+      }
     }
   },
 

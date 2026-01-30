@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException, Body, Depends
+from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from typing import List, Optional, Dict, Any
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from models import Repo, Commit, Issue, CommitPatch, IssuePatch
 from database import get_db
 from bson import ObjectId
@@ -7,6 +9,7 @@ from auth import get_current_user
 import re
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 def parse_oid(id_str: str, name: str = "id") -> ObjectId:
     """Parse string to ObjectId with proper error handling"""
@@ -351,6 +354,8 @@ async def create_issue(repo_id: str, issue: Issue, user_openid: str = Depends(ge
     issue_dict["_id"] = str(result.inserted_id)
     return issue_dict
 
+VALID_ISSUE_STATUSES = {"open", "closed"}
+
 @router.get("/repos/{repo_id}/issues", response_model=List[Issue])
 async def get_issues(repo_id: str, user_openid: str = Depends(get_current_user), status: Optional[str] = None):
     db = get_db()
@@ -358,6 +363,9 @@ async def get_issues(repo_id: str, user_openid: str = Depends(get_current_user),
     repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
     if not repo:
         raise HTTPException(status_code=404, detail="Repo not found or access denied")
+    
+    if status and status not in VALID_ISSUE_STATUSES:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {', '.join(VALID_ISSUE_STATUSES)}")
     
     pipeline = [
         {"$match": {"repo_id": repo_id, "user_openid": user_openid}},
@@ -414,7 +422,8 @@ async def update_issue(issue_id: str, patch: IssuePatch = Body(...), user_openid
 # --- Insights / Stats ---
 
 @router.get("/repos/{repo_id}/stats")
-async def get_repo_stats(repo_id: str, user_openid: str = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def get_repo_stats(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
     repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
@@ -568,7 +577,8 @@ async def get_repo_trends(repo_id: str, user_openid: str = Depends(get_current_u
     }
 
 @router.get("/repos/{repo_id}/export/pdf")
-async def export_repo_to_pdf(repo_id: str, user_openid: str = Depends(get_current_user)):
+@limiter.limit("3/minute")
+async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
     """
     Export vehicle maintenance history to PDF with Chinese font support
     """

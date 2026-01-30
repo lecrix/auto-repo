@@ -5,9 +5,11 @@ Component({
         repoId: {
             type: String,
             value: '',
-            observer(newVal) {
+            async observer(newVal) {
                 if (newVal) {
-                    this.loadIssues(newVal)
+                    await this.loadIssues(newVal).catch(err => {
+                        console.error('Failed to load issues in observer:', err)
+                    })
                 }
             }
         }

@@ -1,12 +1,12 @@
 {
-  "name": "miniprogram-ts-sass-quickstart",
-  "version": "1.0.0",
-  "description": "",
+  "name": "auto-repo",
+  "version": "2.0.0",
+  "description": "Manage your vehicle maintenance like a Git repository",
   "scripts": {
   },
-  "keywords": [],
+  "keywords": ["wechat", "miniprogram", "vehicle", "maintenance", "git"],
   "author": "",
-  "license": "",
+  "license": "MIT",
   "dependencies": {
   },
   "devDependencies": {

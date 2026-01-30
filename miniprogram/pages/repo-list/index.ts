@@ -48,7 +48,7 @@ Page({
       const existingRepos = this.data.repos
       repos.forEach((r: any) => {
         const existing = existingRepos.find((e: any) => e._id === r._id)
-        r.offsetX = existing?.offsetX || 0
+        r.offsetX = existing ? existing.offsetX : 0
       })
       this.setData({ repos })
     } catch (err: any) {
@@ -150,7 +150,7 @@ Page({
         offsetX = 0
       }
 
-      const currentOffsetX = this.data.repos[index]?.offsetX || 0
+      const currentOffsetX = this.data.repos[index] ? this.data.repos[index].offsetX : 0
       if (currentOffsetX === offsetX) return
 
       this.setData({ 
