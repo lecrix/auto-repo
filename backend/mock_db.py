@@ -240,6 +240,12 @@ class MockCollection:
                         results.append(result)
                     return MockCursor(results)
             
+            elif "$addFields" in stage:
+                add_fields_spec = stage["$addFields"]
+                for doc in data:
+                    for field, expr in add_fields_spec.items():
+                        doc[field] = self._evaluate_expression(expr, doc)
+            
             elif "$sort" in stage:
                 # Sort documents
                 sort_spec = stage["$sort"]
@@ -273,7 +279,6 @@ class MockCollection:
         return result_cursor.data
     
     def _apply_accumulator(self, expr, docs):
-        """Apply accumulator expression like $sum, $max, $avg"""
         if isinstance(expr, dict):
             if "$sum" in expr:
                 field_or_val = expr["$sum"]
@@ -288,6 +293,13 @@ class MockCollection:
                             val = val.get(part, 0) if isinstance(val, dict) else 0
                         total += val or 0
                     return total
+                elif isinstance(field_or_val, dict):
+                    total = 0
+                    for doc in docs:
+                        val = self._evaluate_expression(field_or_val, doc)
+                        if isinstance(val, (int, float)):
+                            total += val
+                    return total
             elif "$max" in expr:
                 field = expr["$max"][1:] if expr["$max"].startswith("$") else expr["$max"]
                 return max((doc.get(field, 0) for doc in docs), default=0)
@@ -299,6 +311,59 @@ class MockCollection:
                 field = expr["$push"][1:] if isinstance(expr["$push"], str) and expr["$push"].startswith("$") else expr["$push"]
                 return [doc.get(field) for doc in docs]
         return None
+    
+    def _evaluate_expression(self, expr, doc):
+        if isinstance(expr, str):
+            if expr.startswith("$"):
+                field_path = expr[1:].split(".")
+                val = doc
+                for part in field_path:
+                    val = val.get(part) if isinstance(val, dict) else None
+                return val
+            return expr
+        
+        if not isinstance(expr, dict):
+            return expr
+        
+        if "$dateToString" in expr:
+            date_expr = expr["$dateToString"]
+            fmt = date_expr.get("format", "%Y-%m-%d")
+            date_val = self._evaluate_expression(date_expr.get("date"), doc)
+            
+            if date_val is None:
+                return None
+            
+            try:
+                if isinstance(date_val, (int, float)):
+                    from datetime import datetime
+                    dt = datetime.fromtimestamp(date_val / 1000)
+                    py_format = fmt.replace("%Y", "{year:04d}").replace("%m", "{month:02d}").replace("%d", "{day:02d}")
+                    return py_format.format(year=dt.year, month=dt.month, day=dt.day)
+                return str(date_val)
+            except Exception:
+                return None
+        
+        if "$toDate" in expr:
+            val = self._evaluate_expression(expr["$toDate"], doc)
+            return val
+        
+        if "$add" in expr:
+            operands = expr["$add"]
+            total = 0
+            for operand in operands:
+                val = self._evaluate_expression(operand, doc)
+                if isinstance(val, (int, float)):
+                    total += val
+            return total
+        
+        if "$ifNull" in expr:
+            operands = expr["$ifNull"]
+            if len(operands) >= 2:
+                val = self._evaluate_expression(operands[0], doc)
+                return val if val is not None else self._evaluate_expression(operands[1], doc)
+            return None
+        
+        return expr
 
 
 class MockDatabase:
