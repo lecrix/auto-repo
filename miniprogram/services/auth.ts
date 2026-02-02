@@ -14,21 +14,55 @@ export async function wxLogin(): Promise<LoginResponse> {
       success: async (res) => {
         if (res.code) {
           try {
-            const baseURL = envConfig.baseURL
+            // 支持云托管模式
             const response: any = await new Promise((resolve, reject) => {
-              wx.request({
-                url: `${baseURL}/auth/login`,
-                method: 'POST',
-                data: { code: res.code },
-                success: (res) => {
-                  if (res.statusCode === 200) {
-                    resolve(res.data)
-                  } else {
-                    reject(new Error(`Login failed: ${res.statusCode}`))
+              const url = '/auth/login';
+              const method = 'POST';
+              const data = { code: res.code };
+              
+              if (envConfig.useCloudRun || envConfig.environment === 'prod') {
+                console.log('[Auth] Attempting Cloud Login:', {
+                   env: 'autorepo-backend-8faokd7f798030e',
+                   path: `${envConfig.baseURL}${url}`
+                })
+                wx.cloud.callContainer({
+                  config: { env: 'autorepo-backend-8faokd7f798030e' },
+                  path: `${envConfig.baseURL}${url}`,
+                  method,
+                  header: {
+                    'content-type': 'application/json',
+                    'X-WX-SERVICE': 'autorepo-backend'
+                  },
+                  data,
+                  success: (res) => {
+                    console.log('[Auth] Cloud Login Response:', res)
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                      resolve(res.data)
+                    } else {
+                      reject(new Error(`Login failed: ${res.statusCode} - ${JSON.stringify(res.data)}`))
+                    }
+                  },
+                  fail: (err) => {
+                    console.error('[Auth] Cloud Login Failed:', err)
+                    reject(new Error(`Cloud Login failed: ${JSON.stringify(err)}`))
                   }
-                },
-                fail: reject
-              })
+                })
+              } else {
+                // 本地开发模式
+                wx.request({
+                  url: `${envConfig.baseURL}${url}`,
+                  method,
+                  data,
+                  success: (res) => {
+                    if (res.statusCode === 200) {
+                      resolve(res.data)
+                    } else {
+                      reject(new Error(`Login failed: ${res.statusCode}`))
+                    }
+                  },
+                  fail: reject
+                })
+              }
             })
 
             const { token, openid } = response
@@ -47,6 +81,7 @@ export async function wxLogin(): Promise<LoginResponse> {
     })
   })
 }
+
 
 export function getToken(): string | null {
   try {

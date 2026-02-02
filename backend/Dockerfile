@@ -10,11 +10,14 @@ ENV TZ=Asia/Shanghai \
 
 # Install system dependencies and fonts
 # fonts-wqy-microhei is for Chinese PDF export
+# ca-certificates is for SSL verification when calling external APIs
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-wqy-microhei \
     tzdata \
+    ca-certificates \
     && ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file first (for cache efficiency)

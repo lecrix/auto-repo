@@ -53,6 +53,24 @@ async def shutdown_db_client():
 async def root():
     return {"message": "AutoRepo Backend is Running"}
 
+@app.get("/api/health")
+async def health_check():
+    import os
+    env = os.getenv("ENVIRONMENT", "not_set")
+    jwt_set = bool(os.getenv("JWT_SECRET"))
+    jwt_len = len(os.getenv("JWT_SECRET", ""))
+    appid_set = bool(os.getenv("WECHAT_APPID"))
+    secret_set = bool(os.getenv("WECHAT_SECRET"))
+    
+    return {
+        "status": "ok",
+        "environment": env,
+        "jwt_secret_configured": jwt_set,
+        "jwt_secret_length": jwt_len,
+        "wechat_appid_configured": appid_set,
+        "wechat_secret_configured": secret_set
+    }
+
 from routes import router as api_router
 app.include_router(api_router, prefix="/api", tags=["core"])
 

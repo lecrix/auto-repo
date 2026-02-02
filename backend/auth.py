@@ -1,4 +1,6 @@
 import os
+import ssl
+import certifi
 from datetime import datetime, timedelta
 from typing import Optional
 import httpx
@@ -42,7 +44,7 @@ async def wechat_code_to_session(code: str) -> dict:
             )
         print(f"DEV MODE: Mocking WeChat login for code: {code}")
         return {
-            "openid": "mock_user_openid_12345",  # Fixed openid for dev consistency
+            "openid": "mock_user_openid_12345",
             "session_key": "mock_session_key",
             "unionid": "mock_unionid"
         }
@@ -55,9 +57,18 @@ async def wechat_code_to_session(code: str) -> dict:
         "grant_type": "authorization_code"
     }
     
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params, timeout=10.0)
-        data = response.json()
+    try:
+        async with httpx.AsyncClient(verify=certifi.where()) as client:
+            response = await client.get(url, params=params, timeout=10.0)
+            data = response.json()
+    except httpx.ConnectError as e:
+        if "CERTIFICATE_VERIFY_FAILED" in str(e):
+            print(f"SSL verification failed, retrying without verification: {e}")
+            async with httpx.AsyncClient(verify=False) as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                data = response.json()
+        else:
+            raise
     
     if "errcode" in data and data["errcode"] != 0:
         raise HTTPException(

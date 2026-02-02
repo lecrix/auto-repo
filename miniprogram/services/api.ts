@@ -14,7 +14,8 @@ interface ApiError {
   originalError?: any
 }
 
-const config: ApiConfig = {
+// 重命名局部配置，避免与 config 模块混淆
+const requestConfig: ApiConfig = {
   baseURL: envConfig.baseURL,
   timeout: 10000,
   retryCount: 1
@@ -23,7 +24,7 @@ const config: ApiConfig = {
 let isReloginInProgress = false
 
 export function setBaseURL(url: string) {
-  config.baseURL = url
+  requestConfig.baseURL = url
 }
 
 class RequestError extends Error implements ApiError {
@@ -89,11 +90,20 @@ async function handleUnauthorized(
   })
 }
 
-const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = config.retryCount): Promise<any> => {
+const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = requestConfig.retryCount): Promise<any> => {
   return new Promise((resolve, reject) => {
+    // 调试日志：检查当前环境配置 (现在使用 envConfig)
+    console.log('[API] Request:', { 
+      url, 
+      method, 
+      env: envConfig.environment, 
+      useCloudRun: envConfig.useCloudRun,
+      baseURL: envConfig.baseURL 
+    })
+
     const headers: Record<string, string> = {
       'content-type': 'application/json',
-      // 'X-WX-SERVICE': 'springboot-service' // 如果您的服务名不是默认的，可以在这里指定，或者在 callContainer config 中指定
+      'X-WX-SERVICE': 'autorepo-backend' // 显式指定服务名为 backend
     }
     
     const token = wx.getStorageSync('autorepo_token')
@@ -102,16 +112,23 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
     }
 
     // 处理云托管调用 (生产环境)
-    if (config.useCloudRun) {
+    // 强制检查：如果是 prod 模式，必须走 cloud
+    if (envConfig.useCloudRun || envConfig.environment === 'prod') {
+      if (!wx.cloud) {
+        reject(new RequestError('SYSTEM_ERROR', '当前基础库不支持云能力', undefined))
+        return
+      }
+
       wx.cloud.callContainer({
         config: {
-          env: '' // 留空则使用当前小程序绑定的环境
+          env: 'autorepo-backend-8faokd7f798030e' // 显式指定环境 ID，防止未初始化错误
         },
-        path: `${config.baseURL}${url}`, // e.g., /api/repos
+        path: `${envConfig.baseURL}${url}`, // e.g., /api/repos
         method,
         header: headers,
         data,
         success: async (res: any) => {
+          console.log('[API] Cloud Success:', res)
           // 云托管返回的 res.data 才是实际的响应体
           // res.statusCode 是 HTTP 状态码
           if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -142,64 +159,65 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
           }
         },
         fail: (err: any) => {
-           console.error('Cloud API Error:', err)
-           reject(new RequestError('NETWORK_ERROR', '云服务连接失败', undefined, err))
+           console.error('[API] Cloud Error:', err)
+           reject(new RequestError('NETWORK_ERROR', `云服务连接失败: ${err.errMsg || JSON.stringify(err)}`, undefined, err))
         }
       })
       return // 结束执行，不运行下方的 wx.request
     }
     
+    // 防御性检查：非云托管模式下，URL 必须是完整的 HTTP 地址
+    const fullUrl = `${envConfig.baseURL}${url}`
+    if (fullUrl.startsWith('/')) {
+      console.error('[API] Critical Config Error: Relative URL used in non-cloud mode', fullUrl)
+      reject(new RequestError('CONFIG_ERROR', '环境配置错误：非云托管模式下 URL 无效', undefined))
+      return
+    }
+
     // 处理本地/普通 HTTP 请求 (开发环境)
     wx.request({
-      url: `${config.baseURL}${url}`,
+      url: fullUrl,
       method,
       data,
-      timeout: config.timeout,
+      timeout: requestConfig.timeout,
       header: headers,
       success: async (res: any) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data)
-        } else if (res.statusCode === 401) {
-          try {
-            const result = await handleUnauthorized(url, method, data)
-            resolve(result)
-          } catch (err) {
-            reject(err)
-          }
-        } else if (res.statusCode === 403) {
-          reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
-        } else if (res.statusCode === 404) {
-          reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
-        } else if (res.statusCode >= 500) {
-          reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
-        } else {
-          const detail = res.data && res.data.detail
-          let errorMsg = '请求失败'
-          if (typeof detail === 'string') {
-            errorMsg = detail
-          } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
-            errorMsg = detail[0].msg
-          }
-          reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
-        }
-      },
-      fail: (err: any) => {
-        console.error('API Error:', err)
-        
-        if (err.errMsg && err.errMsg.includes('timeout')) {
-          if (retries > 0) {
-            console.log(`Request timeout, retrying... (${retries} left)`)
-            request(url, method, data, retries - 1).then(resolve).catch(reject)
+
+          console.log('[API] Cloud Success:', res)
+          // 云托管返回的 res.data 才是实际的响应体
+          // res.statusCode 是 HTTP 状态码
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data)
+          } else if (res.statusCode === 401) {
+             try {
+               const result = await handleUnauthorized(url, method, data)
+               resolve(result)
+             } catch (err) {
+               reject(err)
+             }
+          } else if (res.statusCode === 403) {
+             reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
+          } else if (res.statusCode === 404) {
+             reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
+          } else if (res.statusCode >= 500) {
+             reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
           } else {
-            reject(new RequestError('TIMEOUT', '请求超时，请检查网络连接', undefined, err))
+             // 错误处理逻辑复用
+             const detail = res.data && res.data.detail
+             let errorMsg = '请求失败'
+             if (typeof detail === 'string') {
+               errorMsg = detail
+             } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+               errorMsg = detail[0].msg
+             }
+             reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
           }
-        } else if (err.errMsg && err.errMsg.includes('fail')) {
-          reject(new RequestError('NETWORK_ERROR', '网络连接失败，请检查网络设置', undefined, err))
-        } else {
-          reject(new RequestError('UNKNOWN_ERROR', '未知错误', undefined, err))
+        },
+        fail: (err: any) => {
+           console.error('[API] Cloud Error:', err)
+           reject(new RequestError('NETWORK_ERROR', `云服务连接失败: ${err.errMsg || JSON.stringify(err)}`, undefined, err))
         }
-      }
-    })
+      })
   })
 }
 
@@ -281,4 +299,3 @@ export const createIssue = (repoId: string, issue: any) => {
 export const getRepoTrends = (repoId: string, months: number = 12) => {
     return request(`/repos/${repoId}/trends?months=${months}`, 'GET');
 };
-

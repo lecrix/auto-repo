@@ -11,3 +11,4 @@ PyJWT==2.10.1
 python-dotenv==1.0.1
 reportlab==4.4.6
 slowapi==0.1.9
+certifi
