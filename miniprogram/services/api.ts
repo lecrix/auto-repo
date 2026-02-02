@@ -1,5 +1,5 @@
 import { wxLogin, clearAuth } from './auth'
-import { config as envConfig } from '../config'
+import { config as envConfig, CLOUD_ENV_ID } from '../config'
 
 interface ApiConfig {
   baseURL: string
@@ -39,6 +39,51 @@ class RequestError extends Error implements ApiError {
     this.originalError = originalError
     this.name = 'RequestError'
   }
+}
+
+type ResponseHandler = {
+  resolve: (value: any) => void
+  reject: (reason?: any) => void
+  url: string
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  data?: any
+}
+
+async function handleResponse(res: any, handler: ResponseHandler): Promise<void> {
+  const { resolve, reject, url, method, data } = handler
+  
+  if (res.statusCode >= 200 && res.statusCode < 300) {
+    resolve(res.data)
+  } else if (res.statusCode === 401) {
+    try {
+      const result = await handleUnauthorized(url, method, data)
+      resolve(result)
+    } catch (err) {
+      reject(err)
+    }
+  } else if (res.statusCode === 403) {
+    reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
+  } else if (res.statusCode === 404) {
+    reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
+  } else if (res.statusCode === 429) {
+    reject(new RequestError('RATE_LIMITED', '请求过于频繁，请稀后重试', res.statusCode))
+  } else if (res.statusCode >= 500) {
+    reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
+  } else {
+    const detail = res.data && res.data.detail
+    let errorMsg = '请求失败'
+    if (typeof detail === 'string') {
+      errorMsg = detail
+    } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+      errorMsg = detail[0].msg
+    }
+    reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
+  }
+}
+
+function handleNetworkError(err: any, reject: (reason?: any) => void): void {
+  console.error('[API] Network Error:', err)
+  reject(new RequestError('NETWORK_ERROR', `网络连接失败: ${err.errMsg || JSON.stringify(err)}`, undefined, err))
 }
 
 async function handleUnauthorized(
@@ -92,18 +137,9 @@ async function handleUnauthorized(
 
 const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = requestConfig.retryCount): Promise<any> => {
   return new Promise((resolve, reject) => {
-    // 调试日志：检查当前环境配置 (现在使用 envConfig)
-    console.log('[API] Request:', { 
-      url, 
-      method, 
-      env: envConfig.environment, 
-      useCloudRun: envConfig.useCloudRun,
-      baseURL: envConfig.baseURL 
-    })
-
     const headers: Record<string, string> = {
       'content-type': 'application/json',
-      'X-WX-SERVICE': 'autorepo-backend' // 显式指定服务名为 backend
+      'X-WX-SERVICE': 'autorepo-backend'
     }
     
     const token = wx.getStorageSync('autorepo_token')
@@ -111,8 +147,6 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    // 处理云托管调用 (生产环境)
-    // 强制检查：如果是 prod 模式，必须走 cloud
     if (envConfig.useCloudRun || envConfig.environment === 'prod') {
       if (!wx.cloud) {
         reject(new RequestError('SYSTEM_ERROR', '当前基础库不支持云能力', undefined))
@@ -121,105 +155,42 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
 
       wx.cloud.callContainer({
         config: {
-          env: 'autorepo-backend-8faokd7f798030e' // 显式指定环境 ID，防止未初始化错误
+          env: CLOUD_ENV_ID
         },
-        path: `${envConfig.baseURL}${url}`, // e.g., /api/repos
+        path: `${envConfig.baseURL}${url}`,
         method,
         header: headers,
         data,
-        success: async (res: any) => {
-          console.log('[API] Cloud Success:', res)
-          // 云托管返回的 res.data 才是实际的响应体
-          // res.statusCode 是 HTTP 状态码
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(res.data)
-          } else if (res.statusCode === 401) {
-             try {
-               const result = await handleUnauthorized(url, method, data)
-               resolve(result)
-             } catch (err) {
-               reject(err)
-             }
-          } else if (res.statusCode === 403) {
-             reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
-          } else if (res.statusCode === 404) {
-             reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
-          } else if (res.statusCode === 429) {
-             reject(new RequestError('RATE_LIMITED', '请求过于频繁，请稍后重试', res.statusCode))
-          } else if (res.statusCode >= 500) {
-             reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
-          } else {
-             // 错误处理逻辑复用
-             const detail = res.data && res.data.detail
-             let errorMsg = '请求失败'
-             if (typeof detail === 'string') {
-               errorMsg = detail
-             } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
-               errorMsg = detail[0].msg
-             }
-             reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
-          }
+        success: (res: any) => {
+          handleResponse(res, { resolve, reject, url, method, data })
         },
         fail: (err: any) => {
-           console.error('[API] Cloud Error:', err)
-           reject(new RequestError('NETWORK_ERROR', `云服务连接失败: ${err.errMsg || JSON.stringify(err)}`, undefined, err))
+          handleNetworkError(err, reject)
         }
       })
-      return // 结束执行，不运行下方的 wx.request
+      return
     }
     
-    // 防御性检查：非云托管模式下，URL 必须是完整的 HTTP 地址
     const fullUrl = `${envConfig.baseURL}${url}`
     if (fullUrl.startsWith('/')) {
-      console.error('[API] Critical Config Error: Relative URL used in non-cloud mode', fullUrl)
+      console.error('[API] Config Error: Relative URL in non-cloud mode', fullUrl)
       reject(new RequestError('CONFIG_ERROR', '环境配置错误：非云托管模式下 URL 无效', undefined))
       return
     }
 
-    // 处理本地/普通 HTTP 请求 (开发环境)
     wx.request({
       url: fullUrl,
       method,
       data,
       timeout: requestConfig.timeout,
       header: headers,
-      success: async (res: any) => {
-
-          console.log('[API] Cloud Success:', res)
-          // 云托管返回的 res.data 才是实际的响应体
-          // res.statusCode 是 HTTP 状态码
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(res.data)
-          } else if (res.statusCode === 401) {
-             try {
-               const result = await handleUnauthorized(url, method, data)
-               resolve(result)
-             } catch (err) {
-               reject(err)
-             }
-          } else if (res.statusCode === 403) {
-             reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
-          } else if (res.statusCode === 404) {
-             reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
-          } else if (res.statusCode >= 500) {
-             reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
-          } else {
-             // 错误处理逻辑复用
-             const detail = res.data && res.data.detail
-             let errorMsg = '请求失败'
-             if (typeof detail === 'string') {
-               errorMsg = detail
-             } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
-               errorMsg = detail[0].msg
-             }
-             reject(new RequestError('REQUEST_FAILED', errorMsg, res.statusCode, res.data))
-          }
-        },
-        fail: (err: any) => {
-           console.error('[API] Cloud Error:', err)
-           reject(new RequestError('NETWORK_ERROR', `云服务连接失败: ${err.errMsg || JSON.stringify(err)}`, undefined, err))
-        }
-      })
+      success: (res: any) => {
+        handleResponse(res, { resolve, reject, url, method, data })
+      },
+      fail: (err: any) => {
+        handleNetworkError(err, reject)
+      }
+    })
   })
 }
 

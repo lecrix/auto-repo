@@ -1,266 +1,286 @@
-<h1 align="center">🚗 AutoRepo</h1>
+<h1 align="center">
+  <br>
+  🚗 AutoRepo
+  <br>
+</h1>
+
+<h4 align="center">A Git-style vehicle maintenance tracking system for car enthusiasts.</h4>
 
 <p align="center">
-  <strong>Manage your vehicle maintenance like a Git repository.</strong>
-</p>
-
-<p align="center">
-  <a href="./README_ZH.md">简体中文</a> | <strong>English</strong>
+  <a href="./README_ZH.md">简体中文</a> •
+  <a href="#features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#deployment">Deployment</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-v2.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
-  <img src="https://img.shields.io/badge/Backend-FastAPI-009688.svg" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Frontend-MiniProgram-07c160.svg" alt="WeChat">
+  <img src="https://img.shields.io/badge/Python-3.9+-3776ab.svg" alt="Python">
+  <img src="https://img.shields.io/badge/FastAPI-009688.svg" alt="FastAPI">
+  <img src="https://img.shields.io/badge/WeChat_MiniProgram-07c160.svg" alt="WeChat">
+  <img src="https://img.shields.io/badge/MongoDB-47A248.svg" alt="MongoDB">
 </p>
 
-**AutoRepo** is a production-ready, multi-tenant vehicle lifecycle management system. It borrows the concepts of **Git Version Control** to provide a structured, visualized way to track every "change" to your car.
+<!-- 
+📸 SCREENSHOT PLACEHOLDER
+Add your app screenshots here. Recommended: Create an `assets/` folder and add:
+- assets/screenshot-timeline.png (Main timeline view)
+- assets/screenshot-dashboard.png (Statistics dashboard)  
+- assets/screenshot-dark-mode.png (Dark mode showcase)
 
-- **Repo** = Your Vehicle
-- **Commit** = Maintenance/Modification Record (now with images!)
-- **Issue** = Scheduled maintenance tasks
-- **HEAD** = Current Status (Current Mileage/Condition)
-
----
-
-## 🎉 What's New in v2.0 (2026-01-29)
-
-### 🚀 Production Deployment
-*   **WeChat Cloud Run**: Full support for serverless deployment
-*   **Zero-Config Network**: Direct internal link access (No domain/ICP required)
-*   **Auto-Scaling**: Scale to zero when idle for maximum cost efficiency
-*   **Docker Ready**: Optimized Dockerfile for cloud environment
-
-### 🔐 Multi-User Authentication
-*   **WeChat One-Click Login**: Automatic login on app launch
-*   **JWT Authentication**: 7-day token validity
-*   **Data Isolation**: Each user sees only their own data
-*   **Legacy Data Migration**: Seamless upgrade from v1.x
-
-### 📸 Image Upload
-*   **Visual Records**: Upload up to 9 photos per maintenance record
-*   **Cloud Storage**: Automatic backup to WeChat Cloud
-*   **Smart Compression**: Reduces data usage automatically
-*   **Easy Management**: Preview, delete, and organize photos
-
-### 📄 PDF Export
-*   **Professional Reports**: Generate complete maintenance history in PDF
-*   **One-Click Download**: Export all vehicle records instantly
-*   **Print-Ready**: Share with buyers, insurance companies, or for personal records
-*   **Beautiful Formatting**: Styled tables and organized layout
-
-### 🌙 Dark Mode
-*   **Auto-Detection**: Follows system dark mode settings
-*   **Eye-Friendly**: Comfortable night viewing
-*   **OLED Optimized**: Saves battery on OLED screens
+Example:
+<p align="center">
+  <img src="assets/screenshot-timeline.png" width="250" alt="Timeline">
+  <img src="assets/screenshot-dashboard.png" width="250" alt="Dashboard">
+  <img src="assets/screenshot-dark-mode.png" width="250" alt="Dark Mode">
+</p>
+-->
 
 ---
 
-## ✨ Core Features
+## What is AutoRepo?
 
-*   **📅 Visual Git-Style Timeline**: View your car's history (customizations, repairs, maintenance) as a Git commit log.
-*   **💰 Detailed Cost Tracking**: Record labor costs, parts fees, and automatically calculate total investment.
-*   **🔄 Auto-State Management**: Committing a maintenance record automatically updates the vehicle's "HEAD" (current mileage & condition).
-*   **🎨 Premium UI/UX**: Dark mode, glassmorphism design, and fluid animations for a high-end experience.
-*   **🚙 Multi-Vehicle Support**: Manage multiple "Repositories" (cars) in one app.
-*   **📝 Edit & Delete Records**: Edit existing maintenance records or delete them with confirmation.
-*   **📅 Custom Timestamps**: Set custom date/time for each record (not just auto-generated).
-*   **⛽ Extended Templates**: 12 templates including fuel costs and parking fees.
-*   **💰 Purchase Cost Tracking**: Track vehicle purchase cost in total statistics.
-*   **🔍 Search & Filter**: Filter by type, date range, mileage, and keyword search.
-*   **📊 Data Insights**: Visual charts showing cost composition and trends.
-*   **❓ Built-in Help**: Quick help guide accessible from main menu.
+**AutoRepo** transforms vehicle maintenance tracking into an intuitive, developer-friendly experience by borrowing concepts from Git version control:
 
-## 🛠 Tech Stack
+| Git Concept | AutoRepo Equivalent |
+|-------------|---------------------|
+| **Repository** | Your Vehicle |
+| **Commit** | Maintenance/Repair Record |
+| **Issue** | Scheduled Maintenance Task |
+| **HEAD** | Current Status (Mileage/Condition) |
 
-### Frontend (WeChat Mini Program)
-*   **Language**: TypeScript (Strict Mode)
-*   **Styling**: SCSS (Sass), Custom UI Components
-*   **Cloud**: WeChat Cloud Storage (Images)
-*   **Features**: Custom Navigation Bar, Responsive Layout, Interactive Animations, Dark Mode
+Perfect for car enthusiasts who want to:
+- 📊 Track every modification, repair, and maintenance
+- 💰 Monitor total investment and cost breakdown
+- 📸 Document with photos (up to 9 per record)
+- 📄 Export professional PDF reports
+- 🔄 Never lose your vehicle's history
 
-### Backend (Server)
-*   **Framework**: FastAPI (Python 3.9+)
-*   **Authentication**: JWT + WeChat Login
-*   **Database**: MongoDB (via Motor async driver) / MockDB (local development)
-*   **PDF Generation**: ReportLab
-*   **Deployment**: Docker & Docker Compose (optional)
-*   **API**: RESTful API design with auto-generated Swagger docs
+---
 
-## 🚀 Quick Start
+## Features
+
+### Core Functionality
+- **Git-Style Timeline** — Visual commit history of all vehicle changes
+- **Multi-Vehicle Support** — Manage multiple cars in one app
+- **Cost Tracking** — Labor costs, parts fees, automatic totals
+- **Image Upload** — Up to 9 photos per maintenance record
+- **PDF Export** — Professional reports for insurance or resale
+- **Search & Filter** — By type, date range, mileage, or keywords
+
+### User Experience
+- **🌙 Dark Mode** — Auto-detects system preference
+- **⚡ Real-time Sync** — WeChat Cloud Run powered
+- **🔐 Secure** — JWT authentication, data isolation per user
+- **📱 Native Feel** — Custom navigation, smooth animations
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     WeChat Mini Program                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │  Timeline   │  │  Dashboard  │  │  Settings   │              │
+│  │   (Repo)    │  │   (Stats)   │  │   (Theme)   │              │
+│  └──────┬──────┘  └──────┬──────┘  └─────────────┘              │
+│         │                │                                       │
+│  ┌──────┴────────────────┴──────┐                               │
+│  │       api.ts (HTTP Client)    │                               │
+│  │   • JWT Auth • Retry Logic    │                               │
+│  └──────────────┬───────────────┘                               │
+└─────────────────┼───────────────────────────────────────────────┘
+                  │ wx.cloud.callContainer (No domain required)
+                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   WeChat Cloud Run (Docker)                     │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    FastAPI Backend                        │   │
+│  │  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐          │   │
+│  │  │ /repos │  │/commits│  │/issues │  │ /auth  │          │   │
+│  │  └────┬───┘  └────┬───┘  └────┬───┘  └────┬───┘          │   │
+│  │       └───────────┴───────────┴───────────┘               │   │
+│  │                       │                                    │   │
+│  │              ┌────────┴────────┐                          │   │
+│  │              │   MongoDB/Mock  │                          │   │
+│  │              │   (Motor Async) │                          │   │
+│  │              └─────────────────┘                          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | TypeScript, SCSS, WeChat Mini Program |
+| **Backend** | Python 3.9+, FastAPI, Pydantic |
+| **Database** | MongoDB (Motor async driver) |
+| **Auth** | JWT + WeChat Login |
+| **PDF** | ReportLab (Chinese font support) |
+| **Deployment** | Docker, WeChat Cloud Run |
+
+---
+
+## Quick Start
 
 ### Prerequisites
-*   Python 3.9+
-*   WeChat Developer Tools
-*   (Optional) Docker & Docker Compose
+- Python 3.9+
+- WeChat Developer Tools
+- (Optional) Docker, MongoDB
 
 ### 1. Backend Setup
 
-#### Install Dependencies
 ```bash
-cd backend
+# Clone the repository
+git clone https://github.com/yourusername/auto-repo.git
+cd auto-repo/backend
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-#### Configure Environment
-Create `backend/.env` file:
-```bash
-# WeChat Mini Program Credentials
-WECHAT_APPID=your_wechat_appid
-WECHAT_SECRET=your_wechat_secret
+# Create .env file (copy from example)
+cp .env.example .env
+# Edit .env with your credentials
 
-# JWT Secret (use a random string, 32+ characters)
-JWT_SECRET=your-random-secret-key-at-least-32-characters
-
-# Database (optional, defaults to MockDB)
-MONGO_URL=mongodb://localhost:27017
-```
-
-#### Run Server
-```bash
+# Run development server
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-*   The system will automatically use `MockDB` (file-based) if MongoDB is not available.
-*   API docs: `http://localhost:8000/docs`
+**Environment Variables** (`.env`):
+```bash
+WECHAT_APPID=your_wechat_appid
+WECHAT_SECRET=your_wechat_secret
+JWT_SECRET=your-random-secret-key-at-least-32-characters
+MONGO_URL=mongodb://localhost:27017  # Optional, defaults to MockDB
+```
+
+> 💡 Without MongoDB, the system automatically uses MockDB (file-based) for local development.
 
 ### 2. Frontend Setup
 
-1. **Open WeChat Developer Tools**
-2. **Import Project**: Select `auto-repo/miniprogram` directory
-3. **Set AppID**: Use your WeChat Mini Program AppID or test mode
-4. **Configure Cloud**: Update `miniprogram/app.ts` with your cloud environment ID:
+1. Open **WeChat Developer Tools**
+2. Import `miniprogram/` directory
+3. Set AppID (or use test mode)
+4. Update cloud env in `miniprogram/config.ts`:
    ```typescript
-   wx.cloud.init({
-     env: 'your-cloud-env-id',  // Replace with your cloud environment
-     traceUser: true
-   })
+   export const CLOUD_ENV_ID = 'your-cloud-env-id'
    ```
-5. **Compile & Run**
+5. Compile and preview
 
-## 📂 Project Structure
+---
+
+## Deployment
+
+### WeChat Cloud Run (Recommended)
+
+See [DEPLOY.md](./DEPLOY.md) for detailed instructions.
+
+```bash
+# Build and push Docker image
+cd backend
+docker build -t autorepo-backend .
+
+# Deploy via WeChat Cloud Console
+# 1. Create Cloud Run service
+# 2. Upload container image
+# 3. Configure environment variables
+```
+
+**Key Benefits:**
+- ✅ No domain registration/ICP required
+- ✅ Auto-scaling (scale to zero when idle)
+- ✅ Built-in HTTPS
+- ✅ Direct internal network access
+
+---
+
+## Project Structure
 
 ```
 auto-repo/
-├── backend/                    # FastAPI Backend
-│   ├── main.py                 # App entrypoint, CORS, lifecycle
-│   ├── auth.py                 # JWT authentication & WeChat login (NEW!)
-│   ├── routes.py               # API endpoints (15 protected routes)
-│   ├── models.py               # Pydantic data models
-│   ├── database.py             # MongoDB connection manager
-│   ├── mock_db.py              # File-based fallback DB
-│   ├── .env.example            # Environment variables template (NEW!)
-│   └── requirements.txt        # Python dependencies
+├── backend/                 # FastAPI Backend
+│   ├── main.py              # App entrypoint, CORS
+│   ├── auth.py              # JWT + WeChat login
+│   ├── routes.py            # API endpoints (15 routes)
+│   ├── models.py            # Pydantic schemas
+│   ├── database.py          # MongoDB connection
+│   ├── mock_db.py           # Development fallback DB
+│   ├── Dockerfile           # Cloud Run optimized
+│   └── requirements.txt
 │
-├── miniprogram/                # WeChat Mini Program
-│   ├── app.ts                  # App lifecycle, cloud init, auto-login
-│   ├── app.json                # Dark mode configuration (NEW!)
-│   ├── theme.json              # Light/Dark theme colors (NEW!)
-│   ├── pages/                  # UI pages
-│   │   ├── repo-list/          # Vehicle list
-│   │   ├── repo-detail/        # Timeline + insights + issues
-│   │   ├── commit-create/      # Add record with image upload (UPDATED!)
-│   │   └── ...
-│   ├── components/             # Reusable components
-│   │   ├── insights-view/      # Data visualizations
-│   │   ├── filter-bar/         # Search & filter
-│   │   └── ...
-│   ├── services/
-│   │   ├── api.ts              # Backend API wrapper
-│   │   └── auth.ts             # Login & token management (NEW!)
-│   └── ...
+├── miniprogram/             # WeChat Mini Program
+│   ├── app.ts               # Lifecycle, cloud init
+│   ├── config.ts            # Environment configuration
+│   ├── pages/               # UI pages
+│   ├── components/          # Reusable components
+│   └── services/            # API client, auth
 │
-├── docs/                       # Documentation
-│   ├── WORK_SUMMARY.md         # Development summary (NEW!)
-│   ├── TESTING_GUIDE.md        # Testing instructions (NEW!)
-│   └── FEATURE_SUMMARY.md      # Feature details (NEW!)
-│
-├── AGENTS.md                   # Development guide (UPDATED!)
-└── README.md                   # This file (UPDATED!)
+├── docs/                    # Documentation
+├── AGENTS.md                # AI assistant guide
+├── DEPLOY.md                # Deployment guide
+└── CONTRIBUTING.md          # Contribution guide
 ```
 
-## 🛣 Roadmap
+---
 
-- [x] **Phase 1**: Core UI/UX implementation & Backend Integration
-- [x] **Phase 2**: Multi-user authentication & security
-- [x] **Phase 3**: Image upload & PDF export
-- [x] **Phase 3.5**: Data Visualization, Costs & Task Management
-- [x] **Phase 4**: Bug Fixes & UX Improvements (2026-01)
-- [x] **Phase 5**: Cloud Deployment (WeChat Cloud Hosting)
-- [ ] **Phase 6**: Social Sharing Features & Community
+## API Overview
 
-## 🔧 Recent Updates
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/auth/login` | POST | WeChat code → JWT token |
+| `/repos` | GET/POST | List/Create vehicles |
+| `/repos/{id}` | GET/PUT/DELETE | Vehicle CRUD |
+| `/commits` | GET/POST | List/Create records |
+| `/commits/{id}` | GET/PUT/DELETE | Record CRUD |
+| `/repos/{id}/issues` | GET/POST | Maintenance tasks |
+| `/repos/{id}/stats` | GET | Cost statistics |
+| `/repos/{id}/trends` | GET | Monthly trends |
+| `/repos/{id}/export` | GET | PDF export |
 
-### v2.0 (2026-01-30) - Production Deployment Release
-**Deployment & Infrastructure**:
-- ✅ WeChat Cloud Run support (Dockerfile optimization)
-- ✅ `wx.cloud.callContainer` integration (Zero-domain access)
-- ✅ Multi-environment configuration (Dev/Device/Prod)
-- ✅ Comprehensive [Deployment Guide](./DEPLOY.md)
+Full API docs available at `http://localhost:8000/docs` when running locally.
 
-**Authentication & Security**:
-- ✅ JWT-based WeChat login system
-- ✅ Multi-tenant data isolation (user_openid filtering)
-- ✅ All 15 API endpoints protected
-- ✅ Automatic login on app launch
-- ✅ 7-day token validity with auto-refresh
+---
 
-**New Features**:
-- ✅ Image upload (up to 9 photos per record)
-- ✅ WeChat Cloud Storage integration
-- ✅ PDF export with ReportLab
-- ✅ Dark mode infrastructure (auto-detection ready)
+## Roadmap
 
-**Technical Improvements**:
-- ✅ Database indexes for user-scoped queries
-- ✅ MockDB with full MongoDB compatibility
-- ✅ Environment variable configuration
-- ✅ Comprehensive documentation
+- [x] Core UI/UX & Backend Integration
+- [x] Multi-user Authentication
+- [x] Image Upload & PDF Export
+- [x] Data Visualization & Statistics
+- [x] WeChat Cloud Run Deployment
+- [ ] Social Sharing & Community Features
+- [ ] OCR for Receipt Scanning
+- [ ] Maintenance Reminders (Push Notifications)
 
-### v1.3 (2026-01-28) - Deep Code Audit & Optimization
-**Security Fixes** (9 critical vulnerabilities):
-- ✅ ObjectId injection prevention
-- ✅ Mass assignment protection
-- ✅ Regex injection defense
-- ✅ Cross-repository data access prevention
-- ✅ Network layer timeout & retry mechanism
+---
 
-**Performance Optimizations** (67% query reduction):
-- ✅ Database queries optimized (3 queries → 1 via `$facet`)
-- ✅ List scroll performance improved 100%
-- ✅ Atomic operations for mileage updates
+## Contributing
 
-**Code Quality** (171 new lines, ~150 removed):
-- ✅ New utility modules: `utils/date.ts`, `utils/vehicle.ts`
-- ✅ Network layer refactoring
-- ✅ Immutable state updates
+Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) first.
 
-### v1.2 (2026-01-27) - Bug Fixes
-- ✅ Implemented full data pre-fill for edit mode
-- ✅ Fixed CSV export showing zero costs
-- ✅ Fixed chart max value calculation
-- ✅ Timeline cards now show cost and date
-- ✅ Purchase cost correctly included in total
+```bash
+# Fork the repo, then:
+git checkout -b feature/amazing-feature
+git commit -m 'Add amazing feature'
+git push origin feature/amazing-feature
+# Open a Pull Request
+```
 
-### v1.1 (2026-01-26) - Feature Enhancements
-- ✅ Added date/time pickers for custom timestamps
-- ✅ Implemented edit/delete functionality
-- ✅ Extended templates to 12 (added fuel & parking)
-- ✅ Fixed CSV export sharing on WeChat
+---
 
-## 📚 Documentation
-
-- [AGENTS.md](./AGENTS.md) - Development guide for AI assistants
-- [DEPLOY.md](./DEPLOY.md) - Cloud deployment guide
-- [docs/WORK_SUMMARY.md](./docs/WORK_SUMMARY.md) - Detailed development summary
-- [docs/TESTING_GUIDE.md](./docs/TESTING_GUIDE.md) - Comprehensive testing instructions
-- [docs/FEATURE_SUMMARY.md](./docs/FEATURE_SUMMARY.md) - Complete feature documentation
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  Made with ❤️ for car enthusiasts
+  <br>
+  <a href="https://github.com/yourusername/auto-repo/issues">Report Bug</a> •
+  <a href="https://github.com/yourusername/auto-repo/issues">Request Feature</a>
+</p>

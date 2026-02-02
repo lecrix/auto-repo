@@ -11,6 +11,10 @@
 // ⚠️ 重要: 上线前必须改为 'prod'
 const CURRENT_MODE: 'dev' | 'device' | 'prod' = 'prod'
 
+// ==================== 云环境配置 ====================
+// 微信云托管环境ID (统一管理，避免硬编码散落在各处)
+export const CLOUD_ENV_ID = 'autorepo-backend-8faokd7f798030e'
+
 // ==================== 环境配置 ====================
 const ENV_CONFIG = {
   // 开发工具模式 (模拟器) - 本地 Docker 或直接运行
@@ -35,22 +39,10 @@ const ENV_CONFIG = {
   }
 }
 
-// ==================== 导出配置 ====================
 export const config = {
   baseURL: ENV_CONFIG[CURRENT_MODE].baseURL,
   useCloudRun: ENV_CONFIG[CURRENT_MODE].useCloudRun,
   environment: CURRENT_MODE,
   description: ENV_CONFIG[CURRENT_MODE].description
 }
-
-// 强制输出配置日志，确保真机也能看到
-const logConfig = () => {
-  const info = `[AutoRepo Config] 
-  Mode: ${CURRENT_MODE}
-  Env: ${config.environment}
-  CloudRun: ${config.useCloudRun}
-  BaseURL: ${config.baseURL}`;
-  console.warn(info); // 使用 warn 级别，更显眼
-}
-logConfig();
 

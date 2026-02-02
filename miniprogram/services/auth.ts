@@ -1,4 +1,4 @@
-import { config as envConfig } from '../config'
+import { config as envConfig, CLOUD_ENV_ID } from '../config'
 
 interface LoginResponse {
   token: string
@@ -21,12 +21,8 @@ export async function wxLogin(): Promise<LoginResponse> {
               const data = { code: res.code };
               
               if (envConfig.useCloudRun || envConfig.environment === 'prod') {
-                console.log('[Auth] Attempting Cloud Login:', {
-                   env: 'autorepo-backend-8faokd7f798030e',
-                   path: `${envConfig.baseURL}${url}`
-                })
                 wx.cloud.callContainer({
-                  config: { env: 'autorepo-backend-8faokd7f798030e' },
+                  config: { env: CLOUD_ENV_ID },
                   path: `${envConfig.baseURL}${url}`,
                   method,
                   header: {
@@ -35,7 +31,6 @@ export async function wxLogin(): Promise<LoginResponse> {
                   },
                   data,
                   success: (res) => {
-                    console.log('[Auth] Cloud Login Response:', res)
                     if (res.statusCode >= 200 && res.statusCode < 300) {
                       resolve(res.data)
                     } else {

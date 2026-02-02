@@ -1,4 +1,5 @@
 import { wxLogin, isAuthenticated } from './services/auth'
+import { CLOUD_ENV_ID } from './config'
 
 App<IAppOption>({
   globalData: {},
@@ -11,7 +12,7 @@ App<IAppOption>({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        env: 'autorepo-backend-8faokd7f798030e', // 替换为您的真实云环境ID
+        env: CLOUD_ENV_ID,
         traceUser: true,
       })
     }
@@ -19,7 +20,6 @@ App<IAppOption>({
     if (!isAuthenticated()) {
       try {
         await wxLogin()
-        console.log('Auto-login successful')
       } catch (err) {
         console.error('Auto-login failed:', err)
       }
@@ -43,7 +43,6 @@ App<IAppOption>({
 
   watchSystemTheme() {
     wx.onThemeChange((res: { theme: 'light' | 'dark' }) => {
-      console.log('[Theme] System theme changed to:', res.theme)
       if (this.globalData.theme === 'auto') {
         this.updateTheme('auto')
       }
@@ -51,7 +50,6 @@ App<IAppOption>({
   },
 
   updateTheme(theme: 'auto' | 'light' | 'dark') {
-    console.log('[Theme] updateTheme called:', theme)
     this.globalData.theme = theme
     
     const systemTheme = wx.getSystemInfoSync().theme
@@ -59,14 +57,10 @@ App<IAppOption>({
     const themeClass = isDark ? 'theme-dark' : ''
     this.globalData.themeClass = themeClass
 
-    console.log('[Theme] Calculated:', { theme, systemTheme, isDark, themeClass })
-
     const pages = getCurrentPages()
-    console.log('[Theme] Page count:', pages.length)
     
     pages.forEach((page, index) => {
       try {
-        console.log(`[Theme] Updating page ${index}:`, page.route)
         page.setData({ themeClass })
       } catch (err) {
         console.error(`[Theme] Failed to update page ${index}:`, err)

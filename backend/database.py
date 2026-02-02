@@ -1,6 +1,8 @@
 from typing import Any
 import os
 
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
 
 class DatabaseManager:
     def __init__(self) -> None:
@@ -16,6 +18,8 @@ class DatabaseManager:
             self.db = self.client.auto_repo  # type: ignore
             print(f"Connected to MongoDB at {mongo_url}")
         except Exception as e:
+            if ENVIRONMENT == "production":
+                raise RuntimeError(f"MongoDB connection required in production: {e}")
             print(f"Warning: Could not connect to MongoDB ({e}). Using Mock Database.")
             import mock_db  # type: ignore[import-not-found]
             self.db = mock_db.MockDatabase()

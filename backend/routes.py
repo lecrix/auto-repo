@@ -606,12 +606,13 @@ async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = 
         
         font_paths = [
             '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',
+            '/usr/share/fonts/truetype/wqy-microhei/wqy-microhei.ttc',
             '/usr/share/fonts/wqy-microhei/wqy-microhei.ttc',
+            '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+            '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
             'C:/Windows/Fonts/msyh.ttc',
             'C:/Windows/Fonts/simsun.ttc',
             'C:/Windows/Fonts/simhei.ttf',
-            '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
-            '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
             '/System/Library/Fonts/PingFang.ttc',
             '/Library/Fonts/Arial Unicode.ttf',
         ]

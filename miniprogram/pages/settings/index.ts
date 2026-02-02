@@ -33,8 +33,6 @@ Page({
   selectTheme(e: any) {
     const theme = e.currentTarget.dataset.theme as 'auto' | 'light' | 'dark'
     
-    console.log('[Settings] User selected theme:', theme)
-    
     this.setData({ currentTheme: theme })
     wx.setStorageSync('autorepo_theme', theme)
     
