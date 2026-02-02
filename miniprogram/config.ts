@@ -8,6 +8,7 @@
 
 // ==================== 配置开关 ====================
 // 模式选择: 'dev' (开发工具), 'device' (真机调试), 'prod' (云托管-生产环境)
+// ⚠️ 重要: 上线前必须改为 'prod'
 const CURRENT_MODE: 'dev' | 'device' | 'prod' = 'prod'
 
 // ==================== 环境配置 ====================
@@ -42,6 +43,14 @@ export const config = {
   description: ENV_CONFIG[CURRENT_MODE].description
 }
 
-// 方便调试时查看当前配置
-console.log(`[AutoRepo Config] 当前环境: ${config.description}`)
-console.log(`[AutoRepo Config] API地址: ${config.baseURL}`)
+// 强制输出配置日志，确保真机也能看到
+const logConfig = () => {
+  const info = `[AutoRepo Config] 
+  Mode: ${CURRENT_MODE}
+  Env: ${config.environment}
+  CloudRun: ${config.useCloudRun}
+  BaseURL: ${config.baseURL}`;
+  console.warn(info); // 使用 warn 级别，更显眼
+}
+logConfig();
+
