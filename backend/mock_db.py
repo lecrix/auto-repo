@@ -219,7 +219,7 @@ class MockCollection:
                         if field == "_id":
                             continue
                         result[field] = self._apply_accumulator(expr, data)
-                    return MockCursor([result])
+                    data = [result]
                 elif isinstance(group_id, str) and group_id.startswith("$"):
                     # Group by field
                     field_name = group_id[1:]
@@ -238,7 +238,7 @@ class MockCollection:
                                 continue
                             result[field] = self._apply_accumulator(expr, docs)
                         results.append(result)
-                    return MockCursor(results)
+                    data = results
             
             elif "$addFields" in stage:
                 add_fields_spec = stage["$addFields"]
