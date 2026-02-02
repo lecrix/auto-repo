@@ -32,6 +32,28 @@ Component({
         async loadData(id: string) {
             if (!id) return
 
+            const typeMap: { [key: string]: string } = {
+                maintenance: '保养',
+                repair: '维修',
+                modification: '改装',
+                fuel: '加油',
+                parking: '停车',
+                inspection: '年检',
+                other: '其他',
+                insurance: '保险',
+                purchase: '购车'
+            }
+
+            const translateComposition = (stats: any) => {
+                if (stats && stats.composition) {
+                    stats.composition = stats.composition.map((item: any) => ({
+                        ...item,
+                        name: typeMap[item.name] || item.name
+                    }))
+                }
+                return stats
+            }
+
             this.setData({ loading: true })
             try {
                 const [stats, issues, trends] = await Promise.all([
@@ -40,24 +62,7 @@ Component({
                     getRepoTrends(id, 6)
                 ])
 
-                const typeMap: { [key: string]: string } = {
-                    maintenance: '保养',
-                    repair: '维修',
-                    modification: '改装',
-                    fuel: '加油',
-                    parking: '停车',
-                    inspection: '年检',
-                    other: '其他',
-                    insurance: '保险',
-                    purchase: '购车'
-                }
-
-                if (stats && stats.composition) {
-                    stats.composition = stats.composition.map((item: any) => ({
-                        ...item,
-                        name: typeMap[item.name] || item.name
-                    }))
-                }
+                translateComposition(stats)
 
                 if (trends && trends.months && trends.months.length > 0) {
                     const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
@@ -79,6 +84,7 @@ Component({
                 })
                 try {
                     const stats = await getRepoStats(id)
+                    translateComposition(stats)
                     this.setData({ stats })
                 } catch (ex) {
                     console.error('Failed to load fallback stats', ex)
