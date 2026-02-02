@@ -45,14 +45,15 @@
 
 **AutoRepo** 借用 Git 版本控制的概念，将车辆维保记录转化为直观、开发者友好的体验：
 
-| Git 概念 | AutoRepo 对应 |
-|---------|---------------|
-| **Repository (仓库)** | 你的爱车 |
-| **Commit (提交)** | 维修/保养记录 |
-| **Issue (议题)** | 定期维护任务 |
-| **HEAD (指针)** | 当前状态（里程/车况） |
+| Git 概念                    | AutoRepo 对应         |
+| --------------------------- | --------------------- |
+| **Repository (仓库)** | 你的爱车              |
+| **Commit (提交)**     | 维修/保养记录         |
+| **Issue (议题)**      | 定期维护任务          |
+| **HEAD (指针)**       | 当前状态（里程/车况） |
 
 适合以下用户：
+
 - 📊 追踪每一次改装、维修和保养
 - 💰 监控总投入和费用构成
 - 📸 用照片记录（每条记录最多9张）
@@ -64,6 +65,7 @@
 ## 功能特性
 
 ### 核心功能
+
 - **Git 风格时间轴** — 可视化展示车辆变更历史
 - **多车管理** — 一个应用管理多辆车
 - **费用追踪** — 工时费、配件费、自动汇总
@@ -72,6 +74,7 @@
 - **搜索筛选** — 按类型、日期、里程或关键词
 
 ### 用户体验
+
 - **🌙 深色模式** — 自动检测系统偏好
 - **⚡ 实时同步** — 微信云托管驱动
 - **🔐 安全可靠** — JWT 认证，用户数据隔离
@@ -115,20 +118,21 @@
 
 ### 技术栈
 
-| 层级 | 技术 |
-|------|------|
-| **前端** | TypeScript, SCSS, 微信小程序 |
-| **后端** | Python 3.9+, FastAPI, Pydantic |
-| **数据库** | MongoDB (Motor 异步驱动) |
-| **认证** | JWT + 微信登录 |
-| **PDF** | ReportLab (中文字体支持) |
-| **部署** | Docker, 微信云托管 |
+| 层级             | 技术                           |
+| ---------------- | ------------------------------ |
+| **前端**   | TypeScript, SCSS, 微信小程序   |
+| **后端**   | Python 3.9+, FastAPI, Pydantic |
+| **数据库** | MongoDB (Motor 异步驱动)       |
+| **认证**   | JWT + 微信登录                 |
+| **PDF**    | ReportLab (中文字体支持)       |
+| **部署**   | Docker, 微信云托管             |
 
 ---
 
 ## 快速开始
 
 ### 前提条件
+
 - Python 3.9+
 - 微信开发者工具
 - （可选）Docker, MongoDB
@@ -137,7 +141,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/auto-repo.git
+git clone https://github.com/lecrix/auto-repo.git
 cd auto-repo/backend
 
 # 安装依赖
@@ -152,6 +156,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **环境变量** (`.env`):
+
 ```bash
 WECHAT_APPID=你的微信AppID
 WECHAT_SECRET=你的微信密钥
@@ -192,6 +197,7 @@ docker build -t autorepo-backend .
 ```
 
 **主要优势：**
+
 - ✅ 无需域名备案
 - ✅ 自动扩缩容（闲置时缩至零）
 - ✅ 内置 HTTPS
@@ -230,17 +236,17 @@ auto-repo/
 
 ## API 概览
 
-| 端点 | 方法 | 说明 |
-|------|------|------|
-| `/auth/login` | POST | 微信 code → JWT token |
-| `/repos` | GET/POST | 列出/创建车辆 |
-| `/repos/{id}` | GET/PUT/DELETE | 车辆增删改查 |
-| `/commits` | GET/POST | 列出/创建记录 |
-| `/commits/{id}` | GET/PUT/DELETE | 记录增删改查 |
-| `/repos/{id}/issues` | GET/POST | 维护任务 |
-| `/repos/{id}/stats` | GET | 费用统计 |
-| `/repos/{id}/trends` | GET | 月度趋势 |
-| `/repos/{id}/export` | GET | PDF 导出 |
+| 端点                   | 方法           | 说明                   |
+| ---------------------- | -------------- | ---------------------- |
+| `/auth/login`        | POST           | 微信 code → JWT token |
+| `/repos`             | GET/POST       | 列出/创建车辆          |
+| `/repos/{id}`        | GET/PUT/DELETE | 车辆增删改查           |
+| `/commits`           | GET/POST       | 列出/创建记录          |
+| `/commits/{id}`      | GET/PUT/DELETE | 记录增删改查           |
+| `/repos/{id}/issues` | GET/POST       | 维护任务               |
+| `/repos/{id}/stats`  | GET            | 费用统计               |
+| `/repos/{id}/trends` | GET            | 月度趋势               |
+| `/repos/{id}/export` | GET            | PDF 导出               |
 
 本地运行时可访问 `http://localhost:8000/docs` 查看完整 API 文档。
 
@@ -248,11 +254,11 @@ auto-repo/
 
 ## 路线图
 
-- [x] 核心 UI/UX 及后端集成
-- [x] 多用户认证
-- [x] 图片上传及 PDF 导出
-- [x] 数据可视化与统计
-- [x] 微信云托管部署
+- [X] 核心 UI/UX 及后端集成
+- [X] 多用户认证
+- [X] 图片上传及 PDF 导出
+- [X] 数据可视化与统计
+- [X] 微信云托管部署
 - [ ] 社交分享与社区功能
 - [ ] OCR 票据扫描
 - [ ] 保养提醒（推送通知）

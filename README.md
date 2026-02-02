@@ -44,14 +44,15 @@ Example:
 
 **AutoRepo** transforms vehicle maintenance tracking into an intuitive, developer-friendly experience by borrowing concepts from Git version control:
 
-| Git Concept | AutoRepo Equivalent |
-|-------------|---------------------|
-| **Repository** | Your Vehicle |
-| **Commit** | Maintenance/Repair Record |
-| **Issue** | Scheduled Maintenance Task |
-| **HEAD** | Current Status (Mileage/Condition) |
+| Git Concept          | AutoRepo Equivalent                |
+| -------------------- | ---------------------------------- |
+| **Repository** | Your Vehicle                       |
+| **Commit**     | Maintenance/Repair Record          |
+| **Issue**      | Scheduled Maintenance Task         |
+| **HEAD**       | Current Status (Mileage/Condition) |
 
 Perfect for car enthusiasts who want to:
+
 - 📊 Track every modification, repair, and maintenance
 - 💰 Monitor total investment and cost breakdown
 - 📸 Document with photos (up to 9 per record)
@@ -63,6 +64,7 @@ Perfect for car enthusiasts who want to:
 ## Features
 
 ### Core Functionality
+
 - **Git-Style Timeline** — Visual commit history of all vehicle changes
 - **Multi-Vehicle Support** — Manage multiple cars in one app
 - **Cost Tracking** — Labor costs, parts fees, automatic totals
@@ -71,6 +73,7 @@ Perfect for car enthusiasts who want to:
 - **Search & Filter** — By type, date range, mileage, or keywords
 
 ### User Experience
+
 - **🌙 Dark Mode** — Auto-detects system preference
 - **⚡ Real-time Sync** — WeChat Cloud Run powered
 - **🔐 Secure** — JWT authentication, data isolation per user
@@ -114,20 +117,21 @@ Perfect for car enthusiasts who want to:
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | TypeScript, SCSS, WeChat Mini Program |
-| **Backend** | Python 3.9+, FastAPI, Pydantic |
-| **Database** | MongoDB (Motor async driver) |
-| **Auth** | JWT + WeChat Login |
-| **PDF** | ReportLab (Chinese font support) |
-| **Deployment** | Docker, WeChat Cloud Run |
+| Layer                | Technology                            |
+| -------------------- | ------------------------------------- |
+| **Frontend**   | TypeScript, SCSS, WeChat Mini Program |
+| **Backend**    | Python 3.9+, FastAPI, Pydantic        |
+| **Database**   | MongoDB (Motor async driver)          |
+| **Auth**       | JWT + WeChat Login                    |
+| **PDF**        | ReportLab (Chinese font support)      |
+| **Deployment** | Docker, WeChat Cloud Run              |
 
 ---
 
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.9+
 - WeChat Developer Tools
 - (Optional) Docker, MongoDB
@@ -136,7 +140,7 @@ Perfect for car enthusiasts who want to:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/auto-repo.git
+git clone https://github.com/lecrix/auto-repo.git
 cd auto-repo/backend
 
 # Install dependencies
@@ -151,6 +155,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Environment Variables** (`.env`):
+
 ```bash
 WECHAT_APPID=your_wechat_appid
 WECHAT_SECRET=your_wechat_secret
@@ -191,6 +196,7 @@ docker build -t autorepo-backend .
 ```
 
 **Key Benefits:**
+
 - ✅ No domain registration/ICP required
 - ✅ Auto-scaling (scale to zero when idle)
 - ✅ Built-in HTTPS
@@ -229,17 +235,17 @@ auto-repo/
 
 ## API Overview
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/auth/login` | POST | WeChat code → JWT token |
-| `/repos` | GET/POST | List/Create vehicles |
-| `/repos/{id}` | GET/PUT/DELETE | Vehicle CRUD |
-| `/commits` | GET/POST | List/Create records |
-| `/commits/{id}` | GET/PUT/DELETE | Record CRUD |
-| `/repos/{id}/issues` | GET/POST | Maintenance tasks |
-| `/repos/{id}/stats` | GET | Cost statistics |
-| `/repos/{id}/trends` | GET | Monthly trends |
-| `/repos/{id}/export` | GET | PDF export |
+| Endpoint               | Method         | Description              |
+| ---------------------- | -------------- | ------------------------ |
+| `/auth/login`        | POST           | WeChat code → JWT token |
+| `/repos`             | GET/POST       | List/Create vehicles     |
+| `/repos/{id}`        | GET/PUT/DELETE | Vehicle CRUD             |
+| `/commits`           | GET/POST       | List/Create records      |
+| `/commits/{id}`      | GET/PUT/DELETE | Record CRUD              |
+| `/repos/{id}/issues` | GET/POST       | Maintenance tasks        |
+| `/repos/{id}/stats`  | GET            | Cost statistics          |
+| `/repos/{id}/trends` | GET            | Monthly trends           |
+| `/repos/{id}/export` | GET            | PDF export               |
 
 Full API docs available at `http://localhost:8000/docs` when running locally.
 
@@ -247,11 +253,11 @@ Full API docs available at `http://localhost:8000/docs` when running locally.
 
 ## Roadmap
 
-- [x] Core UI/UX & Backend Integration
-- [x] Multi-user Authentication
-- [x] Image Upload & PDF Export
-- [x] Data Visualization & Statistics
-- [x] WeChat Cloud Run Deployment
+- [X] Core UI/UX & Backend Integration
+- [X] Multi-user Authentication
+- [X] Image Upload & PDF Export
+- [X] Data Visualization & Statistics
+- [X] WeChat Cloud Run Deployment
 - [ ] Social Sharing & Community Features
 - [ ] OCR for Receipt Scanning
 - [ ] Maintenance Reminders (Push Notifications)
