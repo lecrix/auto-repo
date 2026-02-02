@@ -144,6 +144,8 @@ const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: 
              reject(new RequestError('FORBIDDEN', '无权限访问', res.statusCode))
           } else if (res.statusCode === 404) {
              reject(new RequestError('NOT_FOUND', '资源不存在', res.statusCode))
+          } else if (res.statusCode === 429) {
+             reject(new RequestError('RATE_LIMITED', '请求过于频繁，请稍后重试', res.statusCode))
           } else if (res.statusCode >= 500) {
              reject(new RequestError('SERVER_ERROR', '服务器错误，请稍后重试', res.statusCode))
           } else {

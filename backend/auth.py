@@ -114,7 +114,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> str:
 
 
 @router.post("/login")
-@limiter.limit("5/minute")
+@limiter.limit("30/minute")
 async def login(request: Request, login_req: LoginRequest):
     """
     WeChat Mini Program login endpoint.

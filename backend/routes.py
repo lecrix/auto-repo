@@ -422,7 +422,7 @@ async def update_issue(issue_id: str, patch: IssuePatch = Body(...), user_openid
 # --- Insights / Stats ---
 
 @router.get("/repos/{repo_id}/stats")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def get_repo_stats(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
     db = get_db()
     
@@ -577,7 +577,7 @@ async def get_repo_trends(repo_id: str, user_openid: str = Depends(get_current_u
     }
 
 @router.get("/repos/{repo_id}/export/pdf")
-@limiter.limit("3/minute")
+@limiter.limit("10/minute")
 async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
     """
     Export vehicle maintenance history to PDF with Chinese font support
