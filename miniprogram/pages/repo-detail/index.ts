@@ -1,6 +1,6 @@
 import { getRepoDetail, getCommits } from '../../services/api'
 import { exportToCSV, shareCSV } from '../../utils/exporter'
-import { formatLocalDate, formatLocalDateTime } from '../../utils/date'
+import { formatLocalDate } from '../../utils/date'
 import { calculateDaysLeft, formatDaysLeft, calculateVehicleAge, isDueWarning } from '../../utils/vehicle'
 import { config as envConfig, CLOUD_ENV_ID } from '../../config'
 
@@ -63,7 +63,7 @@ Page({
 
       const formattedCommits = (commits as any[]).map(c => ({
         ...c,
-        date: formatLocalDateTime(c.timestamp)
+        date: formatLocalDate(c.timestamp)
       }))
 
       this.setData({
