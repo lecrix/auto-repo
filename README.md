@@ -68,6 +68,33 @@ Perfect for car enthusiasts who want to:
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="./screenshots/主页面.jpg" width="200"/><br/><b>Home</b></td>
+    <td align="center"><img src="./screenshots/主页面-深色模式.jpg" width="200"/><br/><b>Home (Dark)</b></td>
+    <td align="center"><img src="./screenshots/添加车辆页面.jpg" width="200"/><br/><b>Add Vehicle</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/车辆详情页面.jpg" width="200"/><br/><b>Vehicle Detail</b></td>
+    <td align="center"><img src="./screenshots/时间线-整备记录.jpg" width="200"/><br/><b>Timeline</b></td>
+    <td align="center"><img src="./screenshots/创建整备记录页面.jpg" width="200"/><br/><b>Add Record</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/数据统计-总花费与趋势分析.jpg" width="200"/><br/><b>Stats - Cost</b></td>
+    <td align="center"><img src="./screenshots/数据统计-费用构成与待办事项.jpg" width="200"/><br/><b>Stats - Issues</b></td>
+    <td align="center"><img src="./screenshots/创建提醒页面.jpg" width="200"/><br/><b>Add Reminder</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/设置页面.jpg" width="200"/><br/><b>Settings</b></td>
+    <td align="center"><img src="./screenshots/使用帮助页面.jpg" width="200"/><br/><b>Help</b></td>
+    <td align="center"><img src="./screenshots/导出的PDF页面.jpg" width="200"/><br/><b>PDF Export</b></td>
+  </tr>
+</table>
+
+---
+
 ## Architecture
 
 ```

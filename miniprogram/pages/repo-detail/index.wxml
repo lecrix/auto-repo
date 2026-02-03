@@ -30,13 +30,6 @@
                   <text class="mileage-unit">km</text>
                 </view>
               </view>
-              <view class="mileage-item">
-                <text class="mileage-label">行驶里程</text>
-                <view class="mileage-value-wrap">
-                  <text class="mileage-value">{{repo.driven_mileage}}</text>
-                  <text class="mileage-unit">km</text>
-                </view>
-              </view>
             </view>
           </view>
           <view class="register-info">

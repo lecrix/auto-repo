@@ -69,6 +69,33 @@
 
 ---
 
+## 界面预览
+
+<table>
+  <tr>
+    <td align="center"><img src="./screenshots/主页面.jpg" width="200"/><br/><b>主页面</b></td>
+    <td align="center"><img src="./screenshots/主页面-深色模式.jpg" width="200"/><br/><b>深色模式</b></td>
+    <td align="center"><img src="./screenshots/添加车辆页面.jpg" width="200"/><br/><b>添加车辆</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/车辆详情页面.jpg" width="200"/><br/><b>车辆详情</b></td>
+    <td align="center"><img src="./screenshots/时间线-整备记录.jpg" width="200"/><br/><b>时间线</b></td>
+    <td align="center"><img src="./screenshots/创建整备记录页面.jpg" width="200"/><br/><b>添加记录</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/数据统计-总花费与趋势分析.jpg" width="200"/><br/><b>费用趋势</b></td>
+    <td align="center"><img src="./screenshots/数据统计-费用构成与待办事项.jpg" width="200"/><br/><b>费用构成</b></td>
+    <td align="center"><img src="./screenshots/创建提醒页面.jpg" width="200"/><br/><b>创建提醒</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./screenshots/设置页面.jpg" width="200"/><br/><b>设置</b></td>
+    <td align="center"><img src="./screenshots/使用帮助页面.jpg" width="200"/><br/><b>使用帮助</b></td>
+    <td align="center"><img src="./screenshots/导出的PDF页面.jpg" width="200"/><br/><b>PDF 导出</b></td>
+  </tr>
+</table>
+
+---
+
 ## 系统架构
 
 ```
