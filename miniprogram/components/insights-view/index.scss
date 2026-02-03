@@ -153,14 +153,61 @@
 }
 
 /* Issues List */
+.issue-list {
+    overflow: hidden;
+}
+
+.issue-swipe-wrapper {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1px;
+}
+
+.movable-area {
+    width: 100%;
+    height: 70px;
+}
+
+.movable-view {
+    width: calc(100% + 70px);
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.delete-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 70px;
+    height: 100%;
+    background: #e74c3c;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -1;
+}
+
 .issue-item {
     display: flex;
     align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--divider-color); /* Was #eee */
+    padding: 12px 16px;
+    background: var(--card-bg);
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--divider-color);
 
-    &:last-child {
-        border-bottom: none;
+    &.completed {
+        .issue-title {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+        .issue-meta {
+            color: var(--text-light);
+        }
     }
 }
 
@@ -172,7 +219,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--text-light); /* Was #ccc */
+    background: var(--text-light);
 
     &.high {
         background: #e74c3c;
@@ -185,6 +232,21 @@
 
     &.low {
         background: var(--success-color);
+    }
+
+    &.done {
+        background: var(--success-color);
+        position: relative;
+        &::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8px;
+            color: white;
+            font-weight: bold;
+        }
     }
 }
 
@@ -210,21 +272,21 @@
     gap: 8px;
 }
 
-.btn-delete {
-    color: #e74c3c;
-    font-weight: bold;
-    font-size: 18px;
-    padding: 4px 8px;
-    background: rgba(231, 76, 60, 0.1);
-    border-radius: 4px;
-}
-
 .btn-check {
     color: var(--success-color);
     font-weight: bold;
     font-size: 18px;
     padding: 4px 8px;
     background: rgba(46, 204, 113, 0.1);
+    border-radius: 4px;
+}
+
+.btn-reopen {
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 18px;
+    padding: 4px 8px;
+    background: rgba(52, 152, 219, 0.1);
     border-radius: 4px;
 }
 

@@ -94,21 +94,41 @@
     </view>
 
     <view class="issue-list" wx:if="{{issues && issues.length > 0}}">
-        <view class="issue-item" wx:for="{{issues}}" wx:key="_id" bindtap="onIssueClick" data-issue="{{item}}">
-            <view class="issue-left">
-                <view class="issue-status {{item.priority}}"></view>
-            </view>
-            <view class="issue-content">
-                <view class="issue-title">{{item.title}}</view>
-                <view class="issue-meta">
-                    <text wx:if="{{item.due_mileage}}">提醒里程: {{item.due_mileage}} km</text>
-                    <text wx:if="{{item.due_date}}">截止日期: {{item.due_date}}</text>
-                </view>
-            </view>
-            <view class="issue-action" catchtap="onActionTap">
-                <text class="btn-delete" bindtap="onDeleteIssue" data-issue="{{item}}">×</text>
-                <text class="btn-check" bindtap="onCompleteIssue" data-issue="{{item}}">✓</text>
-            </view>
+        <view class="issue-swipe-wrapper" wx:for="{{issues}}" wx:key="_id">
+            <movable-area class="movable-area">
+                <movable-view 
+                    class="movable-view" 
+                    direction="horizontal" 
+                    x="{{item.x || 0}}"
+                    damping="50"
+                    friction="5"
+                    out-of-bounds="true"
+                    bindchange="onSwipeChange"
+                    bindtouchend="onSwipeEnd"
+                    data-index="{{index}}"
+                    data-issue="{{item}}">
+                    <view class="issue-item {{item.status === 'closed' ? 'completed' : ''}}" bindtap="onIssueClick" data-issue="{{item}}">
+                        <view class="issue-left">
+                            <view class="issue-status {{item.status === 'closed' ? 'done' : item.priority}}"></view>
+                        </view>
+                        <view class="issue-content">
+                            <view class="issue-title">{{item.title}}</view>
+                            <view class="issue-meta">
+                                <text wx:if="{{item.status === 'closed'}}">已完成</text>
+                                <text wx:elif="{{item.due_mileage}}">提醒里程: {{item.due_mileage}} km</text>
+                                <text wx:elif="{{item.due_date}}">截止日期: {{item.due_date}}</text>
+                            </view>
+                        </view>
+                        <view class="issue-action" catchtap="onActionTap" wx:if="{{item.status !== 'closed'}}">
+                            <text class="btn-check" catchtap="onCompleteIssue" data-issue="{{item}}">✓</text>
+                        </view>
+                        <view class="issue-action" catchtap="onActionTap" wx:else>
+                            <text class="btn-reopen" catchtap="onReopenIssue" data-issue="{{item}}">↺</text>
+                        </view>
+                    </view>
+                </movable-view>
+            </movable-area>
+            <view class="delete-btn" catchtap="onDeleteIssue" data-issue="{{item}}">删除</view>
         </view>
     </view>
 
