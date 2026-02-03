@@ -2,6 +2,7 @@ from typing import Any
 import os
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+REQUIRE_MONGODB = os.getenv("REQUIRE_MONGODB", "false").lower() == "true"
 
 
 class DatabaseManager:
@@ -18,8 +19,8 @@ class DatabaseManager:
             self.db = self.client.auto_repo  # type: ignore
             print(f"Connected to MongoDB at {mongo_url}")
         except Exception as e:
-            if ENVIRONMENT == "production":
-                raise RuntimeError(f"MongoDB connection required in production: {e}")
+            if REQUIRE_MONGODB:
+                raise RuntimeError(f"MongoDB connection required (REQUIRE_MONGODB=true): {e}")
             print(f"Warning: Could not connect to MongoDB ({e}). Using Mock Database.")
             import mock_db  # type: ignore[import-not-found]
             self.db = mock_db.MockDatabase()
