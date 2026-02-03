@@ -2,7 +2,7 @@ import { getRepoDetail, getCommits } from '../../services/api'
 import { exportToCSV, shareCSV } from '../../utils/exporter'
 import { formatLocalDate, formatLocalDateTime } from '../../utils/date'
 import { calculateDaysLeft, formatDaysLeft, calculateVehicleAge, isDueWarning } from '../../utils/vehicle'
-import { config as envConfig } from '../../config'
+import { config as envConfig, CLOUD_ENV_ID } from '../../config'
 
 Page({
   data: {
@@ -190,57 +190,129 @@ Page({
 
     wx.showLoading({ title: '生成PDF...' })
 
-    const baseURL = envConfig.baseURL
-    
     const repoName = this.data.repo ? this.data.repo.name : 'vehicle'
     const fileName = `车辆维护记录-${repoName}.pdf`
+    const savedPath = `${wx.env.USER_DATA_PATH}/${fileName}`
 
-    wx.downloadFile({
-      url: `${baseURL}/repos/${this.data.repoId}/export/pdf`,
-      header: {
-        'Authorization': `Bearer ${token}`
-      },
-      success: (res) => {
-        wx.hideLoading()
-        if (res.statusCode === 200) {
-          const fs = wx.getFileSystemManager()
-          const savedPath = `${wx.env.USER_DATA_PATH}/${fileName}`
-          
-          fs.saveFile({
-            tempFilePath: res.tempFilePath,
-            filePath: savedPath,
-            success: () => {
-              wx.openDocument({
-                filePath: savedPath,
-                fileType: 'pdf',
-                showMenu: true,
-                fail: (err) => {
-                  console.error('Failed to open PDF:', err)
-                  wx.showToast({ title: '打开PDF失败', icon: 'none' })
-                }
-              })
-            },
-            fail: () => {
-              wx.openDocument({
-                filePath: res.tempFilePath,
-                fileType: 'pdf',
-                showMenu: true
-              })
-            }
-          })
-        } else if (res.statusCode === 401) {
-          wx.removeStorageSync('autorepo_token')
-          wx.removeStorageSync('autorepo_openid')
-          wx.showToast({ title: '登录已过期', icon: 'none' })
-        } else {
-          wx.showToast({ title: `导出失败 (${res.statusCode})`, icon: 'none' })
+    const headers: Record<string, string> = {
+      'content-type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'X-WX-SERVICE': 'autorepo-backend'
+    }
+
+    if (envConfig.useCloudRun || envConfig.environment === 'prod') {
+      wx.cloud.callContainer({
+        config: { env: CLOUD_ENV_ID },
+        path: `${envConfig.baseURL}/repos/${this.data.repoId}/export/pdf`,
+        method: 'GET',
+        header: headers,
+        responseType: 'arraybuffer',
+        success: (res: any) => {
+          wx.hideLoading()
+          if (res.statusCode === 200) {
+            const fs = wx.getFileSystemManager()
+            fs.writeFile({
+              filePath: savedPath,
+              data: res.data,
+              encoding: 'binary',
+              success: () => {
+                wx.showModal({
+                  title: '导出成功',
+                  content: '是否打开或分享PDF文件?',
+                  confirmText: '打开',
+                  cancelText: '稍后',
+                  success: (modalRes) => {
+                    if (modalRes.confirm) {
+                      wx.openDocument({
+                        filePath: savedPath,
+                        fileType: 'pdf',
+                        showMenu: true,
+                        fail: (err) => {
+                          console.error('Failed to open PDF:', err)
+                          wx.showToast({ title: '打开PDF失败', icon: 'none' })
+                        }
+                      })
+                    } else {
+                      wx.showToast({ title: '已保存到本地', icon: 'success' })
+                    }
+                  }
+                })
+              },
+              fail: (err) => {
+                console.error('Failed to save PDF:', err)
+                wx.showToast({ title: '保存PDF失败', icon: 'none' })
+              }
+            })
+          } else if (res.statusCode === 401) {
+            wx.removeStorageSync('autorepo_token')
+            wx.removeStorageSync('autorepo_openid')
+            wx.showToast({ title: '登录已过期', icon: 'none' })
+          } else {
+            wx.showToast({ title: `导出失败 (${res.statusCode})`, icon: 'none' })
+          }
+        },
+        fail: (err: any) => {
+          wx.hideLoading()
+          console.error('Cloud container call failed:', err)
+          wx.showToast({ title: '导出失败，请稍后重试', icon: 'none' })
         }
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('Download failed:', err)
-        wx.showToast({ title: '下载失败，请检查网络', icon: 'none' })
-      }
-    })
+      })
+    } else {
+      wx.downloadFile({
+        url: `${envConfig.baseURL}/repos/${this.data.repoId}/export/pdf`,
+        header: { 'Authorization': `Bearer ${token}` },
+        success: (res) => {
+          wx.hideLoading()
+          if (res.statusCode === 200) {
+            const fs = wx.getFileSystemManager()
+            fs.saveFile({
+              tempFilePath: res.tempFilePath,
+              filePath: savedPath,
+              success: () => {
+                wx.showModal({
+                  title: '导出成功',
+                  content: '是否打开或分享PDF文件?',
+                  confirmText: '打开',
+                  cancelText: '稍后',
+                  success: (modalRes) => {
+                    if (modalRes.confirm) {
+                      wx.openDocument({
+                        filePath: savedPath,
+                        fileType: 'pdf',
+                        showMenu: true,
+                        fail: (err) => {
+                          console.error('Failed to open PDF:', err)
+                          wx.showToast({ title: '打开PDF失败', icon: 'none' })
+                        }
+                      })
+                    } else {
+                      wx.showToast({ title: '已保存到本地', icon: 'success' })
+                    }
+                  }
+                })
+              },
+              fail: () => {
+                wx.openDocument({
+                  filePath: res.tempFilePath,
+                  fileType: 'pdf',
+                  showMenu: true
+                })
+              }
+            })
+          } else if (res.statusCode === 401) {
+            wx.removeStorageSync('autorepo_token')
+            wx.removeStorageSync('autorepo_openid')
+            wx.showToast({ title: '登录已过期', icon: 'none' })
+          } else {
+            wx.showToast({ title: `导出失败 (${res.statusCode})`, icon: 'none' })
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading()
+          console.error('Download failed:', err)
+          wx.showToast({ title: '下载失败，请检查网络', icon: 'none' })
+        }
+      })
+    }
   }
 })

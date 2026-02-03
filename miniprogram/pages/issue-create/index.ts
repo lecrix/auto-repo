@@ -42,7 +42,7 @@ Page({
             return
         }
 
-        wx.showLoading({ title: 'Creating...' })
+        wx.showLoading({ title: '创建中...' })
 
         try {
             await createIssue(repoId, {
@@ -52,12 +52,12 @@ Page({
                 due_mileage: due_mileage ? Number(due_mileage) : null
             })
             wx.hideLoading()
-            wx.showToast({ title: 'Success', icon: 'success' })
+            wx.showToast({ title: '添加成功', icon: 'success' })
             setTimeout(() => wx.navigateBack(), 1500)
         } catch (e) {
             wx.hideLoading()
             console.error(e)
-            wx.showToast({ title: 'Failed', icon: 'none' })
+            wx.showToast({ title: '添加失败', icon: 'none' })
         }
     },
 

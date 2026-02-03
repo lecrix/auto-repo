@@ -55,42 +55,49 @@ Component({
             }
 
             this.setData({ loading: true })
-            try {
-                const [stats, issues, trends] = await Promise.all([
-                    getRepoStats(id),
-                    getIssues(id, 'open'),
-                    getRepoTrends(id, 6)
-                ])
 
+            const results = await Promise.allSettled([
+                getRepoStats(id),
+                getIssues(id, 'open'),
+                getRepoTrends(id, 6)
+            ])
+
+            const [statsResult, issuesResult, trendsResult] = results
+
+            const stats = statsResult.status === 'fulfilled' ? statsResult.value : null
+            const issues = issuesResult.status === 'fulfilled' ? issuesResult.value : []
+            const trends = trendsResult.status === 'fulfilled' ? trendsResult.value : null
+
+            if (stats) {
                 translateComposition(stats)
+            }
 
-                if (trends && trends.months && trends.months.length > 0) {
-                    const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
-                    const maxMileage = Math.max(...trends.months.map((m: any) => m.mileage || 0))
-                    const maxFuelCost = Math.max(...trends.months.map((m: any) => m.fuel_cost || 0))
-                    this.setData({
-                        stats,
-                        issues,
-                        trends: { ...trends, maxCost, maxMileage, maxFuelCost }
-                    })
-                } else {
-                    this.setData({ stats, issues, trends })
-                }
-            } catch (e) {
-                console.error('Failed to load insights data', e)
+            const failedRequests = results.filter(r => r.status === 'rejected')
+            if (failedRequests.length > 0) {
+                console.warn('Some insights requests failed:', failedRequests)
+            }
+
+            if (!stats) {
                 wx.showToast({
-                    title: '数据加载失败',
+                    title: '统计数据加载失败',
                     icon: 'none'
                 })
-                try {
-                    const stats = await getRepoStats(id)
-                    translateComposition(stats)
-                    this.setData({ stats })
-                } catch (ex) {
-                    console.error('Failed to load fallback stats', ex)
-                }
-            } finally {
                 this.setData({ loading: false })
+                return
+            }
+
+            if (trends && trends.months && trends.months.length > 0) {
+                const maxCost = Math.max(...trends.months.map((m: any) => m.cost || 0))
+                const maxMileage = Math.max(...trends.months.map((m: any) => m.mileage || 0))
+                const maxFuelCost = Math.max(...trends.months.map((m: any) => m.fuel_cost || 0))
+                this.setData({
+                    stats,
+                    issues,
+                    trends: { ...trends, maxCost, maxMileage, maxFuelCost },
+                    loading: false
+                })
+            } else {
+                this.setData({ stats, issues, trends, loading: false })
             }
         },
 

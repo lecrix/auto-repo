@@ -103,6 +103,54 @@ async def update_repo(repo_id: str, repo: Repo, user_openid: str = Depends(get_c
         {"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid},
         {"$set": update_data}
     )
+    
+    old_purchase_cost = existing.get("purchase_cost") or 0
+    new_purchase_cost = repo.purchase_cost or 0
+    
+    if new_purchase_cost > 0 and new_purchase_cost != old_purchase_cost:
+        from datetime import datetime
+        
+        existing_purchase_commit = await db.commits.find_one({
+            "repo_id": repo_id,
+            "user_openid": user_openid,
+            "type": "purchase"
+        })
+        
+        purchase_date = repo.purchase_date if repo.purchase_date else (
+            existing.get("purchase_date") or datetime.now().timestamp() * 1000
+        )
+        
+        if existing_purchase_commit:
+            await db.commits.update_one(
+                {"_id": existing_purchase_commit["_id"]},
+                {"$set": {
+                    "message": f"车辆购买成本：¥{new_purchase_cost}",
+                    "cost": {
+                        "parts": float(new_purchase_cost),
+                        "labor": 0.0,
+                        "currency": "CNY"
+                    },
+                    "timestamp": purchase_date
+                }}
+            )
+        else:
+            purchase_commit = {
+                "repo_id": repo_id,
+                "user_openid": user_openid,
+                "title": "购车费用",
+                "message": f"车辆购买成本：¥{new_purchase_cost}",
+                "type": "purchase",
+                "mileage": repo.current_mileage if repo.current_mileage else existing.get("current_mileage"),
+                "cost": {
+                    "parts": float(new_purchase_cost),
+                    "labor": 0.0,
+                    "currency": "CNY"
+                },
+                "closes_issues": [],
+                "timestamp": purchase_date
+            }
+            await db.commits.insert_one(purchase_commit)
+    
     return {"status": "updated", "id": repo_id}
 
 @router.delete("/repos/{repo_id}")
