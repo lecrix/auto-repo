@@ -41,9 +41,9 @@ Component({
             const { topIssue } = this.data
             const repoId = this.properties.repoId
             if (topIssue && repoId) {
-                // Navigate to commit-create with issue info pre-filled
+                const issueData = encodeURIComponent(JSON.stringify(topIssue))
                 wx.navigateTo({
-                    url: `/pages/commit-create/index?repoId=${repoId}&closeIssueId=${topIssue._id}&closeIssueTitle=${encodeURIComponent(topIssue.title)}`
+                    url: `/pages/issue-detail/index?issueId=${topIssue._id}&repoId=${repoId}&issue=${issueData}`
                 })
             }
         }

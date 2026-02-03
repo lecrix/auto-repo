@@ -1,4 +1,4 @@
-import { getRepoStats, getIssues, getRepoTrends, deleteIssue } from '../../services/api'
+import { getRepoStats, getIssues, getRepoTrends, deleteIssue, updateIssue } from '../../services/api'
 
 Component({
     properties: {
@@ -107,14 +107,91 @@ Component({
             })
         },
 
-        onCompleteIssue(e: any) {
+        onIssueClick(e: any) {
             const issue = e.currentTarget.dataset.issue
             const repoId = this.properties.repoId
             if (issue && repoId) {
+                const issueData = encodeURIComponent(JSON.stringify(issue))
                 wx.navigateTo({
-                    url: `/pages/commit-create/index?repoId=${repoId}&closeIssueId=${issue._id}&closeIssueTitle=${encodeURIComponent(issue.title)}`
+                    url: `/pages/issue-detail/index?issueId=${issue._id}&repoId=${repoId}&issue=${issueData}`
                 })
             }
+        },
+
+        onActionTap() {},
+
+        onCompleteIssue(e: any) {
+            const issue = e.currentTarget.dataset.issue
+            const repoId = this.properties.repoId
+            if (!issue || !repoId) return
+
+            wx.showActionSheet({
+                itemList: ['稍后处理', '处理完成'],
+                success: async (res) => {
+                    if (res.tapIndex === 0) {
+                        const issueData = encodeURIComponent(JSON.stringify(issue))
+                        wx.navigateTo({
+                            url: `/pages/issue-detail/index?issueId=${issue._id}&repoId=${repoId}&issue=${issueData}`
+                        })
+                    } else if (res.tapIndex === 1) {
+                        wx.showLoading({ title: '处理中...' })
+                        try {
+                            await updateIssue(issue._id, {
+                                status: 'closed',
+                                closed_at: Date.now()
+                            })
+                            wx.hideLoading()
+                            wx.showToast({ title: '已完成', icon: 'success' })
+                            this.loadData(this.properties.repoId)
+                        } catch (err) {
+                            wx.hideLoading()
+                            console.error('Complete issue failed:', err)
+                            wx.showToast({ title: '操作失败', icon: 'none' })
+                        }
+                    }
+                }
+            })
+        },
+
+        // 阻止 action 区域的点击冒泡
+        onActionTap() {
+            // 空方法，用于 catchtap 阻止冒泡
+        },
+
+        onCompleteIssue(e: any) {
+            const issue = e.currentTarget.dataset.issue
+            const repoId = this.properties.repoId
+            if (!issue || !repoId) return
+
+            wx.showActionSheet({
+                itemList: ['稍后处理', '处理完成'],
+                success: async (res) => {
+                    if (res.tapIndex === 0) {
+                        // 稍后处理 - 跳转到详情页
+                        const issueData = encodeURIComponent(JSON.stringify(issue))
+                        wx.navigateTo({
+                            url: `/pages/issue-detail/index?issueId=${issue._id}&repoId=${repoId}&issue=${issueData}`
+                        })
+                    } else if (res.tapIndex === 1) {
+                        // 处理完成 - 调用 API 标记为已完成
+                        wx.showLoading({ title: '处理中...' })
+                        try {
+                            await updateIssue(issue._id, {
+                                status: 'closed',
+                                closed_at: Date.now()
+                            })
+                            wx.hideLoading()
+                            wx.showToast({ title: '已完成', icon: 'success' })
+                            // 刷新列表
+                            this.loadData(this.properties.repoId)
+                        } catch (err) {
+                            wx.hideLoading()
+                            console.error('Complete issue failed:', err)
+                            wx.showToast({ title: '操作失败', icon: 'none' })
+                        }
+                    }
+                }
+            })
         },
 
         onDeleteIssue(e: any) {
@@ -133,7 +210,6 @@ Component({
                             await deleteIssue(issue._id)
                             wx.hideLoading()
                             wx.showToast({ title: '已删除', icon: 'success' })
-                            // 刷新列表
                             this.loadData(this.properties.repoId)
                         } catch (err) {
                             wx.hideLoading()

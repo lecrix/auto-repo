@@ -138,13 +138,18 @@ Page({
       const filePath = await exportToCSV(this.data.commits, this.data.repo.name)
       wx.hideLoading()
 
-      wx.showModal({
-        title: '导出成功',
-        content: '是否分享CSV文件?',
-        confirmText: '分享',
-        cancelText: '稍后',
+      wx.showActionSheet({
+        itemList: ['打开', '分享'],
         success: async (res) => {
-          if (res.confirm) {
+          if (res.tapIndex === 0) {
+            wx.openDocument({
+              filePath: filePath,
+              showMenu: true,
+              fail: () => {
+                wx.showToast({ title: '打开失败', icon: 'none' })
+              }
+            })
+          } else if (res.tapIndex === 1) {
             try {
               await shareCSV(filePath)
             } catch (err: any) {
@@ -153,11 +158,6 @@ Page({
                 icon: 'none'
               })
             }
-          } else {
-            wx.showToast({
-              title: '已保存到本地',
-              icon: 'success'
-            })
           }
         }
       })
@@ -200,6 +200,37 @@ Page({
       'X-WX-SERVICE': 'autorepo-backend'
     }
 
+    const showPDFActions = (filePath: string) => {
+      wx.showActionSheet({
+        itemList: ['打开', '分享'],
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            wx.openDocument({
+              filePath: filePath,
+              fileType: 'pdf',
+              showMenu: true,
+              fail: (err) => {
+                console.error('Failed to open PDF:', err)
+                wx.showToast({ title: '打开PDF失败', icon: 'none' })
+              }
+            })
+          } else if (res.tapIndex === 1) {
+            wx.shareFileMessage({
+              filePath: filePath,
+              fileName: fileName,
+              fail: () => {
+                wx.openDocument({
+                  filePath: filePath,
+                  fileType: 'pdf',
+                  showMenu: true
+                })
+              }
+            })
+          }
+        }
+      })
+    }
+
     if (envConfig.useCloudRun || envConfig.environment === 'prod') {
       wx.cloud.callContainer({
         config: { env: CLOUD_ENV_ID },
@@ -216,27 +247,7 @@ Page({
               data: res.data,
               encoding: 'binary',
               success: () => {
-                wx.showModal({
-                  title: '导出成功',
-                  content: '是否打开或分享PDF文件?',
-                  confirmText: '打开',
-                  cancelText: '稍后',
-                  success: (modalRes) => {
-                    if (modalRes.confirm) {
-                      wx.openDocument({
-                        filePath: savedPath,
-                        fileType: 'pdf',
-                        showMenu: true,
-                        fail: (err) => {
-                          console.error('Failed to open PDF:', err)
-                          wx.showToast({ title: '打开PDF失败', icon: 'none' })
-                        }
-                      })
-                    } else {
-                      wx.showToast({ title: '已保存到本地', icon: 'success' })
-                    }
-                  }
-                })
+                showPDFActions(savedPath)
               },
               fail: (err) => {
                 console.error('Failed to save PDF:', err)
@@ -269,34 +280,10 @@ Page({
               tempFilePath: res.tempFilePath,
               filePath: savedPath,
               success: () => {
-                wx.showModal({
-                  title: '导出成功',
-                  content: '是否打开或分享PDF文件?',
-                  confirmText: '打开',
-                  cancelText: '稍后',
-                  success: (modalRes) => {
-                    if (modalRes.confirm) {
-                      wx.openDocument({
-                        filePath: savedPath,
-                        fileType: 'pdf',
-                        showMenu: true,
-                        fail: (err) => {
-                          console.error('Failed to open PDF:', err)
-                          wx.showToast({ title: '打开PDF失败', icon: 'none' })
-                        }
-                      })
-                    } else {
-                      wx.showToast({ title: '已保存到本地', icon: 'success' })
-                    }
-                  }
-                })
+                showPDFActions(savedPath)
               },
               fail: () => {
-                wx.openDocument({
-                  filePath: res.tempFilePath,
-                  fileType: 'pdf',
-                  showMenu: true
-                })
+                showPDFActions(res.tempFilePath)
               }
             })
           } else if (res.statusCode === 401) {

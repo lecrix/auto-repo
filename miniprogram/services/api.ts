@@ -45,7 +45,7 @@ type ResponseHandler = {
   resolve: (value: any) => void
   reject: (reason?: any) => void
   url: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   data?: any
 }
 
@@ -88,7 +88,7 @@ function handleNetworkError(err: any, reject: (reason?: any) => void): void {
 
 async function handleUnauthorized(
   url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   data?: any
 ): Promise<any> {
   if (isReloginInProgress) {
@@ -135,7 +135,7 @@ async function handleUnauthorized(
   })
 }
 
-const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', data?: any, retries = requestConfig.retryCount): Promise<any> => {
+const request = (url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', data?: any, retries = requestConfig.retryCount): Promise<any> => {
   return new Promise((resolve, reject) => {
     const headers: Record<string, string> = {
       'content-type': 'application/json',
@@ -271,6 +271,10 @@ export const createIssue = (repoId: string, issue: any) => {
 
 export const deleteIssue = (issueId: string) => {
     return request(`/issues/${issueId}`, 'DELETE');
+};
+
+export const updateIssue = (issueId: string, data: any) => {
+    return request(`/issues/${issueId}`, 'PATCH', data);
 };
 
 export const getRepoTrends = (repoId: string, months: number = 12) => {

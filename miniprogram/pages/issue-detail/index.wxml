@@ -1,0 +1,53 @@
+<view class="container {{themeClass}}">
+  <custom-nav showBack="{{true}}" />
+
+  <view class="detail-card" wx:if="{{issue}}">
+    <view class="header-row">
+      <view class="title">{{issue.title}}</view>
+      <view class="priority-tag {{issue.priority}}">{{priorityMap[issue.priority]}}</view>
+    </view>
+    
+    <view class="info-row">
+      <text class="label">状态</text>
+      <text class="value status-{{issue.status}}">{{issue.status === 'open' ? '待处理' : '已完成'}}</text>
+    </view>
+    
+    <view class="info-row" wx:if="{{issue.due_mileage}}">
+      <text class="label">目标里程</text>
+      <text class="value highlight">{{issue.due_mileage}} km</text>
+    </view>
+
+    <view class="info-row" wx:if="{{issue.due_date}}">
+      <text class="label">截止日期</text>
+      <text class="value">{{issue.due_date}}</text>
+    </view>
+
+    <view class="info-row">
+      <text class="label">创建时间</text>
+      <text class="value">{{issue.created_at || '--'}}</text>
+    </view>
+
+    <view class="info-row" wx:if="{{issue.closed_at}}">
+      <text class="label">完成时间</text>
+      <text class="value">{{issue.closed_at}}</text>
+    </view>
+  </view>
+
+  <view class="action-bar" wx:if="{{issue && issue.status === 'open'}}">
+    <view class="btn later-btn" bindtap="onLater">
+      稍后处理
+    </view>
+    <view class="btn complete-btn" bindtap="onComplete">
+      处理完成
+    </view>
+  </view>
+
+  <view class="action-bar" wx:if="{{issue && issue.status === 'closed'}}">
+    <view class="btn reopen-btn" bindtap="onReopen">
+      重新打开
+    </view>
+    <view class="btn delete-btn" bindtap="onDelete">
+      删除
+    </view>
+  </view>
+</view>

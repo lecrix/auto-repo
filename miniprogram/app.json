@@ -16,6 +16,7 @@
     "pages/commit-create/index",
     "pages/commit-detail/index",
     "pages/issue-create/index",
+    "pages/issue-detail/index",
     "pages/settings/index",
     "pages/help/index"
   ],
