@@ -465,6 +465,17 @@ async def update_issue(issue_id: str, patch: IssuePatch = Body(...), user_openid
         return updated_doc
     raise HTTPException(status_code=404, detail="Issue not found")
 
+@router.delete("/issues/{issue_id}")
+async def delete_issue(issue_id: str, user_openid: str = Depends(get_current_user)):
+    db = get_db()
+    
+    issue = await db.issues.find_one({"_id": parse_oid(issue_id, "issue_id"), "user_openid": user_openid})
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    
+    await db.issues.delete_one({"_id": parse_oid(issue_id, "issue_id"), "user_openid": user_openid})
+    return {"status": "deleted", "id": issue_id}
+
 # --- Insights / Stats ---
 
 @router.get("/repos/{repo_id}/stats")

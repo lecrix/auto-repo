@@ -8,7 +8,8 @@ Page({
         priority: 'medium',
         pKeys: ['low', 'medium', 'high'],
         pLabels: ['低 (Low)', '中 (Medium)', '高 (Urgent)'],
-        pIndex: 1
+        pIndex: 1,
+        submitSuccess: false
     },
 
     onShow() {
@@ -52,13 +53,26 @@ Page({
                 due_mileage: due_mileage ? Number(due_mileage) : null
             })
             wx.hideLoading()
-            wx.showToast({ title: '添加成功', icon: 'success' })
-            setTimeout(() => wx.navigateBack(), 1500)
+            this.setData({ submitSuccess: true })
         } catch (e) {
             wx.hideLoading()
             console.error(e)
             wx.showToast({ title: '添加失败', icon: 'none' })
         }
+    },
+
+    onContinueAdd() {
+        this.setData({
+            title: '',
+            due_mileage: '',
+            priority: 'medium',
+            pIndex: 1,
+            submitSuccess: false
+        })
+    },
+
+    onGoBack() {
+        wx.navigateBack()
     },
 
     onCancel() {

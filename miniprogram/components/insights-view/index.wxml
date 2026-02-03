@@ -103,6 +103,7 @@
                 </view>
             </view>
             <view class="issue-action">
+                <text class="btn-delete" bindtap="onDeleteIssue" data-issue="{{item}}">×</text>
                 <text class="btn-check" bindtap="onCompleteIssue" data-issue="{{item}}">✓</text>
             </view>
         </view>

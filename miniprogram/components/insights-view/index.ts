@@ -1,4 +1,4 @@
-import { getRepoStats, getIssues, getRepoTrends } from '../../services/api'
+import { getRepoStats, getIssues, getRepoTrends, deleteIssue } from '../../services/api'
 
 Component({
     properties: {
@@ -115,6 +115,34 @@ Component({
                     url: `/pages/commit-create/index?repoId=${repoId}&closeIssueId=${issue._id}&closeIssueTitle=${encodeURIComponent(issue.title)}`
                 })
             }
+        },
+
+        onDeleteIssue(e: any) {
+            const issue = e.currentTarget.dataset.issue
+            if (!issue || !issue._id) return
+
+            wx.showModal({
+                title: '确认删除',
+                content: `确定要删除待办事项「${issue.title}」吗？`,
+                confirmText: '删除',
+                confirmColor: '#e74c3c',
+                success: async (res) => {
+                    if (res.confirm) {
+                        wx.showLoading({ title: '删除中...' })
+                        try {
+                            await deleteIssue(issue._id)
+                            wx.hideLoading()
+                            wx.showToast({ title: '已删除', icon: 'success' })
+                            // 刷新列表
+                            this.loadData(this.properties.repoId)
+                        } catch (err) {
+                            wx.hideLoading()
+                            console.error('Delete issue failed:', err)
+                            wx.showToast({ title: '删除失败', icon: 'none' })
+                        }
+                    }
+                }
+            })
         }
     }
 })

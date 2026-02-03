@@ -1,28 +1,41 @@
 <view class="container {{themeClass}}">
   <custom-nav showBack="{{true}}" />
   
-  <view class="form-group">
-    <view class="label">标题</view>
-    <input class="input" placeholder="例如: 更换刹车片" data-field="title" bindinput="onInput" />
+  <!-- 成功状态 -->
+  <view class="success-state" wx:if="{{submitSuccess}}">
+    <view class="success-icon">✓</view>
+    <view class="success-text">添加成功</view>
+    <view class="success-actions">
+      <button class="btn-continue" bindtap="onContinueAdd">继续新建</button>
+      <button class="btn-back" bindtap="onGoBack">返回</button>
+    </view>
   </view>
 
-  <view class="form-group">
-    <view class="label">优先级</view>
-    <picker bindchange="onPriorityChange" value="{{pIndex}}" range="{{pLabels}}">
-      <view class="picker">
-        {{pLabels[pIndex]}}
-      </view>
-    </picker>
-  </view>
+  <!-- 表单 -->
+  <view wx:else>
+    <view class="form-group">
+      <view class="label">标题</view>
+      <input class="input" placeholder="例如: 更换刹车片" data-field="title" bindinput="onInput" value="{{title}}" />
+    </view>
 
-  <view class="section-title">触发条件 (选填)</view>
-  
-  <view class="form-group">
-    <view class="label">目标里程 (km)</view>
-    <input class="input" type="number" placeholder="到达该里程时提醒" data-field="due_mileage" bindinput="onInput" />
-  </view>
+    <view class="form-group">
+      <view class="label">优先级</view>
+      <picker bindchange="onPriorityChange" value="{{pIndex}}" range="{{pLabels}}">
+        <view class="picker">
+          {{pLabels[pIndex]}}
+        </view>
+      </picker>
+    </view>
 
-  <view class="btn-group">
-    <button class="submit-btn" bindtap="onSubmit">创建提醒</button>
+    <view class="section-title">触发条件 (选填)</view>
+    
+    <view class="form-group">
+      <view class="label">目标里程 (km)</view>
+      <input class="input" type="number" placeholder="到达该里程时提醒" data-field="due_mileage" bindinput="onInput" value="{{due_mileage}}" />
+    </view>
+
+    <view class="btn-group">
+      <button class="submit-btn" bindtap="onSubmit">创建提醒</button>
+    </view>
   </view>
 </view>

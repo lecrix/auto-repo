@@ -187,13 +187,24 @@
 
 .issue-action {
     padding: 0 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-delete {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 4px 8px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 4px;
 }
 
 .btn-check {
     color: var(--success-color);
     font-weight: bold;
     font-size: 18px;
-    padding: 4px;
+    padding: 4px 8px;
     background: rgba(46, 204, 113, 0.1);
     border-radius: 4px;
 }

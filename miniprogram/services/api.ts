@@ -269,6 +269,10 @@ export const createIssue = (repoId: string, issue: any) => {
     return request(`/repos/${repoId}/issues`, 'POST', issue);
 };
 
+export const deleteIssue = (issueId: string) => {
+    return request(`/issues/${issueId}`, 'DELETE');
+};
+
 export const getRepoTrends = (repoId: string, months: number = 12) => {
     return request(`/repos/${repoId}/trends?months=${months}`, 'GET');
 };
