@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from models import Repo, Commit, Issue, CommitPatch, IssuePatch
@@ -59,7 +60,6 @@ async def create_repo(repo: Repo, user_openid: str = Depends(get_current_user)):
     
     # Auto-create purchase record if purchase_cost exists
     if repo.purchase_cost and repo.purchase_cost > 0:
-        from datetime import datetime
         purchase_commit = {
             "repo_id": repo_id,
             "user_openid": user_openid,
@@ -108,8 +108,6 @@ async def update_repo(repo_id: str, repo: Repo, user_openid: str = Depends(get_c
     new_purchase_cost = repo.purchase_cost or 0
     
     if new_purchase_cost > 0 and new_purchase_cost != old_purchase_cost:
-        from datetime import datetime
-        
         existing_purchase_commit = await db.commits.find_one({
             "repo_id": repo_id,
             "user_openid": user_openid,
