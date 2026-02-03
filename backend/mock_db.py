@@ -250,7 +250,8 @@ class MockCollection:
                 # Sort documents
                 sort_spec = stage["$sort"]
                 for field, direction in reversed(list(sort_spec.items())):
-                    data.sort(key=lambda x: x.get(field, 0), reverse=(direction == -1))
+                    # Use 0 as default for None values to avoid TypeError in comparison
+                    data.sort(key=lambda x, f=field: x.get(f) if x.get(f) is not None else 0, reverse=(direction == -1))
             
             elif "$project" in stage:
                 # Project fields
@@ -302,7 +303,8 @@ class MockCollection:
                     return total
             elif "$max" in expr:
                 field = expr["$max"][1:] if expr["$max"].startswith("$") else expr["$max"]
-                return max((doc.get(field, 0) for doc in docs), default=0)
+                values = [doc.get(field) for doc in docs if doc.get(field) is not None]
+                return max(values, default=0) if values else 0
             elif "$avg" in expr:
                 field = expr["$avg"][1:] if expr["$avg"].startswith("$") else expr["$avg"]
                 values = [doc.get(field, 0) for doc in docs if doc.get(field) is not None]
