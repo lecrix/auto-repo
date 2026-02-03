@@ -321,6 +321,8 @@ async def update_commit(commit_id: str, patch: CommitPatch, user_openid: str = D
                 )
     
     updated = await db.commits.find_one({"_id": parse_oid(commit_id, "commit_id"), "user_openid": user_openid})
+    if not updated:
+        raise HTTPException(status_code=404, detail="Commit not found after update")
     updated["_id"] = str(updated["_id"])
     
     return updated

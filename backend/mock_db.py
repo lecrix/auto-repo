@@ -392,9 +392,9 @@ class MockDatabase:
                         # Restore ObjectIds
                         for doc in col_data:
                             if "_id" in doc:
-                                try:
+                            try:
                                     doc["_id"] = ObjectId(doc["_id"])
-                                except:
+                                except Exception:
                                     pass
                         c.data = col_data
             except Exception as e:
