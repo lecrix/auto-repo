@@ -371,7 +371,10 @@ class MockCollection:
 class MockDatabase:
     def __init__(self):
         self.collections = {}
-        self.file_path = "mock_db_data.json"
+        data_dir = os.getenv("DATA_DIR", "/data")
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir, exist_ok=True)
+        self.file_path = os.path.join(data_dir, "mock_db_data.json")
         self.load()
 
     def __getattr__(self, name):
