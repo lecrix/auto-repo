@@ -126,9 +126,9 @@
                             <text class="btn-reopen" catchtap="onReopenIssue" data-issue="{{item}}">↺</text>
                         </view>
                     </view>
+                    <view class="delete-btn" catchtap="onDeleteIssue" data-issue="{{item}}">删除</view>
                 </movable-view>
             </movable-area>
-            <view class="delete-btn" catchtap="onDeleteIssue" data-issue="{{item}}">删除</view>
         </view>
     </view>
 
