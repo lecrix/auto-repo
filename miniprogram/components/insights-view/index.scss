@@ -1,6 +1,6 @@
 .insights-container {
-    padding: 24px;
-    background: var(--bg-color); /* Was #f8f9fa */
+    padding: 24px 24px 0 24px;
+    background: var(--bg-color);
 }
 
 /* 1. Metrics Grid */
@@ -57,11 +57,15 @@
 
 /* 2. Chart Section */
 .chart-section {
-    background: var(--card-bg); /* Was white */
+    background: var(--card-bg);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: var(--shadow-sm);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .section-title {
