@@ -633,11 +633,10 @@ async def get_repo_trends(repo_id: str, user_openid: str = Depends(get_current_u
         "total_months": len(monthly_data)
     }
 
-@router.get("/repos/{repo_id}/export/pdf")
-@limiter.limit("10/minute")
-async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
+async def generate_pdf_buffer(repo_id: str, user_openid: str):
     """
-    Export vehicle maintenance history to PDF with Chinese font support
+    Generate PDF buffer for vehicle maintenance history.
+    Returns (buffer, filename) tuple.
     """
     try:
         from reportlab.lib.pagesizes import A4
@@ -652,162 +651,168 @@ async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = 
         print(f"ReportLab import failed: {e}")
         raise HTTPException(status_code=500, detail=f"PDF generation library missing: {str(e)}")
 
-    try:
-        from fastapi.responses import StreamingResponse
-        from io import BytesIO
-        from datetime import datetime
-        import os
-        
-        chinese_font_name = 'ChineseFont'
-        chinese_font_registered = False
-        
-        font_paths = [
-            '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',
-            '/usr/share/fonts/truetype/wqy-microhei/wqy-microhei.ttc',
-            '/usr/share/fonts/wqy-microhei/wqy-microhei.ttc',
-            '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
-            '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
-            'C:/Windows/Fonts/msyh.ttc',
-            'C:/Windows/Fonts/simsun.ttc',
-            'C:/Windows/Fonts/simhei.ttf',
-            '/System/Library/Fonts/PingFang.ttc',
-            '/Library/Fonts/Arial Unicode.ttf',
-        ]
-        
-        for font_path in font_paths:
-            if os.path.exists(font_path):
-                try:
-                    pdfmetrics.registerFont(TTFont(chinese_font_name, font_path))
-                    chinese_font_registered = True
-                    break
-                except Exception:
-                    continue
-        
-        if not chinese_font_registered:
-            # Fallback to standard font if no Chinese font found (may cause encoding issues)
-            print("Warning: No Chinese font found for PDF export")
-            chinese_font_name = 'Helvetica'
-        
-        db = get_db()
-        
-        repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
-        if not repo:
-            raise HTTPException(status_code=404, detail="Repo not found")
-        
-        commits_cursor = db.commits.find({"repo_id": repo_id, "user_openid": user_openid}).sort("timestamp", -1)
-        commits = []
-        async for doc in commits_cursor:
-            doc["_id"] = str(doc["_id"])
-            commits.append(doc)
-        
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.75*inch, bottomMargin=0.75*inch)
-        
-        story = []
-        styles = getSampleStyleSheet()
-        
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontName=chinese_font_name,
-            fontSize=24,
-            textColor=colors.HexColor('#2c3e50'),
-            spaceAfter=30,
-            alignment=TA_CENTER
-        )
-        
-        heading_style = ParagraphStyle(
-            'CustomHeading',
+    from io import BytesIO
+    from datetime import datetime
+    import os
+    
+    chinese_font_name = 'ChineseFont'
+    chinese_font_registered = False
+    
+    font_paths = [
+        '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc',
+        '/usr/share/fonts/truetype/wqy-microhei/wqy-microhei.ttc',
+        '/usr/share/fonts/wqy-microhei/wqy-microhei.ttc',
+        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+        '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
+        'C:/Windows/Fonts/msyh.ttc',
+        'C:/Windows/Fonts/simsun.ttc',
+        'C:/Windows/Fonts/simhei.ttf',
+        '/System/Library/Fonts/PingFang.ttc',
+        '/Library/Fonts/Arial Unicode.ttf',
+    ]
+    
+    for font_path in font_paths:
+        if os.path.exists(font_path):
+            try:
+                pdfmetrics.registerFont(TTFont(chinese_font_name, font_path))
+                chinese_font_registered = True
+                break
+            except Exception:
+                continue
+    
+    if not chinese_font_registered:
+        print("Warning: No Chinese font found for PDF export")
+        chinese_font_name = 'Helvetica'
+    
+    db = get_db()
+    
+    repo = await db.repos.find_one({"_id": parse_oid(repo_id, "repo_id"), "user_openid": user_openid})
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repo not found")
+    
+    commits_cursor = db.commits.find({"repo_id": repo_id, "user_openid": user_openid}).sort("timestamp", -1)
+    commits = []
+    async for doc in commits_cursor:
+        doc["_id"] = str(doc["_id"])
+        commits.append(doc)
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.75*inch, bottomMargin=0.75*inch)
+    
+    story = []
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontName=chinese_font_name,
+        fontSize=18,
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+    
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontName=chinese_font_name,
+        fontSize=10,
+        alignment=TA_LEFT,
+        spaceAfter=10
+    )
+    
+    repo_name = repo.get('name', 'Unknown Vehicle')
+    story.append(Paragraph(f"车辆维护记录 - {repo_name}", title_style))
+    story.append(Spacer(1, 12))
+    
+    info_lines = []
+    if repo.get('make'):
+        info_lines.append(f"品牌: {repo['make']}")
+    if repo.get('model'):
+        info_lines.append(f"型号: {repo['model']}")
+    if repo.get('year'):
+        info_lines.append(f"年份: {repo['year']}")
+    if repo.get('mileage'):
+        info_lines.append(f"当前里程: {repo['mileage']} km")
+    
+    if info_lines:
+        for line in info_lines:
+            story.append(Paragraph(line, info_style))
+        story.append(Spacer(1, 20))
+    
+    story.append(Paragraph(f"导出时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}", info_style))
+    story.append(Spacer(1, 20))
+    
+    if commits:
+        story.append(Paragraph("维护记录", ParagraphStyle(
+            'SectionTitle',
             parent=styles['Heading2'],
             fontName=chinese_font_name,
             fontSize=14,
-            textColor=colors.HexColor('#2c3e50'),
-            spaceAfter=10
-        )
+            spaceAfter=15
+        )))
         
-        story.append(Paragraph(f"车辆整备记录 - {repo.get('name', 'Unknown')}", title_style))
-        story.append(Spacer(1, 0.2*inch))
+        commit_data = [["日期", "标题", "类型", "里程 (km)", "费用 (元)"]]
         
-        info_data = [
-            ["车辆信息", ""],
-            ["车辆名称", repo.get('name', 'N/A')],
-            ["车架号", repo.get('vin', 'N/A')],
-            ["当前里程", f"{repo.get('current_mileage', 0)} km"],
-            ["导出日期", datetime.now().strftime('%Y-%m-%d')]
-        ]
+        type_map = {
+            'maintenance': '常规保养',
+            'repair': '维修',
+            'modification': '改装',
+            'fuel': '加油',
+            'parking': '停车',
+            'inspection': '年检',
+            'insurance': '保险',
+            'purchase': '购车费用',
+            'other': '其他'
+        }
         
-        info_table = Table(info_data, colWidths=[2*inch, 4*inch])
-        info_table.setStyle(TableStyle([
+        for commit in commits:
+            date = datetime.fromtimestamp(commit.get('timestamp', 0) / 1000).strftime('%Y-%m-%d')
+            title = commit.get('title', 'N/A')
+            commit_type = type_map.get(commit.get('type', ''), commit.get('type', 'N/A'))
+            mileage = commit.get('mileage')
+            mileage_display = "/" if not mileage else str(mileage)
+            cost = commit.get('cost', {})
+            total_cost = cost.get('parts', 0) + cost.get('labor', 0)
+            
+            commit_data.append([date, title, commit_type, mileage_display, f"¥{total_cost:.2f}"])
+        
+        commit_table = Table(commit_data, colWidths=[1.2*inch, 2*inch, 1*inch, 1*inch, 1*inch])
+        commit_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('TOPPADDING', (0, 0), (-1, -1), 8),
             ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('FONTSIZE', (0, 1), (-1, -1), 9)
         ]))
         
-        story.append(info_table)
-        story.append(Spacer(1, 0.3*inch))
-        
-        if commits:
-            story.append(Paragraph("整备记录", heading_style))
-            story.append(Spacer(1, 0.1*inch))
-            
-            commit_data = [["日期", "标题", "类型", "里程 (km)", "费用 (元)"]]
-            
-            type_map = {
-                'maintenance': '常规保养',
-                'repair': '维修',
-                'modification': '改装',
-                'fuel': '加油',
-                'parking': '停车',
-                'inspection': '年检',
-                'insurance': '保险',
-                'purchase': '购车费用',
-                'other': '其他'
-            }
-            
-            for commit in commits:
-                date = datetime.fromtimestamp(commit.get('timestamp', 0) / 1000).strftime('%Y-%m-%d')
-                title = commit.get('title', 'N/A')
-                commit_type = type_map.get(commit.get('type', ''), commit.get('type', 'N/A'))
-                mileage = commit.get('mileage')
-                mileage_display = "/" if not mileage else str(mileage)
-                cost = commit.get('cost', {})
-                total_cost = cost.get('parts', 0) + cost.get('labor', 0)
-                
-                commit_data.append([date, title, commit_type, mileage_display, f"¥{total_cost:.2f}"])
-            
-            commit_table = Table(commit_data, colWidths=[1.2*inch, 2*inch, 1*inch, 1*inch, 1*inch])
-            commit_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('FONTNAME', (0, 0), (-1, -1), chinese_font_name),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                ('FONTSIZE', (0, 1), (-1, -1), 9)
-            ]))
-            
-            story.append(commit_table)
-        
-        doc.build(story)
-        buffer.seek(0)
-        
-        # RFC 5987: filename* with UTF-8 encoding for non-ASCII characters
+        story.append(commit_table)
+    
+    doc.build(story)
+    buffer.seek(0)
+    
+    filename = f"车辆维护记录-{repo.get('name', 'vehicle')}.pdf"
+    return buffer, filename
+
+
+@router.get("/repos/{repo_id}/export/pdf")
+@limiter.limit("10/minute")
+async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
+    """
+    Export vehicle maintenance history to PDF with Chinese font support (binary response)
+    """
+    try:
+        from fastapi.responses import StreamingResponse
         from urllib.parse import quote
-        raw_filename = f"车辆维护记录-{repo.get('name', 'vehicle')}.pdf"
-        encoded_filename = quote(raw_filename)
+        
+        buffer, filename = await generate_pdf_buffer(repo_id, user_openid)
+        encoded_filename = quote(filename)
         
         return StreamingResponse(
             buffer,
@@ -816,6 +821,36 @@ async def export_repo_to_pdf(request: Request, repo_id: str, user_openid: str = 
                 "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
             }
         )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"PDF Export Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"PDF Export Failed: {str(e)}")
+
+
+@router.get("/repos/{repo_id}/export/pdf-base64")
+@limiter.limit("10/minute")
+async def export_repo_to_pdf_base64(request: Request, repo_id: str, user_openid: str = Depends(get_current_user)):
+    """
+    Export vehicle maintenance history to PDF as base64 encoded JSON.
+    For WeChat Cloud Run compatibility where binary response is not supported.
+    """
+    import base64
+    
+    try:
+        buffer, filename = await generate_pdf_buffer(repo_id, user_openid)
+        pdf_bytes = buffer.read()
+        pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
+        
+        return {
+            "filename": filename,
+            "data": pdf_base64,
+            "size": len(pdf_bytes)
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"PDF Export Error: {e}")
         import traceback

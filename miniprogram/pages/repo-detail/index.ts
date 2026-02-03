@@ -234,18 +234,18 @@ Page({
     if (envConfig.useCloudRun || envConfig.environment === 'prod') {
       wx.cloud.callContainer({
         config: { env: CLOUD_ENV_ID },
-        path: `${envConfig.baseURL}/repos/${this.data.repoId}/export/pdf`,
+        path: `${envConfig.baseURL}/repos/${this.data.repoId}/export/pdf-base64`,
         method: 'GET',
         header: headers,
-        responseType: 'arraybuffer',
         success: (res: any) => {
           wx.hideLoading()
-          if (res.statusCode === 200) {
+          if (res.statusCode === 200 && res.data && res.data.data) {
             const fs = wx.getFileSystemManager()
+            const base64Data = res.data.data
+            const arrayBuffer = wx.base64ToArrayBuffer(base64Data)
             fs.writeFile({
               filePath: savedPath,
-              data: res.data,
-              encoding: 'binary',
+              data: arrayBuffer,
               success: () => {
                 showPDFActions(savedPath)
               },
@@ -259,6 +259,7 @@ Page({
             wx.removeStorageSync('autorepo_openid')
             wx.showToast({ title: '登录已过期', icon: 'none' })
           } else {
+            console.error('PDF export response:', res)
             wx.showToast({ title: `导出失败 (${res.statusCode})`, icon: 'none' })
           }
         },
