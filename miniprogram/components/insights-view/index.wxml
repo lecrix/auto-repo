@@ -88,7 +88,10 @@
 
   <!-- 3. Upcoming Tasks (Issues) -->
   <view class="chart-section">
-    <view class="section-title">待办事项</view>
+    <view class="section-header">
+      <view class="section-title">待办事项</view>
+      <view class="btn-add-issue" bindtap="goToAddIssue">+ 新建</view>
+    </view>
 
     <view class="issue-list" wx:if="{{issues && issues.length > 0}}">
         <view class="issue-item" wx:for="{{issues}}" wx:key="_id">

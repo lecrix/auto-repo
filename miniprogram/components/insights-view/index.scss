@@ -67,10 +67,29 @@
 .section-title {
     font-size: 16px;
     font-weight: 700;
-    margin-bottom: 16px;
-    color: var(--text-main); /* Was #333 */
+    color: var(--text-main);
     padding-left: 8px;
     border-left: 4px solid var(--primary-color);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .section-title {
+        margin-bottom: 0;
+    }
+}
+
+.btn-add-issue {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-color);
+    padding: 6px 12px;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 6px;
 }
 
 /* Simple Chart Visualization */
